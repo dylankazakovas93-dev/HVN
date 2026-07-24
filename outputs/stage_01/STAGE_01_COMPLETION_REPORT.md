@@ -14,7 +14,7 @@ occupancy proxy. Neither is exact exchange volume at price.
 
 - Starting state: empty GitHub repository; no starting SHA.
 - Implementation/source-audit SHA:
-  `62e308a6929d808b4d2e3727b07cd2b92e652d05`.
+  `018038824dfabea5e01b4184bbc990206d483bf7`.
 - Branch: `main`.
 - Remote: `https://github.com/dylankazakovas93-dev/HVN.git`.
 - Final SHA: see `git rev-parse HEAD` after the completion commit.
@@ -114,7 +114,7 @@ python3 -m compileall -q src tests scripts
 git diff --check
 git add .
 git commit -m 'Build deterministic Stage 1 MNQ profile engine'
-PYTHONPATH=src python3 -m hvn.cli synthetic-audit --output outputs/stage_01/synthetic --code-sha 62e308a6929d808b4d2e3727b07cd2b92e652d05
+PYTHONPATH=src python3 -m hvn.cli synthetic-audit --output outputs/stage_01/synthetic --code-sha 018038824dfabea5e01b4184bbc990206d483bf7
 PYTHONPATH=src pytest
 git diff --check
 git add .
