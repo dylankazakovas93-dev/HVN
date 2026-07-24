@@ -25,10 +25,11 @@ def test_forbidden_year_path_access_rejected(name):
         assert_path_not_forbidden(name)
 
 
-def test_instrument_guard_rejects_supplied_nq_archive():
+def test_instrument_guard_accepts_supplied_outright_nq_archive():
     path = Path("/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2025.zip")
     if not path.exists():
         pytest.skip("user-supplied mismatch fixture is unavailable")
     member = "glbx-mdp3-20250101-20260607.ohlcv-1m.csv.zst"
-    with pytest.raises(ValueError, match="non-outright-MNQ"):
-        databento_rows_from_zip(path, member, allowed_year=2025, maximum_rows=1)
+    bars = databento_rows_from_zip(path, member, allowed_year=2025, maximum_rows=1)
+    assert len(bars) == 1
+    assert bars[0].symbol == "NQH5"

@@ -4,7 +4,7 @@ The package is deliberately small and separates causal inputs from deterministic
 derivations.
 
 1. `hvn.io` reads Databento CSV/Zstandard streams with development-year and
-   outright-MNQ guards. Source timestamps are interval starts and are converted
+   outright-NQ guards. Source timestamps are interval starts and are converted
    to completed-bar close times by adding one minute.
 2. `hvn.atr` computes completed one-minute Wilder ATR(24) and exposes the latest
    value available at or before profile source start.
@@ -16,7 +16,10 @@ derivations.
 5. `hvn.hvn` identifies plateaus/local peaks, local median baselines,
    prominence, half-peak node boundaries, and merged touching/overlapping nodes.
 6. `hvn.ledger` emits stable, price-ordered CSV bytes with source row lineage.
-7. `hvn.audit` creates deterministic synthetic engineering audit artifacts.
+7. `reviews/reference_stage_01b` is an independent arithmetic oracle.
+8. Stage 1B reconciliation emits numerical CSV/JSON only. `hvn.audit` and
+   historical SVG artifacts are retained solely as historical Stage 1 code and
+   are not executed or used by the revised gate.
 
 The same `construct_profile` function serves all profile families, allocation
 methods, and authorized ATR ratios.

@@ -1,6 +1,6 @@
 # Project Status
 
-Status: **STAGE 1 BLOCKED — authoritative MNQ data unavailable**
+Status: **STAGE_01_PROFILE_FOUNDATION = PASS**
 
 Implemented:
 
@@ -10,14 +10,19 @@ Implemented:
 - deterministic binning, POC, local prominence, plateaus, boundaries, and
   touching/overlapping node merges;
 - source-row lineage and byte-stable profile ledgers;
-- synthetic numerical/visual audit pack;
+- independent oracle and real NQ numerical reconciliation;
 - deterministic unit and integration tests.
 
-Blocked:
+Authoritative profile/signal market is now NQ. Eventual execution market is MNQ,
+not yet tested. Source roll methodology remains unknown. No later research
+stage has begun.
 
-- empirical audit pack from development MNQ sessions;
-- source-specific contract/roll verification;
-- final Stage 1 PASS and transition authorization.
+Stage 1B evidence:
 
-The supplied files identify `NQ.FUT`, not MNQ. No NQ-to-MNQ substitution was
-made. No later research stage has begun.
+- 6/6 independent oracle fixtures match production;
+- 16/16 real NQ profiles reconcile;
+- exact uniform total: 1,598,303 source and allocated units;
+- exact TPO total: 57,260 expected and actual intersections;
+- all production bins independently equal;
+- all post-freeze hashes equal;
+- all revised gate criteria pass.

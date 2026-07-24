@@ -25,6 +25,26 @@ def test_wilder_atr_24_completed_bars_only(base_time):
     assert atr_before(points, bars[23].close_time) == points[0]
 
 
+def test_wilder_atr_rejects_mixed_contracts(base_time):
+    bars = [
+        make_bar(i, base_time + timedelta(minutes=i), "100", "102", "1")
+        for i in range(1, 25)
+    ]
+    bar = bars[-1]
+    bars[-1] = type(bar)(
+        bar.source_row_id,
+        bar.close_time,
+        bar.open,
+        bar.high,
+        bar.low,
+        bar.close,
+        bar.volume,
+        "NQM5",
+    )
+    with pytest.raises(ValueError, match="one contract symbol"):
+        wilder_atr(bars)
+
+
 @pytest.mark.parametrize(
     ("family", "start", "end"),
     [

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from fractions import Fraction
 from decimal import (
     ROUND_CEILING,
     ROUND_FLOOR,
@@ -21,6 +22,7 @@ from .models import (
 
 TICK_SIZE = Decimal("0.25")
 GRID_ORIGIN = Decimal("0")
+ALLOCATION_QUANTUM = Decimal("1e-50")
 
 
 def rounded_bin_size(atr: Decimal, ratio: Decimal) -> tuple[Decimal, Decimal]:
@@ -107,13 +109,17 @@ def construct_profile(
     timestamp_keys = [(b.close_time, b.symbol) for b in source]
     if len(set(timestamp_keys)) != len(timestamp_keys):
         raise ValueError("duplicate symbol timestamp in source window")
+    if len({b.symbol for b in source}) != 1:
+        raise ValueError("profile construction requires exactly one contract symbol")
     weights: dict[int, Decimal] = {}
     with localcontext() as ctx:
-        ctx.prec = 40
+        ctx.prec = 80
         for bar in source:
             indices = intersected_bin_indices(bar.low, bar.high, size)
             if method == AllocationMethod.UNIFORM_VOLUME:
-                contribution = bar.volume / Decimal(len(indices))
+                contribution = (bar.volume / Decimal(len(indices))).quantize(
+                    ALLOCATION_QUANTUM
+                )
                 contributions = [contribution] * (len(indices) - 1)
                 contributions.append(
                     bar.volume - contribution * Decimal(len(indices) - 1)
@@ -122,23 +128,34 @@ def construct_profile(
                 contributions = [Decimal(1)] * len(indices)
             for index, contribution in zip(indices, contributions):
                 weights[index] = weights.get(index, Decimal(0)) + contribution
-        total_weight = sum(weights.values(), Decimal(0))
+        for index in range(min(weights), max(weights) + 1):
+            weights.setdefault(index, Decimal(0))
         source_total_volume = sum((b.volume for b in source), Decimal(0))
+        if method == AllocationMethod.UNIFORM_VOLUME:
+            exact_allocated = sum((Fraction(value) for value in weights.values()), Fraction(0))
+            exact_source = Fraction(source_total_volume)
+            residual = exact_source - exact_allocated
+            weights[max(weights)] += Decimal(residual.numerator) / Decimal(
+                residual.denominator
+            )
+            if sum((Fraction(value) for value in weights.values()), Fraction(0)) != exact_source:
+                raise AssertionError("uniform allocation failed exact volume conservation")
+            total_weight = source_total_volume
+        else:
+            total_weight = sum(weights.values(), Decimal(0))
     if total_weight <= 0:
         raise ValueError("profile has no positive weight")
     allocated = (
         total_weight if method == AllocationMethod.UNIFORM_VOLUME else Decimal(0)
     )
-    if method == AllocationMethod.UNIFORM_VOLUME and allocated != source_total_volume:
-        tolerance = max(Decimal("1e-25"), source_total_volume * Decimal("1e-30"))
-        if abs(allocated - source_total_volume) > tolerance:
-            raise AssertionError("uniform allocation failed volume conservation")
 
     centers = {i: GRID_ORIGIN + (Decimal(i) + Decimal("0.5")) * size for i in weights}
     weighted_mean = sum(
         (centers[i] * weight for i, weight in weights.items()), Decimal(0)
     ) / total_weight
-    range_mid = (min(b.low for b in source) + max(b.high for b in source)) / Decimal(2)
+    profile_range_low = min(b.low for b in source)
+    profile_range_high = max(b.high for b in source)
+    range_mid = (profile_range_low + profile_range_high) / Decimal(2)
     poc = select_poc(weights, centers, weighted_mean, range_mid)
     cumulative = Decimal(0)
     bins: list[ProfileBin] = []
@@ -167,6 +184,8 @@ def construct_profile(
         bin_ratio,
         raw_size,
         size,
+        profile_range_low,
+        profile_range_high,
         tuple(bins),
         poc,
         row_ids,

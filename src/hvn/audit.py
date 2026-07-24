@@ -10,7 +10,7 @@ from .atr import wilder_atr
 from .engine import construct_profile
 from .hvn import extract_hvns
 from .ledger import write_profile_ledger, write_records
-from .models import AllocationMethod, Bar, ProfileFamily
+from .models import AllocationMethod, Bar, HvnNode, PeakCandidate, ProfileFamily
 from .sessions import profile_window
 
 NY = ZoneInfo("America/New_York")
@@ -142,8 +142,16 @@ def generate_synthetic_audit_pack(
             stem = f"{family.value}__{method.value}"
             ledger = output / f"{stem}__profile.csv"
             write_profile_ledger(profile, ledger)
-            write_records(candidates, output / f"{stem}__candidates.csv")
-            write_records(nodes, output / f"{stem}__nodes.csv")
+            write_records(
+                candidates,
+                output / f"{stem}__candidates.csv",
+                record_type=PeakCandidate,
+            )
+            write_records(
+                nodes,
+                output / f"{stem}__nodes.csv",
+                record_type=HvnNode,
+            )
             svg = output / f"{stem}__audit.svg"
             svg.write_text(_svg(profile, candidates, nodes, bars), encoding="utf-8")
             hashes[stem] = hashlib.sha256(ledger.read_bytes()).hexdigest()

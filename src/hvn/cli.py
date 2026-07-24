@@ -8,7 +8,7 @@ from .audit import generate_synthetic_audit_pack
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="MNQ HVN Stage 1 utilities")
+    parser = argparse.ArgumentParser(description="NQ HVN Stage 1 utilities")
     sub = parser.add_subparsers(dest="command", required=True)
     audit = sub.add_parser("synthetic-audit")
     audit.add_argument("--output", type=Path, default=Path("outputs/stage_01/synthetic"))

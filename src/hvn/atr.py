@@ -12,6 +12,12 @@ def wilder_atr(bars: list[Bar] | tuple[Bar, ...], period: int = 24) -> tuple[Atr
     ordered = sorted(bars, key=lambda b: (b.close_time, b.source_row_id))
     if len({b.source_row_id for b in ordered}) != len(ordered):
         raise ValueError("duplicate source_row_id")
+    symbols = {b.symbol for b in ordered}
+    if len(symbols) > 1:
+        raise ValueError("Wilder ATR requires exactly one contract symbol")
+    timestamp_keys = [(b.close_time, b.symbol) for b in ordered]
+    if len(set(timestamp_keys)) != len(timestamp_keys):
+        raise ValueError("duplicate symbol timestamp in ATR input")
     trs: list[Decimal] = []
     out: list[AtrPoint] = []
     previous_close: Decimal | None = None

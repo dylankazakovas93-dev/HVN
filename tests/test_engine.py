@@ -13,7 +13,7 @@ from hvn.engine import (
     select_poc,
 )
 from hvn.ledger import profile_ledger_bytes
-from hvn.models import AllocationMethod
+from hvn.models import AllocationMethod, Bar
 
 from conftest import fixed_atr, make_bar, simple_window
 
@@ -145,6 +145,63 @@ def test_duplicate_rows_and_timestamps_rejected(base_time):
             AllocationMethod.UNIFORM_VOLUME,
             Decimal("0.10"),
         )
+
+
+def test_mixed_contract_symbols_rejected(base_time):
+    first = make_bar(1, base_time, "100", "100")
+    second = make_bar(2, base_time + timedelta(minutes=1), "101", "101")
+    second = type(second)(
+        second.source_row_id,
+        second.close_time,
+        second.open,
+        second.high,
+        second.low,
+        second.close,
+        second.volume,
+        "NQM5",
+    )
+    with pytest.raises(ValueError, match="one contract symbol"):
+        construct_profile(
+            [first, second],
+            fixed_atr(base_time),
+            simple_window(base_time),
+            AllocationMethod.UNIFORM_VOLUME,
+            Decimal("0.10"),
+        )
+
+
+def test_bar_rejects_non_nq_or_calendar_spread(base_time):
+    for symbol in ("ESM5", "NQH5-NQM5"):
+        with pytest.raises(ValueError, match="outright NQ"):
+            Bar(
+                symbol,
+                base_time,
+                Decimal(100),
+                Decimal(100),
+                Decimal(100),
+                Decimal(100),
+                Decimal(1),
+                symbol,
+            )
+
+
+def test_untraded_bins_inside_profile_range_are_materialized(base_time):
+    profile = construct_profile(
+        [
+            make_bar(1, base_time, "100", "100", "10"),
+            make_bar(2, base_time + timedelta(minutes=1), "102", "102", "10"),
+        ],
+        fixed_atr(base_time),
+        simple_window(base_time),
+        AllocationMethod.UNIFORM_VOLUME,
+        Decimal("0.10"),
+    )
+    assert [bin_.bin_index for bin_ in profile.bins] == [100, 101, 102]
+    assert [bin_.profile_weight for bin_ in profile.bins] == [
+        Decimal(10),
+        Decimal(0),
+        Decimal(10),
+    ]
 
 
 def test_poc_unique_maximum(base_time):

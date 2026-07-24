@@ -5,8 +5,8 @@ proxy. It is not a top-percentile bin set and is not a profitable grade.
 
 Equal-weight adjacent maximum bins form one plateau. A plateau is locally
 eligible only when both adjacent weights are lower (missing edges are treated as
-lower). Its representative uses the POC proximity hierarchy and its full range
-is preserved.
+lower). Its representative uses the POC proximity hierarchy, including the
+actual source-range midpoint, and its full range is preserved.
 
 The local baseline is the median weight of non-plateau bins whose centers lie
 within ±0.50 ATR of the representative center. At least two surrounding bins

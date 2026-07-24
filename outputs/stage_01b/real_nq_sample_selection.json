@@ -1,0 +1,66 @@
+[
+  {
+    "profile_family": "prior_rth",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "523452",
+    "source_bar_count": 390,
+    "source_session_date": "2025-01-06"
+  },
+  {
+    "profile_family": "prior_rth",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "654265",
+    "source_bar_count": 390,
+    "source_session_date": "2025-01-07"
+  },
+  {
+    "profile_family": "full_overnight",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "479425",
+    "source_bar_count": 930,
+    "source_session_date": "2025-01-06"
+  },
+  {
+    "profile_family": "full_overnight",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "562263",
+    "source_bar_count": 930,
+    "source_session_date": "2025-01-07"
+  },
+  {
+    "profile_family": "midnight",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "476794",
+    "source_bar_count": 570,
+    "source_session_date": "2025-01-06"
+  },
+  {
+    "profile_family": "midnight",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "585013",
+    "source_bar_count": 570,
+    "source_session_date": "2025-01-07"
+  },
+  {
+    "profile_family": "opening_hour_rth",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "523452",
+    "source_bar_count": 60,
+    "source_session_date": "2025-01-06"
+  },
+  {
+    "profile_family": "opening_hour_rth",
+    "rule": "greatest outright-contract volume in [source_start-72h, source_start); symbol ascending tie-break",
+    "selected_symbol": "NQH5",
+    "selected_volume": "654265",
+    "source_bar_count": 60,
+    "source_session_date": "2025-01-07"
+  }
+]

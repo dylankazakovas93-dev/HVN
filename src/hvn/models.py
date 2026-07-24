@@ -27,7 +27,7 @@ class Bar:
     low: Decimal
     close: Decimal
     volume: Decimal
-    symbol: str = "MNQ"
+    symbol: str = "NQ"
 
     @property
     def start_time(self) -> datetime:
@@ -42,6 +42,8 @@ class Bar:
             raise ValueError("volume must be nonnegative")
         if not (self.low <= self.open <= self.high and self.low <= self.close <= self.high):
             raise ValueError("OHLC is internally inconsistent")
+        if not self.symbol.startswith("NQ") or "-" in self.symbol:
+            raise ValueError("Bar must represent one outright NQ contract")
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +95,8 @@ class FrozenProfile:
     bin_ratio: Decimal
     bin_size_raw: Decimal
     bin_size_rounded: Decimal
+    profile_range_low: Decimal
+    profile_range_high: Decimal
     bins: tuple[ProfileBin, ...]
     poc_bin_index: int
     source_row_ids: tuple[str, ...]

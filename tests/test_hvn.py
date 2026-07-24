@@ -53,6 +53,8 @@ def manual_profile(weights, *, atr="8", size="1", poc=None):
         Decimal("0.10"),
         Decimal(size),
         Decimal(size),
+        Decimal(0),
+        Decimal(len(weights)) * Decimal(size),
         tuple(bins),
         poc_index,
         ("manual-row",),
@@ -127,3 +129,28 @@ def test_below_threshold_rejected():
     peak = next(c for c in candidates if c.representative_bin_index == 1)
     assert not peak.qualifies
     assert peak.rejection_reason == "below_prominence_threshold"
+
+
+def test_plateau_representative_uses_actual_source_range_midpoint():
+    profile = manual_profile([1, 5, 5, 1])
+    profile = FrozenProfile(
+        profile.profile_id,
+        profile.window,
+        profile.allocation_method,
+        profile.atr_reference_time,
+        profile.atr_value,
+        profile.bin_ratio,
+        profile.bin_size_raw,
+        profile.bin_size_rounded,
+        Decimal("0.9"),
+        Decimal("3.9"),
+        profile.bins,
+        profile.poc_bin_index,
+        profile.source_row_ids,
+        profile.source_total_volume,
+        profile.allocated_total_volume,
+        profile.code_sha,
+        profile.data_partition,
+    )
+    candidate = peak_candidates(profile, Decimal("1.5"))[0]
+    assert candidate.representative_bin_index == 2

@@ -10,12 +10,19 @@ start. Ratios are 0.05, 0.10, and 0.20. For raw size `ATR × ratio`:
 The raw and rounded values are ledger fields and cannot change during formation.
 Insufficient ATR warm-up rejects the profile.
 
+NQ and MNQ both use a 0.25-point minimum tick, but this profile is constructed
+from NQ only. MNQ execution has not been tested.
+
 ## Grid and bar intersection
 
 Grid origin is 0.00. Bins are `[bin_low, bin_high)`. Low maps with floor.
 For a nonzero range, the highest intersected index is `ceil(high / size) - 1`,
 so a high exactly on a boundary does not create a bin above the traded high. A
 zero-range bar maps to exactly `floor(price / size)`.
+
+Every bin from the minimum through maximum observed profile index is
+materialized. Unintersected interior bins have zero weight and participate in
+local-baseline and adjacency calculations.
 
 ## Proxies
 

@@ -1,4 +1,4 @@
-"""Causal, deterministic MNQ profile construction."""
+"""Causal, deterministic NQ profile construction."""
 
 from .engine import construct_profile
 from .hvn import extract_hvns

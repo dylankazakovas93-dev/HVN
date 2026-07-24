@@ -134,3 +134,11 @@ The exact next authorized action is to supply an outright MNQ one-minute OHLCV
 development archive (small 2021, 2023, or 2025/partial-2026 samples are enough)
 with contract/roll documentation, rerun the Stage 1 empirical numerical/visual
 audit, and update criterion 14. Do not begin Stage 2.
+
+## Historical status amended by Stage 1B
+
+This report preserves the original MNQ-authoritative Stage 1 decision and
+blocked result. Stage 1B subsequently authorized NQ as the profile and signal
+market, kept MNQ as an untested eventual execution market, replaced visual gate
+evidence with independent numerical/code reconciliation, and passed the revised
+Stage 1 gate. See `outputs/stage_01b/STAGE_01B_COMPLETION_REPORT.md`.

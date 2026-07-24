@@ -11,7 +11,8 @@ from .models import FrozenProfile, HvnNode, PeakCandidate
 
 def _format(value) -> str:
     if isinstance(value, Decimal):
-        return format(value, "f")
+        text = format(value, "f")
+        return text.rstrip("0").rstrip(".") if "." in text else text
     if hasattr(value, "isoformat"):
         return value.isoformat()
     if isinstance(value, bool):
@@ -24,6 +25,7 @@ def profile_ledger_bytes(profile: FrozenProfile) -> bytes:
         "profile_id", "profile_family", "source_session_date", "source_start",
         "source_end", "freeze_time", "allocation_method", "atr_reference_time",
         "atr_value", "bin_ratio", "bin_size_raw", "bin_size_rounded", "bin_index",
+        "profile_range_low", "profile_range_high",
         "bin_low", "bin_high", "bin_center", "profile_weight", "weight_share",
         "cumulative_weight_share", "is_poc", "source_bar_count",
         "source_row_ids", "source_total_volume", "allocated_total_volume",
@@ -45,6 +47,8 @@ def profile_ledger_bytes(profile: FrozenProfile) -> bytes:
         "bin_ratio": profile.bin_ratio,
         "bin_size_raw": profile.bin_size_raw,
         "bin_size_rounded": profile.bin_size_rounded,
+        "profile_range_low": profile.profile_range_low,
+        "profile_range_high": profile.profile_range_high,
         "source_bar_count": len(profile.source_row_ids),
         "source_row_ids": "|".join(profile.source_row_ids),
         "source_total_volume": profile.source_total_volume,
@@ -63,10 +67,19 @@ def write_profile_ledger(profile: FrozenProfile, destination: Path) -> None:
     destination.write_bytes(profile_ledger_bytes(profile))
 
 
-def write_records(records: tuple[PeakCandidate, ...] | tuple[HvnNode, ...], destination: Path) -> None:
+def write_records(
+    records: tuple[PeakCandidate, ...] | tuple[HvnNode, ...],
+    destination: Path,
+    *,
+    record_type: type[PeakCandidate] | type[HvnNode] | None = None,
+) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if not records:
-        destination.write_text("", encoding="utf-8")
+        if record_type is None:
+            raise ValueError("record_type is required for an empty ledger")
+        fields = list(record_type.__dataclass_fields__)
+        with destination.open("w", newline="", encoding="utf-8") as stream:
+            csv.DictWriter(stream, fieldnames=fields, lineterminator="\n").writeheader()
         return
     fields = list(asdict(records[0]))
     with destination.open("w", newline="", encoding="utf-8") as stream:

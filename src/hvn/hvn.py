@@ -12,7 +12,7 @@ def _representative(profile: FrozenProfile, indices: list[int]) -> int:
     mean = sum(
         (b.bin_center * b.profile_weight for b in profile.bins), Decimal(0)
     ) / total
-    range_mid = (profile.bins[0].bin_low + profile.bins[-1].bin_high) / Decimal(2)
+    range_mid = (profile.profile_range_low + profile.profile_range_high) / Decimal(2)
     return min(
         indices,
         key=lambda i: (

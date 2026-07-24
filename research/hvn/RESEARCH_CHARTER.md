@@ -3,13 +3,17 @@
 ## Objective and classification
 
 This is an original Auction Market Theory-inspired hypothesis. Stage 1's sole
-objective is to construct auditable frozen MNQ historical profile proxies and
+objective is to construct auditable frozen NQ historical profile proxies and
 extract locally prominent HVN zones. It does not test whether an HVN changes
 later behavior.
 
 The primary method is a **uniform bar-volume allocation proxy**, not exact
 exchange volume at price. The secondary method is a **TPO/range-occupancy
-proxy**. MNQ one-minute OHLCV lacks transaction-level volume-at-price.
+proxy**. NQ one-minute OHLCV lacks transaction-level volume-at-price.
+
+Authoritative profile market and signal market are NQ. Eventual execution may
+use MNQ, but portability and execution have not been tested. No identity of NQ
+and MNQ volume distributions is assumed.
 
 ## Stage boundary
 

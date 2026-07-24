@@ -12,7 +12,7 @@ exclusive, and the frozen profile is available immediately after source end.
 
 The generic constructor receives an explicit window. It does not infer a prior
 trading day, holiday, early close, or roll. Those mechanics require an
-authoritative calendar and MNQ contract source. Tests cover both DST transitions,
+authoritative calendar and NQ contract source. Tests cover both DST transitions,
 midnight crossing, and inclusive/exclusive source boundaries.
 
 Only one-minute intervals with

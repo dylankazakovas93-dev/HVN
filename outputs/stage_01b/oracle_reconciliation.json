@@ -1,0 +1,698 @@
+[
+  {
+    "description": "Single/multi-bin uniform allocation with an interior gap",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "individual_allocations": [
+        [
+          "6",
+          "6"
+        ],
+        [
+          "4"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ],
+        [
+          404
+        ]
+      ],
+      "poc": 401,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "6",
+        "401": "6",
+        "402": "0",
+        "403": "0",
+        "404": "4"
+      }
+    },
+    "fixture_id": "O01_uniform_conservation",
+    "input": {
+      "description": "Single/multi-bin uniform allocation with an interior gap",
+      "expected_atr": "2.5",
+      "expected_baseline": null,
+      "expected_individual_allocations": [
+        [
+          "6",
+          "6"
+        ],
+        [
+          "4"
+        ]
+      ],
+      "expected_intersected_bins": [
+        [
+          400,
+          401
+        ],
+        [
+          404
+        ]
+      ],
+      "expected_merge_result": null,
+      "expected_node_boundaries": null,
+      "expected_peak_candidates": null,
+      "expected_poc": 401,
+      "expected_prominence": null,
+      "expected_raw_bin_size": "0.125",
+      "expected_rounded_bin_size": "0.25",
+      "expected_total_weights": {
+        "400": "6",
+        "401": "6",
+        "402": "0",
+        "403": "0",
+        "404": "4"
+      },
+      "fixture_id": "O01_uniform_conservation",
+      "input_bars": [
+        {
+          "high": "100.50",
+          "low": "100.00",
+          "volume": "12"
+        },
+        {
+          "high": "101.00",
+          "low": "101.00",
+          "volume": "4"
+        }
+      ]
+    },
+    "oracle_result": {
+      "individual_allocations": [
+        [
+          "6",
+          "6"
+        ],
+        [
+          "4"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ],
+        [
+          404
+        ]
+      ],
+      "poc": 401,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "6",
+        "401": "6",
+        "402": "0",
+        "403": "0",
+        "404": "4"
+      }
+    },
+    "production_result": {
+      "individual_allocations": [
+        [
+          "6",
+          "6"
+        ],
+        [
+          "4"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ],
+        [
+          404
+        ]
+      ],
+      "poc": 401,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "6",
+        "401": "6",
+        "402": "0",
+        "403": "0",
+        "404": "4"
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "description": "A high exactly on 100.50 excludes bin 402",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "individual_allocations": [
+        [
+          "5",
+          "5"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ]
+      ],
+      "poc": 400,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "5",
+        "401": "5"
+      }
+    },
+    "fixture_id": "O02_boundary_high_exclusion",
+    "input": {
+      "description": "A high exactly on 100.50 excludes bin 402",
+      "expected_atr": "2.5",
+      "expected_baseline": null,
+      "expected_individual_allocations": [
+        [
+          "5",
+          "5"
+        ]
+      ],
+      "expected_intersected_bins": [
+        [
+          400,
+          401
+        ]
+      ],
+      "expected_merge_result": null,
+      "expected_node_boundaries": null,
+      "expected_peak_candidates": null,
+      "expected_poc": 400,
+      "expected_prominence": null,
+      "expected_raw_bin_size": "0.125",
+      "expected_rounded_bin_size": "0.25",
+      "expected_total_weights": {
+        "400": "5",
+        "401": "5"
+      },
+      "fixture_id": "O02_boundary_high_exclusion",
+      "input_bars": [
+        {
+          "high": "100.50",
+          "low": "100.00",
+          "volume": "10"
+        }
+      ]
+    },
+    "oracle_result": {
+      "individual_allocations": [
+        [
+          "5",
+          "5"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ]
+      ],
+      "poc": 400,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "5",
+        "401": "5"
+      }
+    },
+    "production_result": {
+      "individual_allocations": [
+        [
+          "5",
+          "5"
+        ]
+      ],
+      "intersected_bins": [
+        [
+          400,
+          401
+        ]
+      ],
+      "poc": 400,
+      "raw_bin_size": "0.125",
+      "rounded_bin_size": "0.25",
+      "total_weights": {
+        "400": "5",
+        "401": "5"
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "description": "Equal maxima resolved by proxy-weighted mean",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "101": "0",
+        "102": "10",
+        "99": "9"
+      }
+    },
+    "fixture_id": "O03_poc_weighted_mean",
+    "input": {
+      "description": "Equal maxima resolved by proxy-weighted mean",
+      "expected_atr": null,
+      "expected_baseline": null,
+      "expected_individual_allocations": null,
+      "expected_intersected_bins": null,
+      "expected_merge_result": null,
+      "expected_node_boundaries": null,
+      "expected_peak_candidates": null,
+      "expected_poc": 100,
+      "expected_prominence": null,
+      "expected_raw_bin_size": "1",
+      "expected_rounded_bin_size": "1",
+      "expected_total_weights": {
+        "100": "10",
+        "101": "0",
+        "102": "10",
+        "99": "9"
+      },
+      "fixture_id": "O03_poc_weighted_mean",
+      "input_profile_weights": {
+        "100": "10",
+        "101": "0",
+        "102": "10",
+        "99": "9"
+      },
+      "source_high": "102",
+      "source_low": "99"
+    },
+    "oracle_result": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "101": "0",
+        "102": "10",
+        "99": "9"
+      }
+    },
+    "production_result": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "101": "0",
+        "102": "10",
+        "99": "9"
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "description": "Weighted-mean and range-midpoint ties fall to lower price",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "102": "10"
+      }
+    },
+    "fixture_id": "O04_poc_midpoint_lower",
+    "input": {
+      "description": "Weighted-mean and range-midpoint ties fall to lower price",
+      "expected_atr": null,
+      "expected_baseline": null,
+      "expected_individual_allocations": null,
+      "expected_intersected_bins": null,
+      "expected_merge_result": null,
+      "expected_node_boundaries": null,
+      "expected_peak_candidates": null,
+      "expected_poc": 100,
+      "expected_prominence": null,
+      "expected_raw_bin_size": "1",
+      "expected_rounded_bin_size": "1",
+      "expected_total_weights": {
+        "100": "10",
+        "102": "10"
+      },
+      "fixture_id": "O04_poc_midpoint_lower",
+      "input_profile_weights": {
+        "100": "10",
+        "102": "10"
+      },
+      "source_high": "103",
+      "source_low": "100"
+    },
+    "oracle_result": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "102": "10"
+      }
+    },
+    "production_result": {
+      "poc": 100,
+      "total_weights": {
+        "100": "10",
+        "102": "10"
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "description": "Known flat peak, median baseline, prominence, and node",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "nodes": [
+        {
+          "constituent_count": 1,
+          "high": "3",
+          "left": 1,
+          "low": "1",
+          "right": 2,
+          "share": null,
+          "weight": "10"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "2",
+          "end": 2,
+          "prominence": "2.5",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "2",
+        "5",
+        "5",
+        "2"
+      ]
+    },
+    "fixture_id": "O05_flat_plateau",
+    "input": {
+      "description": "Known flat peak, median baseline, prominence, and node",
+      "expected_atr": "8",
+      "expected_baseline": "2",
+      "expected_individual_allocations": null,
+      "expected_intersected_bins": null,
+      "expected_merge_result": {
+        "node_count": 1,
+        "weight": "10"
+      },
+      "expected_node_boundaries": [
+        {
+          "high": "3",
+          "low": "1"
+        }
+      ],
+      "expected_peak_candidates": [
+        {
+          "end": 2,
+          "representative": 1,
+          "start": 1
+        }
+      ],
+      "expected_poc": 1,
+      "expected_prominence": "2.5",
+      "expected_raw_bin_size": "1",
+      "expected_rounded_bin_size": "1",
+      "expected_total_weights": [
+        "2",
+        "5",
+        "5",
+        "2"
+      ],
+      "fixture_id": "O05_flat_plateau",
+      "input_profile_weights": [
+        "2",
+        "5",
+        "5",
+        "2"
+      ],
+      "source_high": "4",
+      "source_low": "0"
+    },
+    "oracle_result": {
+      "nodes": [
+        {
+          "constituent_count": 1,
+          "high": "3",
+          "left": 1,
+          "low": "1",
+          "right": 2,
+          "share": "0.7142857142857142857142857143",
+          "weight": "10"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "2",
+          "end": 2,
+          "prominence": "2.5",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "2",
+        "5",
+        "5",
+        "2"
+      ]
+    },
+    "production_result": {
+      "nodes": [
+        {
+          "constituent_count": 1,
+          "high": "3",
+          "left": 1,
+          "low": "1",
+          "right": 2,
+          "share": "0.7142857142857142857142857143",
+          "weight": "10"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "2",
+          "end": 2,
+          "prominence": "2.5",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "2",
+        "5",
+        "5",
+        "2"
+      ]
+    },
+    "status": "PASS"
+  },
+  {
+    "description": "Two equal peaks expand into one merged node without double count",
+    "exact_difference": {
+      "oracle": [],
+      "production": []
+    },
+    "expected": {
+      "nodes": [
+        {
+          "constituent_count": 2,
+          "high": "4",
+          "left": 1,
+          "low": "1",
+          "right": 3,
+          "share": null,
+          "weight": "21"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "3",
+          "end": 1,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        },
+        {
+          "baseline": "3",
+          "end": 3,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 3,
+          "start": 3
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "1",
+        "8",
+        "5",
+        "8",
+        "1"
+      ]
+    },
+    "fixture_id": "O06_overlapping_nodes",
+    "input": {
+      "description": "Two equal peaks expand into one merged node without double count",
+      "expected_atr": "8",
+      "expected_baseline": "3",
+      "expected_individual_allocations": null,
+      "expected_intersected_bins": null,
+      "expected_merge_result": {
+        "constituent_count": 2,
+        "node_count": 1,
+        "weight": "21"
+      },
+      "expected_node_boundaries": [
+        {
+          "high": "4",
+          "low": "1"
+        }
+      ],
+      "expected_peak_candidates": [
+        {
+          "end": 1,
+          "representative": 1,
+          "start": 1
+        },
+        {
+          "end": 3,
+          "representative": 3,
+          "start": 3
+        }
+      ],
+      "expected_poc": 1,
+      "expected_prominence": "2.666666666666666666666666667",
+      "expected_raw_bin_size": "1",
+      "expected_rounded_bin_size": "1",
+      "expected_total_weights": [
+        "1",
+        "8",
+        "5",
+        "8",
+        "1"
+      ],
+      "fixture_id": "O06_overlapping_nodes",
+      "input_profile_weights": [
+        "1",
+        "8",
+        "5",
+        "8",
+        "1"
+      ],
+      "source_high": "5",
+      "source_low": "0"
+    },
+    "oracle_result": {
+      "nodes": [
+        {
+          "constituent_count": 2,
+          "high": "4",
+          "left": 1,
+          "low": "1",
+          "right": 3,
+          "share": "0.9130434782608695652173913043",
+          "weight": "21"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "3",
+          "end": 1,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        },
+        {
+          "baseline": "3",
+          "end": 3,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 3,
+          "start": 3
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "1",
+        "8",
+        "5",
+        "8",
+        "1"
+      ]
+    },
+    "production_result": {
+      "nodes": [
+        {
+          "constituent_count": 2,
+          "high": "4",
+          "left": 1,
+          "low": "1",
+          "right": 3,
+          "share": "0.9130434782608695652173913043",
+          "weight": "21"
+        }
+      ],
+      "peak_candidates": [
+        {
+          "baseline": "3",
+          "end": 1,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 1,
+          "start": 1
+        },
+        {
+          "baseline": "3",
+          "end": 3,
+          "prominence": "2.666666666666666666666666667",
+          "qualifies": true,
+          "representative": 3,
+          "start": 3
+        }
+      ],
+      "poc": 1,
+      "total_weights": [
+        "1",
+        "8",
+        "5",
+        "8",
+        "1"
+      ]
+    },
+    "status": "PASS"
+  }
+]

@@ -6,7 +6,7 @@ Databento `ohlcv-1m` `ts_event` denotes the interval start. The ingestion
 adapter adds one minute and stores the result as `Bar.close_time`; only that
 completed-bar time is used for causality.
 
-## D-002 — Instrument guard
+## D-002 — Original Stage 1 instrument guard (historical)
 
 The authoritative instrument is MNQ. Outright symbols must begin with `MNQ` and
 must not contain `-`. NQ and calendar spreads are rejected. The supplied
@@ -36,3 +36,35 @@ The generic engine consumes an explicitly selected source window and already
 selected outright MNQ bars. Holiday calendars, early closes, and causal
 front-contract selection are upstream responsibilities and remain blocked
 pending authoritative MNQ data documentation. No silent roll stitching occurs.
+
+## D-007 — Stage 1B authoritative-instrument amendment
+
+Effective 2026-07-24:
+
+```text
+AUTHORITATIVE PROFILE MARKET = NQ
+AUTHORITATIVE SIGNAL MARKET = NQ
+EVENTUAL EXECUTION MARKET = MNQ, NOT YET TESTED
+```
+
+This supersedes D-002 and the MNQ portions of D-006 for new work without
+erasing the historical decision. NQ and MNQ volume distributions are not
+assumed identical. No MNQ execution or NQ-to-MNQ portability test has occurred.
+Only outright NQ contracts may enter one profile. Calendar spreads are excluded
+and recorded.
+
+## D-008 — Causal audit-sample contract selection
+
+For a real-data profile, choose the outright NQ contract with greatest
+aggregate volume in a fixed 72-hour lookback ending at profile source start.
+Ties resolve by symbol. Selection therefore uses no source-window or
+post-freeze information. This is an audit-sample rule, not a claim about the
+vendor's roll methodology, which remains `UNKNOWN`.
+
+## D-009 — Stage 1B conformance corrections
+
+Independent inspection recorded F-01 through F-04 in
+`reviews/STAGE_01B_FINDINGS.md` before correction. The engine now rejects mixed
+contract symbols, materializes zero-weight bins across the full profile range,
+and uses actual source-range midpoint for plateau tie-breaking. These are
+conformance fixes, not changes to the research hypothesis.

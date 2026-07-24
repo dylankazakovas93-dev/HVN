@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mnq-hvn"
+name = "nq-hvn"
 version = "0.1.0"
-description = "Deterministic historical profile and HVN construction for MNQ one-minute OHLCV"
+description = "Deterministic historical profile and HVN construction for NQ one-minute OHLCV"
 requires-python = ">=3.11"
 dependencies = []
 
