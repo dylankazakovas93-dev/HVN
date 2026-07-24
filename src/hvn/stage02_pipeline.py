@@ -97,6 +97,21 @@ class ContractSelector:
         return min(volumes, key=lambda symbol: (-volumes[symbol], symbol))
 
 
+class AtrSelector:
+    def __init__(self, points) -> None:
+        self.points = tuple(points)
+        self.times = tuple(point.available_time for point in self.points)
+
+    def before(self, timestamp: datetime):
+        index = bisect_left(self.times, timestamp)
+        if index < len(self.times) and self.times[index] == timestamp:
+            return self.points[index]
+        index -= 1
+        if index < 0:
+            raise ValueError("insufficient completed ATR warm-up")
+        return self.points[index]
+
+
 def trading_dates(bars: tuple[Bar, ...]) -> tuple[date, ...]:
     counts: dict[tuple[date, str], int] = defaultdict(int)
     for bar in bars:
@@ -240,6 +255,9 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
         symbol: wilder_atr(symbol_bars)
         for symbol, symbol_bars in bars_by_symbol.items()
     }
+    atr_selectors = {
+        symbol: AtrSelector(points) for symbol, points in atr_by_symbol.items()
+    }
     selector = ContractSelector(bars_by_symbol)
     result = YearResult([], [], [], [], [], [], [], [])
     seen_controls: set[tuple[str, str, str]] = set()
@@ -310,7 +328,7 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                     try:
                         profile = construct_profile(
                             source,
-                            atr_by_symbol[symbol],
+                            (atr_selectors[symbol].before(pwindow.source_start),),
                             pwindow,
                             method,
                             ratio,
@@ -406,9 +424,7 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                             if interaction and interaction.touched and interaction.bar:
                                 event_id = "E-" + hashlib.sha256(opportunity_id.encode()).hexdigest()[:20]
                                 try:
-                                    atr_point = atr_before(
-                                        atr_by_symbol[symbol], interaction.event_time
-                                    )
+                                    atr_point = atr_selectors[symbol].before(interaction.event_time)
                                     features = pre_touch_features(
                                         context_bars,
                                         touch_bar=interaction.bar,
@@ -538,6 +554,8 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                                 "touched": False,
                                             }
                                         )
+                                    else:
+                                        continue
                                     czone = Zone(
                                         control.control_zone_id,
                                         price_to_ticks(control.low),
@@ -562,7 +580,7 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                     ceid = "CE-" + hashlib.sha256(
                                         "|".join(control_event_key).encode()
                                     ).hexdigest()[:20]
-                                    atr_point = atr_before(atr_by_symbol[symbol], ci.event_time)
+                                    atr_point = atr_selectors[symbol].before(ci.event_time)
                                     cf = pre_touch_features(
                                         context_bars,
                                         touch_bar=ci.bar,

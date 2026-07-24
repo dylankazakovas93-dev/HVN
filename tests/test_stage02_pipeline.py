@@ -3,7 +3,8 @@ from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 from hvn.models import Bar
-from hvn.stage02_pipeline import ContractSelector, choose_contract, trading_dates
+from hvn.models import AtrPoint
+from hvn.stage02_pipeline import AtrSelector, ContractSelector, choose_contract, trading_dates
 
 NY = ZoneInfo("America/New_York")
 
@@ -38,3 +39,14 @@ def test_trading_dates_require_substantial_rth_coverage():
         for index in range(300)
     )
     assert trading_dates(bars) == (start.date(),)
+
+
+def test_indexed_atr_selector_includes_exact_available_time():
+    start = datetime(2025, 1, 6, 9, 30, tzinfo=NY)
+    points = (
+        AtrPoint(start, Decimal(1)),
+        AtrPoint(start + timedelta(minutes=1), Decimal(2)),
+    )
+    selector = AtrSelector(points)
+    assert selector.before(start).value == 1
+    assert selector.before(start + timedelta(seconds=30)).value == 1
