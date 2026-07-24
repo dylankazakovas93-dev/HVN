@@ -2,8 +2,9 @@
 
 Status: **LOCKED — NOT YET EVALUATED**
 
+Amended before empirical access by `STAGE_02_SPECIFICATION_AMENDMENT_01`.
 Each relationship R01–R05 is evaluated independently using primary
-within-session matches. A relationship advances only if G01–G08 all pass.
+cross-session matches. A relationship advances only if G01–G08 all pass.
 `UNDERPOWERED` is distinct from `FAIL`.
 
 ## G01 — sample support
@@ -11,6 +12,9 @@ within-session matches. A relationship advances only if G01–G08 all pass.
 Pass requires at least 100 pooled matched pairs and at least 20 matched pairs
 in at least three supplied development years. If the thresholds are missed,
 G01 is `UNDERPOWERED`, not a negative-effect failure.
+
+All G01–G08 calculations use cross-session pairs only. Same-session descriptive
+results cannot rescue any gate.
 
 ## G02 — primary pooled effect
 

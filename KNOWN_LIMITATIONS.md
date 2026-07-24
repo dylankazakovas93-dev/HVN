@@ -18,3 +18,7 @@
   were not regenerated or reviewed.
 - Stage 1 includes no return labels, revisit logic, residence calculation,
   controls, MFE/MAE, trades, costs, or validation.
+- Stage 2 primary controls come from different interaction dates. Matching and
+  session-pair inference cannot eliminate unmeasured cross-session regimes.
+- Same-session Stage 2 comparisons share a market path and may have overlapping
+  forward windows. They are descriptive and cannot enter advancement gates.

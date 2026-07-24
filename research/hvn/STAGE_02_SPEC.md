@@ -2,6 +2,10 @@
 
 Status: **LOCKED BEFORE EMPIRICAL RESULTS**
 
+Amended before empirical access by `STAGE_02_SPECIFICATION_AMENDMENT_01`.
+Cross-session matching is primary; same-session matching is descriptive
+secondary. The amendment artifact preserves the original contradiction.
+
 Lock date: 2026-07-24  
 Required starting SHA: `697779c958f817a251b52721f1c82011c402e407`  
 Branch: `stage-02-hvn-acceptance`
@@ -168,9 +172,9 @@ aggregation; failed and rerun checkpoints remain in the run registry.
   defines the 25th and 75th percentiles, using exact Decimal arithmetic.
 - “Within 5 minutes” for episode clustering is an absolute touch-time
   difference of at most five minutes.
-- Nonoverlapping 120-minute forward windows have disjoint half-open time
-  intervals; boundary adjacency is permitted.
+- Primary pairs use different interaction-session dates, so their forward
+  windows are temporally distinct without a pairwise overlap test. Secondary
+  same-session overlap is measured and reported, not rejected.
 - All empirical redesigns after this lock belong to a new research generation.
   A genuine implementation defect may be corrected only with a documented
   finding, failing regression fixture, minimal fix, and affected reruns.
-

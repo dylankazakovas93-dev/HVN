@@ -2,6 +2,8 @@
 
 Status: **LOCKED BEFORE EMPIRICAL RESULTS**
 
+Amended before empirical access by `STAGE_02_SPECIFICATION_AMENDMENT_01`.
+
 ## Candidate enumeration
 
 Controls use only the same frozen profile as the treated HVN. For a treated
@@ -71,29 +73,29 @@ First touch, classification, features, censoring, and forward metrics use the
 identical event specification as HVNs. Complete control opportunity and event
 ledgers are saved; matching is not a retention filter.
 
-## Primary within-session matching
+## Primary cross-session matching
 
 Primary matching is run independently for C01 and C02 and exactly within:
 
 ```text
-source profile
-interaction session
 relationship
 allocation method
 bin ratio
 prominence threshold
 data year
+approach side
+zone width in bins
 ```
 
-A pair requires equal width in bins, the same approach side, two genuine
-approach events, complete 30-minute primary outcomes, available matching
-features, and disjoint half-open 120-minute forward intervals. `START_INSIDE`
-is excluded. A control cannot be reused within a control family.
+A pair must use different interaction-session dates. It requires two genuine
+approach events, complete outcomes, and available matching features.
+`START_INSIDE` is excluded. A control cannot be reused within a
+relationship/method/ratio/prominence/year/control-family lane.
 
 Treated events are processed in stable order:
 
 ```text
-interaction date, touch time, profile_id, node_id, event_id
+year, interaction date, touch time, profile_id, node_id, event_id
 ```
 
 The fixed distance is:
@@ -105,46 +107,40 @@ D =
 + 1.0 * abs(15m pre-touch path-efficiency difference)
 + 0.5 * abs(interaction-open-distance difference in ATR)
 + 0.5 * abs(POC-distance difference in ATR)
++ 1.0 * abs(ATR-at-touch proportional difference)
 ```
 
 Calipers are:
 
-- touch-time difference at most 60 minutes;
+- interaction-window minute difference at most 60 minutes;
 - absolute pre-touch displacement difference at most `0.75 ATR`;
-- interaction-open-distance difference at most `1.00 ATR`.
+- interaction-open-distance difference at most `1.00 ATR`;
+- ATR-at-touch proportional difference at most `0.20`.
 
 The lowest distance wins; `control_event_id` is the final tie-break. No
 forward metric, touch outcome after event confirmation, or other
-post-treatment feature enters eligibility, ranking, or calipers.
+post-treatment feature enters eligibility, ranking, or calipers. No pairwise
+forward-window overlap check is imposed because primary dates differ. Complete
+15/30/60/120-minute outcomes remain mandatory.
 
-## Secondary cross-session matching
+## Secondary same-session matching
 
-Only treated events unmatched by primary matching enter a separately labelled
-secondary procedure. It matches within relationship, method, ratio,
-prominence, and year, across sessions.
+Secondary matching is separately labelled and descriptive. It requires the
+same source profile, interaction session, relationship, method, ratio,
+prominence, width, and approach side, with interaction-window minute
+difference at most 60 and no control reuse.
 
-It requires equal bin width, same approach side, genuine approaches, touch-time
-difference at most 30 clock minutes-of-session, ATR-at-touch proportional
-difference at most `0.20`, complete primary outcomes, and no control reuse.
-
-```text
-ATR proportional difference =
-abs(treated_ATR - control_ATR) / treated_ATR
-```
-
-The primary distance is used with:
-
-```text
-+ 1.0 * ATR proportional difference
-```
-
-The same deterministic tie-break applies. Primary and secondary match ledgers
-and results remain distinct; only primary evidence is authoritative for gates.
+It uses the original distance without the ATR term. Treated/control zones must
+not overlap or touch, and definition duplicates in one economic episode cannot
+pair. Overlapping forward windows are permitted; overlap is reported at
+15/30/60/120 minutes and results are separated by overlap status where
+observations exist. Secondary results cannot enter G01–G08.
 
 ## Match quality
 
 Every lane reports treated events, available controls, pairs, match rate,
-unmatched reasons, reuse count, distance distribution, caliper failures, and
+unmatched reasons, reuse count, touch-time, ATR, displacement, path-efficiency,
+interaction-open, and POC difference distributions, caliper failures, and
 pre/post balance for every matching covariate.
 
 For a covariate:
@@ -185,4 +181,3 @@ episode, and represented methods, ratios, and prominence thresholds. Events
 never cluster across contracts. Configuration-level inference retains its own
 events. Cross-configuration summaries use episodes and do not treat duplicate
 definitions as independent.
-

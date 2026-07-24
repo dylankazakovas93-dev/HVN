@@ -68,3 +68,13 @@ Independent inspection recorded F-01 through F-04 in
 contract symbols, materializes zero-weight bins across the full profile range,
 and uses actual source-range midpoint for plateau tie-breaking. These are
 conformance fixes, not changes to the research hypothesis.
+
+## D-010 — Stage 2 cross-session primary matching amendment
+
+Before any Stage 2 empirical access, the original same-session primary rules
+were found to require both touch-time difference at most 60 minutes and
+nonoverlapping 120-minute forward windows, which is impossible. Authorized
+`STAGE_02_SPECIFICATION_AMENDMENT_01` makes different-session matching primary
+and same-session matching descriptive secondary. All Stage 2 gates use only
+cross-session pairs. The original defect and its non-empirical detection are
+preserved in `research/hvn/STAGE_02_AMENDMENT_01.md`.

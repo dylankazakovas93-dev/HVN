@@ -2,6 +2,8 @@
 
 Status: **LOCKED BEFORE EMPIRICAL RESULTS**
 
+Amended before empirical access by `STAGE_02_SPECIFICATION_AMENDMENT_01`.
+
 ## Estimands
 
 All comparisons are paired treated minus matched control. Expected signs are:
@@ -18,8 +20,8 @@ All comparisons are paired treated minus matched control. Expected signs are:
 | clean-exit time | positive |
 
 The primary estimand is the mean paired difference in
-`inside_close_share_30` from primary within-session matches. C01 and C02 are
-separate estimands. Secondary cross-session results are labelled sensitivity
+`inside_close_share_30` from primary cross-session matches. C01 and C02 are
+separate estimands. Secondary same-session results are descriptive sensitivity
 evidence and do not enter advancement gates.
 
 ## Required reporting cells
@@ -41,14 +43,20 @@ The median is the ordinary middle value or mean of two middle values. Quartiles
 and IQR use exact type-7 interpolation. Sample standard deviation uses `n-1`
 and is null for fewer than two pairs.
 
-## Session-block bootstrap
+## Session-pair block bootstrap
 
 The deterministic seed is `20260724` and the resample count is `10,000`.
-The block is `(relationship_id, interaction_session_date)` within the reporting
-lane. Every pair is assigned to its treated event’s session. A replicate draws
-the observed number of distinct session blocks with replacement and includes
-all pairs in every selected block, including multiplicity. The replicate
-statistic is the pair-weighted arithmetic mean, not a mean of session means.
+The primary block is the stable
+`(treated_interaction_session_date, control_interaction_session_date)` pair
+within the reporting lane. A replicate draws the observed number of distinct
+session-pair blocks with replacement and includes all matched pairs and all
+definition-level rows in their economic episodes, including multiplicity. The
+replicate statistic is pair-weighted, not a mean of block means.
+
+A two-way sensitivity separately resamples treated-session and control-session
+dependence. If a valid two-way clustered bootstrap is unavailable, only the
+documented session-pair block bootstrap is authoritative and residual
+cross-pair session dependence is a stated limitation.
 
 Randomness uses a documented stable PRNG and stable sorted block order.
 Intervals are the type-7 2.5th and 97.5th percentiles of valid replicate means.
@@ -105,7 +113,7 @@ remaining pairs in each diagnostic.
 
 The six G05 candidates are mean overlap share, midpoint crossings, path
 efficiency, continuous residence, re-entry, and clean-exit time. A metric
-supports the interpretation when its primary within-session pooled mean paired
+supports the interpretation when its primary cross-session pooled mean paired
 difference has the expected sign and its session-block 95% interval does not
 cross zero. A major contradiction is the opposite sign with an interval
 excluding zero. Residence/exit comparisons use pairs for which both treated
@@ -127,4 +135,3 @@ Stable sorts precede aggregation. Decimal inputs remain exact through paired
 differences; documented numerical conversion may be used only inside bootstrap
 mean/quantile calculations and is verified against deterministic fixtures.
 A byte-identical complete rerun is required.
-

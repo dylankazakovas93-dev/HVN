@@ -1,6 +1,6 @@
 # Project Status
 
-Status: **STAGE_01_PROFILE_FOUNDATION = PASS**
+Status: **STAGE_02 IMPLEMENTATION — AMENDMENT 01 AUTHORIZED**
 
 Implemented:
 
@@ -13,9 +13,11 @@ Implemented:
 - independent oracle and real NQ numerical reconciliation;
 - deterministic unit and integration tests.
 
-Authoritative profile/signal market is now NQ. Eventual execution market is MNQ,
-not yet tested. Source roll methodology remains unknown. No later research
-stage has begun.
+Authoritative profile/signal market is NQ. Eventual execution market is MNQ,
+not yet tested. Source roll methodology remains unknown. Stage 2 specifications
+and event/control/metric code are committed; empirical access has not begun.
+Cross-session matching is primary under Amendment 01. Same-session matching is
+descriptive secondary.
 
 Stage 1B evidence:
 
