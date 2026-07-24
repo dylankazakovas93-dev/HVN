@@ -1,0 +1,2 @@
+candidate_id,start_bin_index,end_bin_index,representative_bin_index,peak_price,peak_weight,local_baseline,prominence_ratio,baseline_bin_indices,qualifies,rejection_reason
+67c5dabe9544eae86290-P001,42000,42000,42000,21000.250,360,20,18,"(41996, 41997, 41998, 42002, 42003, 42004)",true,

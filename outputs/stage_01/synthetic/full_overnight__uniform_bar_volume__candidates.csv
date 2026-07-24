@@ -1,0 +1,3 @@
+candidate_id,start_bin_index,end_bin_index,representative_bin_index,peak_price,peak_weight,local_baseline,prominence_ratio,baseline_bin_indices,qualifies,rejection_reason
+f20d56955adf51368c48-P001,41994,41994,41994,20997.250,230,10,23,"(41992, 41993, 41995, 41996, 41997, 41998)",true,
+f20d56955adf51368c48-P002,42006,42006,42006,21003.250,230,10,23,"(42002, 42003, 42004, 42005, 42007, 42008)",true,

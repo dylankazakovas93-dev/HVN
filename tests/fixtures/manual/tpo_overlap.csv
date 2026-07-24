@@ -1,0 +1,3 @@
+source_row_id,low,high,volume,expected_intersected_bins
+manual-t-1,100.00,100.25,999,400
+manual-t-2,100.00,100.50,1,400|401

@@ -1,0 +1,8 @@
+access_id,timestamp_utc,path,operation,years_whose_market_rows_parsed,row_scope,result
+PA-001,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2021.zip,sha256_and_archive_member_listing,none,none,"mixed-year member name revealed; no market row parsed by this operation"
+PA-002,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2023.zip,sha256_and_archive_member_listing,none,none,"mixed-year member name revealed; no market row parsed by this operation"
+PA-003,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2025.zip,sha256_archive_listing_and_metadata,none,none,"metadata identifies NQ.FUT"
+PA-004,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2021.zip,stream_header_and_first_five_rows,2021,5,"symbols identify NQ outright/contract data"
+PA-005,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2023.zip,stream_header_and_first_row,2023,1,"symbol identifies NQ calendar spread"
+PA-006,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2025.zip,stream_header_and_first_row,2025,1,"symbol identifies NQ outright data"
+PA-007,2026-07-24T00:00:00Z,/Users/mariusvidziunas/Downloads/quant-data-upload/NQ/nq2025.zip,guarded_ingestion_test,2025,1,"rejected first NQ row before constructing any Bar"

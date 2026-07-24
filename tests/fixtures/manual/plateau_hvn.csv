@@ -1,0 +1,5 @@
+bin_index,bin_low,bin_high,profile_weight,is_plateau
+0,0,1,1,false
+1,1,2,5,true
+2,2,3,5,true
+3,3,4,1,false

@@ -1,0 +1,10 @@
+{
+  "project": "standalone_mnq_hvn",
+  "timezone": "America/New_York",
+  "development": [2019, 2021, 2023, 2025, 2026],
+  "development_2026_is_partial": true,
+  "first_frozen_validation": [2020, 2022],
+  "final_untouched_holdout": [2024],
+  "stage_01_allowed_inputs": ["synthetic", "small_documented_development_mnq_sessions"],
+  "stage_01_forbidden_years": [2020, 2022, 2024]
+}

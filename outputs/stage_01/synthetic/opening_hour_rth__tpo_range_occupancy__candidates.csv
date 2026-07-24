@@ -1,0 +1,3 @@
+candidate_id,start_bin_index,end_bin_index,representative_bin_index,peak_price,peak_weight,local_baseline,prominence_ratio,baseline_bin_indices,qualifies,rejection_reason
+8972f5a717f41964e53b-P001,42000,42000,42000,21000.250,20,1,20,"(41996, 41997, 41998, 42001, 42002, 42003, 42004)",true,
+8972f5a717f41964e53b-P002,42002,42002,42002,21001.250,19,1,19,"(41998, 42000, 42001, 42003, 42004, 42006)",true,

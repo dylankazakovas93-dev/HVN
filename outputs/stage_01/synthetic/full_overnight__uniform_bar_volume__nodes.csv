@@ -1,0 +1,3 @@
+hvn_id,hvn_low,hvn_high,hvn_center,hvn_width,peak_price,peak_weight,local_baseline,prominence_ratio,node_total_weight,node_weight_share,node_bin_count,constituent_candidate_ids,representative_candidate_id
+f20d56955adf51368c48-H001,20997.00,20997.50,20997.25,0.50,20997.250,230,10,23,230,0.3833333333333333333333333333,1,"('f20d56955adf51368c48-P001',)",f20d56955adf51368c48-P001
+f20d56955adf51368c48-H002,21003.00,21003.50,21003.25,0.50,21003.250,230,10,23,230,0.3833333333333333333333333333,1,"('f20d56955adf51368c48-P002',)",f20d56955adf51368c48-P002

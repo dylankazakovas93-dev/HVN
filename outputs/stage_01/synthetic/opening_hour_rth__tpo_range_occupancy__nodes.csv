@@ -1,0 +1,2 @@
+hvn_id,hvn_low,hvn_high,hvn_center,hvn_width,peak_price,peak_weight,local_baseline,prominence_ratio,node_total_weight,node_weight_share,node_bin_count,constituent_candidate_ids,representative_candidate_id
+8972f5a717f41964e53b-H001,21000.00,21001.50,21000.75,1.50,21000.250,20,1,20,49,0.8166666666666666666666666667,3,"('8972f5a717f41964e53b-P001', '8972f5a717f41964e53b-P002')",8972f5a717f41964e53b-P001

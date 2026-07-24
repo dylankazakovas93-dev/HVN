@@ -1,0 +1,2 @@
+hvn_id,hvn_low,hvn_high,hvn_center,hvn_width,peak_price,peak_weight,local_baseline,prominence_ratio,node_total_weight,node_weight_share,node_bin_count,constituent_candidate_ids,representative_candidate_id
+d1fbd64a08d2b65b75d1-H001,21000.00,21001.00,21000.50,1.00,21000.250,240,10,24,480,0.8,2,"('d1fbd64a08d2b65b75d1-P001',)",d1fbd64a08d2b65b75d1-P001

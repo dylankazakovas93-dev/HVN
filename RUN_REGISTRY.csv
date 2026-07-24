@@ -1,0 +1,7 @@
+run_id,timestamp_utc,git_sha,dataset_hash,stage,profile_family,allocation_method,bin_ratio,prominence_threshold,session_sample,command,status,selected,notes
+S01-ENG-001,2026-07-24T09:10:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,all,all,synthetic,PYTHONPATH=src pytest,failed,false,"47 passed; one hand-calculated median expectation corrected"
+S01-ENG-002,2026-07-24T09:18:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,all,all,synthetic,PYTHONPATH=src pytest,passed,false,"48 passed"
+S01-AUD-001,2026-07-24T09:19:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,0.10,1.5,synthetic_all_families,PYTHONPATH=src python3 -m hvn.cli synthetic-audit --output outputs/stage_01/synthetic,failed,false,"module entry point omitted; produced no artifacts"
+S01-AUD-002,2026-07-24T09:20:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,0.10,1.5,synthetic_all_families,PYTHONPATH=src python3 -m hvn.cli synthetic-audit --output outputs/stage_01/synthetic,failed,false,"decimal conservation assertion exposed aggregate rounding; fixed with deterministic per-bar residual allocation"
+S01-AUD-003,2026-07-24T09:23:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,0.10,1.5,synthetic_all_families,PYTHONPATH=src python3 -m hvn.cli synthetic-audit --output outputs/stage_01/synthetic,passed,false,"engineering audit only; repeated run hashes byte-identical"
+S01-ENG-003,2026-07-24T09:25:00Z,UNCOMMITTED,SYNTHETIC,stage_01,all,all,all,all,synthetic,PYTHONPATH=src pytest,passed,false,"52 passed including full synthetic audit integration and every POC tie stage"
