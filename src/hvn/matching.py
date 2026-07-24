@@ -65,6 +65,18 @@ def _same_lane(treated: MatchEvent, control: MatchEvent) -> bool:
     )
 
 
+def _lane_key(event: MatchEvent):
+    return (
+        event.relationship_id,
+        event.allocation_method,
+        event.bin_ratio,
+        event.prominence_threshold,
+        event.year,
+        event.approach_side,
+        event.zone_width_bins,
+    )
+
+
 def _components(
     treated: MatchEvent, control: MatchEvent, *, include_atr: bool
 ) -> tuple[Decimal, int, Decimal, Decimal, Decimal, Decimal, Decimal]:
@@ -140,6 +152,9 @@ def primary_cross_session_match(
     control_family: str,
 ) -> tuple[tuple[MatchedPair, ...], dict[str, str]]:
     control_events = tuple(control_events)
+    controls_by_lane: dict[tuple, list[MatchEvent]] = {}
+    for control in control_events:
+        controls_by_lane.setdefault(_lane_key(control), []).append(control)
     used: set[str] = set()
     pairs: list[MatchedPair] = []
     unmatched: dict[str, str] = {}
@@ -157,8 +172,9 @@ def primary_cross_session_match(
     for treated in ordered:
         eligible = []
         lane_count = 0
-        for control in control_events:
-            if control.event_id in used or not _same_lane(treated, control):
+        lane_controls = controls_by_lane.get(_lane_key(treated), ())
+        for control in lane_controls:
+            if control.event_id in used:
                 continue
             lane_count += 1
             if control.session_date == treated.session_date:
@@ -199,6 +215,10 @@ def secondary_same_session_match(
     control_family: str,
 ) -> tuple[tuple[MatchedPair, ...], dict[str, str]]:
     control_events = tuple(control_events)
+    controls_by_lane: dict[tuple, list[MatchEvent]] = {}
+    for control in control_events:
+        key = (_lane_key(control), control.profile_id, control.session_date)
+        controls_by_lane.setdefault(key, []).append(control)
     used: set[str] = set()
     pairs = []
     unmatched = {}
@@ -214,13 +234,11 @@ def secondary_same_session_match(
         ),
     ):
         eligible = []
-        for control in control_events:
-            if control.event_id in used or not _same_lane(treated, control):
-                continue
-            if (
-                control.session_date != treated.session_date
-                or control.profile_id != treated.profile_id
-            ):
+        lane_controls = controls_by_lane.get(
+            (_lane_key(treated), treated.profile_id, treated.session_date), ()
+        )
+        for control in lane_controls:
+            if control.event_id in used:
                 continue
             if (
                 treated.economic_episode_id

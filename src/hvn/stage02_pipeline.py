@@ -479,7 +479,11 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                     metric_row["prominence_threshold"] = prominence
                                     metric_row["config_hash"] = config_hash
                                 result.metric_rows.extend(metric_rows)
-                                if interaction.approach_side != ApproachSide.START_INSIDE:
+                                if (
+                                    interaction.approach_side != ApproachSide.START_INSIDE
+                                    and features.absolute_15m_pre_touch_displacement_atr is not None
+                                    and features.pre_touch_15m_close_path_efficiency is not None
+                                ):
                                     result.match_events.append(
                                         MatchEvent(
                                             event_id,
@@ -496,8 +500,8 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                             features.minute_from_interaction_start,
                                             interaction.event_time,
                                             features.atr_1m_at_touch,
-                                            features.absolute_15m_pre_touch_displacement_atr or Decimal(0),
-                                            features.pre_touch_15m_close_path_efficiency or Decimal(0),
+                                            features.absolute_15m_pre_touch_displacement_atr,
+                                            features.pre_touch_15m_close_path_efficiency,
                                             features.distance_from_interaction_open_to_zone_center_atr,
                                             features.zone_distance_from_poc_atr,
                                             zone.low_ticks,
@@ -628,7 +632,11 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                         metric_row["prominence_threshold"] = prominence
                                         metric_row["config_hash"] = config_hash
                                     result.metric_rows.extend(control_metrics)
-                                    if ci.approach_side != ApproachSide.START_INSIDE:
+                                    if (
+                                        ci.approach_side != ApproachSide.START_INSIDE
+                                        and cf.absolute_15m_pre_touch_displacement_atr is not None
+                                        and cf.pre_touch_15m_close_path_efficiency is not None
+                                    ):
                                         result.match_events.append(
                                             MatchEvent(
                                                 ceid,
@@ -645,8 +653,8 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                                                 cf.minute_from_interaction_start,
                                                 ci.event_time,
                                                 cf.atr_1m_at_touch,
-                                                cf.absolute_15m_pre_touch_displacement_atr or Decimal(0),
-                                                cf.pre_touch_15m_close_path_efficiency or Decimal(0),
+                                                cf.absolute_15m_pre_touch_displacement_atr,
+                                                cf.pre_touch_15m_close_path_efficiency,
                                                 cf.distance_from_interaction_open_to_zone_center_atr,
                                                 cf.zone_distance_from_poc_atr,
                                                 czone.low_ticks,
