@@ -15,7 +15,12 @@ from pathlib import Path
 from hvn.episode_clustering import EpisodeEvent, cluster_episodes
 from hvn.matching import MatchEvent, primary_cross_session_match, secondary_same_session_match
 from hvn.stage02_ledger import deterministic_csv_bytes, write_deterministic_gzip_csv
-from hvn.stage02_statistics import PairObservation, paired_summary, stable_grid
+from hvn.stage02_statistics import (
+    PairObservation,
+    paired_summary,
+    stable_grid,
+    standardized_mean_difference,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "outputs" / "stage_02"
@@ -66,6 +71,39 @@ def match_event(row: dict, *, episode_id: str = "") -> MatchEvent | None:
         int(dec(high) / Decimal("0.25")),
         episode_id,
     )
+
+
+def collapse_episodes(group: list[PairObservation]) -> list[PairObservation]:
+    by_episode = defaultdict(list)
+    for observation in group:
+        by_episode[observation.economic_episode_id or observation.pair_id].append(
+            observation
+        )
+    collapsed = []
+    for episode_id, members in sorted(by_episode.items()):
+        first = members[0]
+        difference = sum(
+            (member.difference for member in members), Decimal(0)
+        ) / Decimal(len(members))
+        collapsed.append(
+            PairObservation(
+                episode_id,
+                first.match_design,
+                first.relationship_id,
+                first.control_family,
+                first.allocation_method,
+                first.bin_ratio,
+                first.prominence_threshold,
+                first.year,
+                first.treated_session_date,
+                first.control_session_date,
+                episode_id,
+                first.metric_name,
+                difference,
+                Decimal(0),
+            )
+        )
+    return collapsed
 
 
 def load() -> tuple[list[MatchEvent], dict[str, str], dict[str, dict], dict]:
@@ -374,6 +412,29 @@ def main() -> None:
                 if pair.control_family == family
                 and by_event[pair.treated_event_id].relationship_id == relationship
             ]
+            covariates = (
+                "minute_from_interaction_start",
+                "atr_at_touch",
+                "pre_touch_displacement_atr",
+                "pre_touch_path_efficiency",
+                "interaction_open_distance_atr",
+                "poc_distance_atr",
+            )
+            smds = {}
+            for covariate in covariates:
+                smds[covariate] = (
+                    standardized_mean_difference(
+                        [getattr(by_event[pair.treated_event_id], covariate) for pair in pairs],
+                        [getattr(by_event[pair.control_event_id], covariate) for pair in pairs],
+                    )
+                    if pairs
+                    else None
+                )
+            finite_smds = [
+                abs(value)
+                for value in smds.values()
+                if value is not None
+            ]
             match_quality.append(
                 {
                     "relationship_id": relationship,
@@ -385,6 +446,11 @@ def main() -> None:
                     "mean_distance": (
                         sum((pair.distance for pair in pairs), Decimal(0)) / Decimal(len(pairs))
                         if pairs else None
+                    ),
+                    "maximum_absolute_post_match_smd": max(finite_smds) if finite_smds else None,
+                    "material_imbalance": (
+                        any(value > Decimal("0.20") for value in finite_smds)
+                        if finite_smds else None
                     ),
                 }
             )
@@ -418,8 +484,156 @@ def main() -> None:
         sort_by=("event_id",),
     )
 
-    # Conservative gates: full diagnostics are explicit, and any missing
-    # required corroboration or balance evidence prevents a pass.
+    primary_observations = [
+        observation
+        for observation in observations
+        if observation.metric_name == "inside_close_share"
+    ]
+    year_rows = []
+    concentration_rows = []
+    diagnostic_by_lane = {}
+    for relationship in sorted({event.relationship_id for event in treated}):
+        for family in ("C01", "C02"):
+            lane = [
+                observation
+                for observation in primary_observations
+                if observation.relationship_id == relationship
+                and observation.control_family == family
+            ]
+            collapsed = collapse_episodes(lane)
+            if not collapsed:
+                continue
+            base = paired_summary(collapsed, resamples=10_000)
+            year_means = {}
+            for year in YEARS:
+                subset = [observation for observation in collapsed if observation.year == year]
+                summary = paired_summary(subset, resamples=10_000) if subset else None
+                year_means[year] = summary.mean if summary else None
+                year_rows.append(
+                    {
+                        "relationship_id": relationship,
+                        "control_family": family,
+                        "year": year,
+                        "unique_economic_episodes": len(subset),
+                        "mean": summary.mean if summary else None,
+                        "ci_low": summary.ci_low if summary else None,
+                        "ci_high": summary.ci_high if summary else None,
+                    }
+                )
+            ordered = sorted(
+                collapsed, key=lambda observation: (-abs(observation.difference), observation.pair_id)
+            )
+            trim_count = math.ceil(len(ordered) * 0.01)
+            trimmed = ordered[trim_count:]
+            trimmed_mean = (
+                sum((observation.difference for observation in trimmed), Decimal(0))
+                / Decimal(len(trimmed))
+                if trimmed
+                else None
+            )
+            episode_trimmed = list(collapsed)
+            for year in YEARS:
+                largest = sorted(
+                    [observation for observation in episode_trimmed if observation.year == year],
+                    key=lambda observation: (-abs(observation.difference), observation.pair_id),
+                )[:5]
+                remove = {observation.pair_id for observation in largest}
+                episode_trimmed = [
+                    observation for observation in episode_trimmed
+                    if observation.pair_id not in remove
+                ]
+            episode_trimmed_mean = (
+                sum((observation.difference for observation in episode_trimmed), Decimal(0))
+                / Decimal(len(episode_trimmed))
+                if episode_trimmed else None
+            )
+            loo = {}
+            for year in YEARS:
+                subset = [observation for observation in collapsed if observation.year != year]
+                loo[year] = (
+                    sum((observation.difference for observation in subset), Decimal(0))
+                    / Decimal(len(subset))
+                    if subset else None
+                )
+            concentration_rows.extend(
+                [
+                    {
+                        "relationship_id": relationship,
+                        "control_family": family,
+                        "diagnostic": "BASE",
+                        "excluded_year": "",
+                        "mean": base.mean,
+                        "count": len(collapsed),
+                    },
+                    {
+                        "relationship_id": relationship,
+                        "control_family": family,
+                        "diagnostic": "REMOVE_LARGEST_1_PERCENT",
+                        "excluded_year": "",
+                        "mean": trimmed_mean,
+                        "count": len(trimmed),
+                    },
+                    {
+                        "relationship_id": relationship,
+                        "control_family": family,
+                        "diagnostic": "REMOVE_TOP5_EPISODES_PER_YEAR",
+                        "excluded_year": "",
+                        "mean": episode_trimmed_mean,
+                        "count": len(episode_trimmed),
+                    },
+                ]
+                + [
+                    {
+                        "relationship_id": relationship,
+                        "control_family": family,
+                        "diagnostic": "LEAVE_ONE_YEAR_OUT",
+                        "excluded_year": year,
+                        "mean": value,
+                        "count": sum(1 for observation in collapsed if observation.year != year),
+                    }
+                    for year, value in loo.items()
+                ]
+            )
+            contributions = {
+                year: sum(
+                    (
+                        observation.difference
+                        for observation in collapsed
+                        if observation.year == year
+                    ),
+                    Decimal(0),
+                )
+                for year in YEARS
+            }
+            contribution_denominator = sum(
+                (abs(value) for value in contributions.values()), Decimal(0)
+            )
+            diagnostic_by_lane[(relationship, family)] = {
+                "base": base,
+                "year_means": year_means,
+                "max_year_contribution": (
+                    max(abs(value) for value in contributions.values())
+                    / contribution_denominator
+                    if contribution_denominator else None
+                ),
+                "trimmed_mean": trimmed_mean,
+                "episode_trimmed_mean": episode_trimmed_mean,
+                "loo": loo,
+            }
+
+    fields = tuple(year_rows[0]) if year_rows else ("relationship_id",)
+    (OUTPUT / "year_results.csv").write_bytes(
+        deterministic_csv_bytes(year_rows, fields, sort_by=("relationship_id", "control_family", "year"))
+    )
+    fields = tuple(concentration_rows[0]) if concentration_rows else ("relationship_id",)
+    (OUTPUT / "concentration_results.csv").write_bytes(
+        deterministic_csv_bytes(
+            concentration_rows,
+            fields,
+            sort_by=("relationship_id", "control_family", "diagnostic", "excluded_year"),
+        )
+    )
+
     gate_rows = []
     for relationship in sorted({event.relationship_id for event in treated}):
         rel_pairs = [
@@ -439,17 +653,113 @@ def main() -> None:
             if episode_count >= 100 and sum(len(value) >= 20 for value in year_counts.values()) >= 3
             else "UNDERPOWERED"
         )
+        lane_passes = {}
+        for family in ("C01", "C02"):
+            diagnostic = diagnostic_by_lane.get((relationship, family))
+            if not diagnostic:
+                continue
+            base = diagnostic["base"]
+            g02 = bool(base.mean and base.mean > 0 and base.ci_low and base.ci_low > 0)
+            signed_years = sum(
+                value is not None and value > 0
+                for value in diagnostic["year_means"].values()
+            )
+            g03 = (
+                signed_years >= 3
+                and diagnostic["max_year_contribution"] is not None
+                and diagnostic["max_year_contribution"] <= Decimal("0.50")
+            )
+            stable = any(
+                row["stable_neighborhood"]
+                for row in grid_rows
+                if row["relationship_id"] == relationship
+                and row["control_family"] == family
+            )
+            structural_support = 0
+            contradiction = False
+            for metric_name, expected_positive in (
+                ("mean_overlap_share", True),
+                ("midpoint_crossings", True),
+                ("path_efficiency", False),
+                ("continuous_residence_minutes", True),
+                ("reentry_30", True),
+            ):
+                metric_group = collapse_episodes(
+                    [
+                        observation
+                        for observation in observations
+                        if observation.relationship_id == relationship
+                        and observation.control_family == family
+                        and observation.metric_name == metric_name
+                    ]
+                )
+                if not metric_group:
+                    continue
+                summary = paired_summary(
+                    metric_group,
+                    expected_positive=expected_positive,
+                    resamples=10_000,
+                )
+                supports = (
+                    summary.mean > 0 and summary.ci_low > 0
+                    if expected_positive
+                    else summary.mean < 0 and summary.ci_high < 0
+                )
+                opposes = (
+                    summary.mean < 0 and summary.ci_high < 0
+                    if expected_positive
+                    else summary.mean > 0 and summary.ci_low > 0
+                )
+                structural_support += int(supports)
+                contradiction = contradiction or opposes
+            g05 = structural_support >= 2 and not contradiction
+            g06 = (
+                diagnostic["trimmed_mean"] is not None
+                and diagnostic["trimmed_mean"] > 0
+                and diagnostic["episode_trimmed_mean"] is not None
+                and diagnostic["episode_trimmed_mean"] > 0
+                and all(value is not None and value > 0 for value in diagnostic["loo"].values())
+            )
+            quality = next(
+                row for row in match_quality
+                if row["relationship_id"] == relationship
+                and row["control_family"] == family
+            )
+            g07 = (
+                quality["control_reuse_count"] == 0
+                and quality["material_imbalance"] is False
+            )
+            g08 = stable and base.mean > 0
+            lane_passes[family] = {
+                "G02": g02,
+                "G03": g03,
+                "G04": stable,
+                "G05": g05,
+                "G06": g06,
+                "G07": g07,
+                "G08": g08,
+                "supporting_metrics": structural_support,
+            }
         for gate in ("G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08"):
+            if gate == "G01":
+                status = g01
+            elif g01 != "PASS":
+                status = "UNDERPOWERED"
+            else:
+                status = (
+                    "PASS"
+                    if any(lane.get(gate, False) for lane in lane_passes.values())
+                    else "FAIL"
+                )
             gate_rows.append(
                 {
                     "relationship_id": relationship,
                     "gate": gate,
-                    "status": g01 if gate == "G01" else (
-                        "BLOCKED" if g01 == "PASS" else "UNDERPOWERED"
-                    ),
+                    "status": status,
                     "evidence": (
                         f"unique_primary_episodes={episode_count}; "
-                        f"years_20plus={sum(len(value) >= 20 for value in year_counts.values())}"
+                        f"years_20plus={sum(len(value) >= 20 for value in year_counts.values())}; "
+                        f"control_lanes={lane_passes}"
                     ),
                 }
             )
@@ -457,18 +767,6 @@ def main() -> None:
     (OUTPUT / "gate_results.csv").write_bytes(
         deterministic_csv_bytes(gate_rows, fields, sort_by=("relationship_id", "gate"))
     )
-
-    # Placeholders required by the locked artifact contract; diagnostics are
-    # derived from primary pairs and explicitly marked pending where not valid.
-    for filename, label in (
-        ("year_results.csv", "see paired_primary_results.csv"),
-        ("concentration_results.csv", "pending full primary support"),
-    ):
-        (OUTPUT / filename).write_bytes(
-            deterministic_csv_bytes(
-                [{"status": label}], ("status",)
-            )
-        )
 
     # Commit-safe schemas and deterministic audit samples for every full local
     # ledger partition, including files above the GitHub-safe threshold.
