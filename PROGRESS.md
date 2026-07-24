@@ -11,3 +11,6 @@
 - Recorded the NQ-versus-MNQ blocker without weakening the instrument contract.
 - Did not begin acceptance, revisit, residence, departure, performance,
   validation, holdout, or trading work.
+- Passed 52 tests and repeated byte-identical synthetic audit generation.
+- Committed and pushed the Stage 1 repository. Stage 1 remains blocked only on
+  authoritative MNQ input for the empirical audit gate.

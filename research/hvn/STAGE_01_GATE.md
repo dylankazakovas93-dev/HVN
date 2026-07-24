@@ -23,7 +23,7 @@ be produced from the supplied NQ archives.
 | 14 | Visual artifacts agree with numerical ledgers | BLOCKED | synthetic engineering pack exists; empirical MNQ pack unavailable |
 | 15 | All tests pass | PASS | 52 passed; `PYTHONPATH=src pytest` |
 | 16 | Exact reproduction commands documented | PASS | `README.md` |
-| 17 | Work committed and pushed | PENDING | final commit/push pending |
+| 17 | Work committed and pushed | PASS | `main` pushed to `origin/main`; see repository log |
 
 No causal, allocation, freeze, session, or partition defect is currently known.
 The remaining blocker is authoritative MNQ data, not permission to substitute NQ.

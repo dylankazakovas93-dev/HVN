@@ -96,13 +96,24 @@ def _svg(profile, candidates, nodes, bars) -> str:
         parts.append(f'<rect x="{x-2:.2f}" y="{min(y_open,y_close):.2f}" width="4" height="{max(1,abs(y_close-y_open)):.2f}" fill="{color}"/>')
     parts.append('<text x="50" y="215" font-family="monospace" font-size="11">frozen profile histogram: orange=POC, purple=peak candidate; candidate/node ledgers contain baseline windows and qualification</text>')
     candidate_indices = {c.representative_bin_index for c in candidates}
+    node_indices = {
+        bin_.bin_index
+        for bin_ in profile.bins
+        if any(
+            node.hvn_low <= bin_.bin_low and bin_.bin_high <= node.hvn_high
+            for node in nodes
+        )
+    }
     for n, (bin_, value) in enumerate(zip(profile.bins, weights)):
         y = 225 + n * bar_h
         length = (value / maximum) * 650
-        color = "#d95f02" if bin_.is_poc else "#4c78a8"
+        color = "#4c78a8"
         if bin_.bin_index in candidate_indices:
             color = "#8e44ad"
-        parts.append(f'<rect x="{margin}" y="{y:.2f}" width="{length:.2f}" height="{max(1,bar_h-1):.2f}" fill="{color}"/>')
+        if bin_.is_poc:
+            color = "#d95f02"
+        stroke = "#1b9e77" if bin_.bin_index in node_indices else "none"
+        parts.append(f'<rect x="{margin}" y="{y:.2f}" width="{length:.2f}" height="{max(1,bar_h-1):.2f}" fill="{color}" stroke="{stroke}" stroke-width="2"/>')
         parts.append(f'<text x="715" y="{y+bar_h*.75:.2f}" font-family="monospace" font-size="10">{bin_.bin_low}</text>')
     parts.append(f'<text x="20" y="{height-16}" font-family="monospace" font-size="12">ATR@{profile.atr_reference_time.isoformat()}={profile.atr_value} bin={profile.bin_size_rounded} source_vol={profile.source_total_volume} allocated={profile.allocated_total_volume} nodes={len(nodes)}</text>')
     parts.append("</svg>")
