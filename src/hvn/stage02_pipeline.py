@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from bisect import bisect_left
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta
@@ -67,6 +68,33 @@ def choose_contract(bars: tuple[Bar, ...], source_start: datetime) -> str:
     if not volumes:
         raise ValueError("no causal contract-selection history")
     return min(volumes, key=lambda symbol: (-volumes[symbol], symbol))
+
+
+class ContractSelector:
+    def __init__(self, bars_by_symbol: dict[str, tuple[Bar, ...]]) -> None:
+        self._times = {
+            symbol: tuple(bar.start_time for bar in bars)
+            for symbol, bars in bars_by_symbol.items()
+        }
+        self._prefix = {}
+        for symbol, bars in bars_by_symbol.items():
+            running = [Decimal(0)]
+            for bar in bars:
+                running.append(running[-1] + bar.volume)
+            self._prefix[symbol] = tuple(running)
+
+    def choose(self, source_start: datetime) -> str:
+        lower = source_start - timedelta(hours=72)
+        volumes = {}
+        for symbol, times in self._times.items():
+            left = bisect_left(times, lower)
+            right = bisect_left(times, source_start)
+            volume = self._prefix[symbol][right] - self._prefix[symbol][left]
+            if volume:
+                volumes[symbol] = volume
+        if not volumes:
+            raise ValueError("no causal contract-selection history")
+        return min(volumes, key=lambda symbol: (-volumes[symbol], symbol))
 
 
 def trading_dates(bars: tuple[Bar, ...]) -> tuple[date, ...]:
@@ -212,6 +240,7 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
         symbol: wilder_atr(symbol_bars)
         for symbol, symbol_bars in bars_by_symbol.items()
     }
+    selector = ContractSelector(bars_by_symbol)
     result = YearResult([], [], [], [], [], [], [], [])
     seen_controls: set[tuple[str, str, str]] = set()
     seen_control_events: set[tuple[str, str, str]] = set()
@@ -228,8 +257,8 @@ def run_year(bars: tuple[Bar, ...], *, year: int, code_sha: str) -> YearResult:
                 relationship, source_date=prior_date, interaction_date=current_date
             )
             try:
-                symbol = choose_contract(bars, pwindow.source_start)
-                interaction_symbol = choose_contract(bars, iwindow.start)
+                symbol = selector.choose(pwindow.source_start)
+                interaction_symbol = selector.choose(iwindow.start)
             except ValueError:
                 continue
             selected_all = bars_by_symbol[symbol]
