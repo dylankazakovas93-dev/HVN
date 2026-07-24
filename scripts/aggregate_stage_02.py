@@ -470,6 +470,34 @@ def main() -> None:
             )
         )
 
+    # Commit-safe schemas and deterministic audit samples for every full local
+    # ledger partition, including files above the GitHub-safe threshold.
+    schemas = {}
+    sample_dir = OUTPUT / "audit_samples"
+    sample_dir.mkdir(exist_ok=True)
+    for path in sorted(DETAIL.glob("*.csv.gz")):
+        with gzip.open(path, "rt", newline="") as stream:
+            reader = csv.DictReader(stream)
+            fields = tuple(reader.fieldnames or ())
+            sample = []
+            for index, row in enumerate(reader):
+                if index == 250:
+                    break
+                sample.append(row)
+        schemas[path.name] = {
+            "fields": fields,
+            "full_local_path": str(path),
+        }
+        write_deterministic_gzip_csv(
+            sample_dir / path.name,
+            sample,
+            fields or ("record_id",),
+            sort_by=(),
+        )
+    (OUTPUT / "DETAILED_LEDGER_SCHEMAS.json").write_text(
+        json.dumps(schemas, indent=2, sort_keys=True) + "\n"
+    )
+
     manifest = []
     for path in sorted(OUTPUT.rglob("*")):
         if not path.is_file() or path.name == "STAGE_02_MANIFEST.json":
