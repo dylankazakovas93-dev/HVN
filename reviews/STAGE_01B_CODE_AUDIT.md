@@ -1,7 +1,11 @@
 # Stage 1B Independent Code Audit
 
-Audit date: 2026-07-24  
-Starting SHA: `6aec1594745a1e2081f6a433106674c9bf0162db`  
+Audit date: 2026-07-24
+
+Starting SHA: `6aec1594745a1e2081f6a433106674c9bf0162db`
+
+Audited implementation SHA: `be525b971419e7f9371f979c691d5e118397a252`
+
 Scope: Stage 1 profile/HVN construction only
 
 The auditor inspected every production module and every test directly. Test

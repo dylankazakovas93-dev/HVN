@@ -15,6 +15,8 @@ profile artifact was generated or reviewed.
 
 - Starting SHA:
   `6aec1594745a1e2081f6a433106674c9bf0162db`.
+- Audited implementation/evidence SHA:
+  `be525b971419e7f9371f979c691d5e118397a252`.
 - Branch: `main`.
 - Final SHA and push status: reported by final `git rev-parse HEAD`,
   `git ls-remote origin refs/heads/main`, and the handoff response.
