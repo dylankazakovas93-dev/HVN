@@ -61,3 +61,29 @@ reads, immediately before ingestion, and writes it into
 `checkpoint_<year>.json` together with the member name and the producing code
 SHA. Dataset identity is therefore derived from the run rather than asserted
 alongside it.
+
+## F-06 — Ledger digests embed the producing code SHA
+
+The 2019 partition was rerun under the streaming writer to prove that change
+inert. Five of eight ledgers reproduced byte-for-byte; `events`,
+`opportunities` and `forward_metrics` did not.
+
+The cause is not the writer. Those three ledgers carry a `code_sha` column, so
+their bytes necessarily change when the producing commit changes, while the
+five without that column do not. Compared with the `code_sha` column excluded,
+`events_2019` (2,898 rows) and `opportunities_2019` (4,009 rows) are identical
+row for row and in the same order.
+
+`forward_metrics_2019` is not tracked in Git and its prior copy was overwritten
+by the rerun, so it was verified directly instead: its real 521,444-row payload
+recompressed through the previous in-memory path yields
+`93ffdd27aa9178de447a46f3dab0af6a…`, exactly the bytes the streaming writer
+produced. The writers are equivalent on production data, not merely on
+fixtures.
+
+Consequence for review: a ledger digest is only meaningful beside the commit
+that produced it. `LEDGER_HASHES.csv` now records `code_sha` and
+`dataset_sha256` alongside every digest, and is rebuilt by
+`scripts/record_ledger_hashes.py`. The invariant that survives recompilation is
+equality ignoring `code_sha`; identical digests across different commits must
+not be expected, and their absence is not evidence of nondeterminism.
