@@ -1,0 +1,16 @@
+{
+  "archive": "nq2025.zip",
+  "bars": 456913,
+  "code_sha": "cd327bf920a8c2b308e74a3c2dd6fb0a732fcff5",
+  "control_events": 284838,
+  "control_opportunities": 484841,
+  "dataset_sha256": "b4fcf58ff5db70d2a8d45d605ce5a2742ab003a1cf694ef2721a04562b6608e2",
+  "episode_events": 1008,
+  "events": 3265,
+  "match_events": 203130,
+  "member": "glbx-mdp3-20250101-20260607.ohlcv-1m.csv.zst",
+  "metric_rows": 1152412,
+  "opportunities": 4462,
+  "profiles": 7242,
+  "year": 2025
+}
