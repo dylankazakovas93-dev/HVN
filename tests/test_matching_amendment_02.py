@@ -229,6 +229,39 @@ def test_generation_1_artifacts_are_preserved_and_separate():
     assert generation_2 not in generation_1.parents
 
 
+def test_aggregator_never_writes_into_the_input_directory():
+    """A generation must not write artifacts into the shared ledger directory.
+
+    Generation 2 originally emitted its match and episode ledgers into
+    outputs/stage_02/detailed, silently modifying preserved Generation 1
+    artifacts. Every DETAIL path must now be read-only input.
+    """
+    import ast
+
+    source = (ROOT / "scripts/aggregate_stage_02.py").read_text()
+    detail_targets = set()
+    for node in ast.walk(ast.parse(source)):
+        if (
+            isinstance(node, ast.BinOp)
+            and isinstance(node.op, ast.Div)
+            and isinstance(node.left, ast.Name)
+            and node.left.id == "DETAIL"
+        ):
+            if isinstance(node.right, ast.Constant):
+                detail_targets.add(node.right.value)
+            elif isinstance(node.right, ast.JoinedStr):
+                detail_targets.add(
+                    "".join(
+                        part.value if isinstance(part, ast.Constant) else "{}"
+                        for part in node.right.values
+                    )
+                )
+    # Only per-year input ledgers and checkpoints may be addressed under DETAIL.
+    assert detail_targets <= {"{}_{}.csv.gz", "checkpoint_{}.json"}, detail_targets
+    for forbidden in ("match_ledger", "economic_episode_ledger"):
+        assert f'DETAIL / "{forbidden}' not in source, forbidden
+
+
 # 15. No forbidden partition is reachable from the Generation 2 inputs.
 def test_generation_2_inputs_exclude_forbidden_years():
     detail = ROOT / "outputs/stage_02/detailed"

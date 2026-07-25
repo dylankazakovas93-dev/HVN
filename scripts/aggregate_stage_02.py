@@ -70,6 +70,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     # argparse already rejects unknown arguments; the partition guard is ours.
     args = parser.parse_args(argv)
+    # The manifest records paths relative to ROOT, so both roots must be absolute.
+    args.input_root = args.input_root.resolve()
+    args.output_root = args.output_root.resolve()
     forbidden = sorted(set(args.years) & {2020, 2022, 2024})
     if forbidden:
         parser.error(f"forbidden partitions requested: {forbidden}")
@@ -325,7 +328,13 @@ def main(argv: list[str] | None = None) -> None:
     OUTPUT = args.output_root
     YEARS = tuple(args.years)
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    generation, amendment = args.generation, args.amendment
     code_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    # Pin the exact inputs this generation consumed.
+    input_checkpoints = {
+        str(year): json.loads((DETAIL / f"checkpoint_{year}.json").read_text())
+        for year in YEARS
+    }
     events, families, metrics, episodes = load()
     treated = [event for event in events if event.event_id.startswith("E-")]
     controls = [event for event in events if event.event_id.startswith("CE-")]
@@ -402,14 +411,14 @@ def main(argv: list[str] | None = None) -> None:
 
     match_fields = tuple(primary_rows[0]) if primary_rows else ("pair_id",)
     write_deterministic_gzip_csv(
-        DETAIL / "match_ledger_primary.csv.gz",
+        OUTPUT / "match_ledger_primary.csv.gz",
         primary_rows,
         match_fields,
         sort_by=("pair_id",),
     )
     secondary_fields = tuple(secondary_rows[0]) if secondary_rows else ("pair_id",)
     write_deterministic_gzip_csv(
-        DETAIL / "match_ledger_secondary.csv.gz",
+        OUTPUT / "match_ledger_secondary.csv.gz",
         secondary_rows,
         secondary_fields,
         sort_by=("pair_id",),
@@ -655,7 +664,7 @@ def main(argv: list[str] | None = None) -> None:
         for event_id, episode_id in episodes.items()
     ]
     write_deterministic_gzip_csv(
-        DETAIL / "economic_episode_ledger.csv.gz",
+        OUTPUT / "economic_episode_ledger.csv.gz",
         episode_rows,
         ("event_id", "economic_episode_id"),
         sort_by=("event_id",),
@@ -973,9 +982,10 @@ def main(argv: list[str] | None = None) -> None:
         json.dumps(schemas, indent=2, sort_keys=True) + "\n"
     )
 
+    manifest_name = f"STAGE_02_{generation.upper()}_MANIFEST.json"
     manifest = []
     for path in sorted(OUTPUT.rglob("*")):
-        if not path.is_file() or path.name == "STAGE_02_MANIFEST.json":
+        if not path.is_file() or path.name == manifest_name:
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         manifest.append(
@@ -986,12 +996,15 @@ def main(argv: list[str] | None = None) -> None:
                 "commit_eligible": path.stat().st_size < 90_000_000,
             }
         )
-    (OUTPUT / "STAGE_02_MANIFEST.json").write_text(
+    (OUTPUT / manifest_name).write_text(
         json.dumps(
             {
                 "code_sha": code_sha,
+                "generation": generation,
+                "amendment": amendment,
                 "years_available": list(YEARS),
-                "year_2019": "ABSENT_FROM_SUPPLIED_ARCHIVES",
+                "input_root": str(DETAIL.relative_to(ROOT)),
+                "input_checkpoints": input_checkpoints,
                 "files": manifest,
                 "primary_pairs": len(primary),
                 "secondary_pairs": len(secondary),

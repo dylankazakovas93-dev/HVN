@@ -1,0 +1,11 @@
+relationship_id,control_family,treated_events,control_events,matched_pairs,unmatched_no_lane_controls,unmatched_lane_exhausted,unmatched_caliper_or_session,unmatched_invalid_treated_width,width_caliper_rejections
+R01,C01,574,70920,13,3,0,558,0,356545
+R01,C02,574,7318,1,28,0,545,0,37195
+R02,C01,978,107765,87,8,0,883,0,1021495
+R02,C02,978,14489,27,16,0,935,0,139170
+R03,C01,875,134234,182,3,0,690,0,1182795
+R03,C02,875,22717,79,8,0,788,0,213617
+R04,C01,806,148993,166,0,0,640,0,1246445
+R04,C02,806,22579,74,4,0,728,0,180565
+R05,C01,878,71327,175,3,0,700,0,421321
+R05,C02,878,15202,72,16,0,790,0,94413
