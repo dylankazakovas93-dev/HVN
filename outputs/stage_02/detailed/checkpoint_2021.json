@@ -1,0 +1,16 @@
+{
+  "archive": "nq2021.zip",
+  "bars": 454877,
+  "code_sha": "5b5a3de0313f69eb66f6b474836914ec300de54e",
+  "control_events": 201994,
+  "control_opportunities": 413917,
+  "dataset_sha256": "0336cfac5fe804a4c756ff9372a0bad314e526c389e5dd8da3774883a29b2f62",
+  "episode_events": 1133,
+  "events": 3388,
+  "match_events": 151564,
+  "member": "glbx-mdp3-20210101-20221230.ohlcv-1m.csv.zst",
+  "metric_rows": 821528,
+  "opportunities": 4595,
+  "profiles": 7278,
+  "year": 2021
+}
