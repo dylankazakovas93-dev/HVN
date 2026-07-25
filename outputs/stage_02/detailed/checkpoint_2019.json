@@ -1,0 +1,16 @@
+{
+  "archive": "nq2018.zip",
+  "bars": 430528,
+  "code_sha": "214754c6ade41608cdc4538fefac0f68f93afcff",
+  "control_events": 127463,
+  "control_opportunities": 232609,
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "episode_events": 987,
+  "events": 2898,
+  "match_events": 92436,
+  "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+  "metric_rows": 521444,
+  "opportunities": 4009,
+  "profiles": 6852,
+  "year": 2019
+}
