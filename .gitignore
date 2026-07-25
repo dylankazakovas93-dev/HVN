@@ -3,3 +3,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 *.egg-info/
+
+# Forward-metric ledgers exceed GitHub's per-file limit on the larger
+# partitions. They are regenerable from the committed code SHA and the hashed
+# source archive; byte hashes for every ledger, including these, are recorded
+# in outputs/stage_02/LEDGER_HASHES.csv.
+outputs/stage_02/detailed/forward_metrics_*.csv.gz
