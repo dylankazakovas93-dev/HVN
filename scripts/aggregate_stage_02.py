@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import gzip
 import hashlib
@@ -13,7 +14,14 @@ from decimal import Decimal
 from pathlib import Path
 
 from hvn.episode_clustering import EpisodeEvent, cluster_episodes
-from hvn.matching import MatchEvent, primary_cross_session_match, secondary_same_session_match
+from hvn.matching import (
+    MatchEvent,
+    _primary_lane_key,
+    _width_terms,
+    primary_cross_session_match,
+    secondary_same_session_match,
+    zone_width_atr,
+)
 from hvn.stage02_ledger import deterministic_csv_bytes, write_deterministic_gzip_csv
 from hvn.stage02_statistics import (
     PairObservation,
@@ -25,7 +33,47 @@ from hvn.stage02_statistics import (
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "outputs" / "stage_02"
 DETAIL = OUTPUT / "detailed"
-YEARS = (2021, 2023, 2025, 2026)
+
+# All five development partitions declared in PARTITIONS.json. Generation 1
+# omitted 2019; see STAGE_02_AMENDMENT_02.md section 9 and D-016.
+YEARS = (2019, 2021, 2023, 2025, 2026)
+GENERATION = "generation_2"
+AMENDMENT = "amendment_02"
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse arguments. Reads no ledger, so --help exits without touching data."""
+    parser = argparse.ArgumentParser(
+        prog="aggregate_stage_02.py",
+        description=(
+            "Aggregate Stage 2 matching, statistics and gates from existing "
+            "authoritative ledgers. Reads no market archive."
+        ),
+    )
+    parser.add_argument("--generation", default=GENERATION)
+    parser.add_argument("--amendment", default=AMENDMENT)
+    parser.add_argument(
+        "--input-root",
+        type=Path,
+        default=DETAIL,
+        help="directory holding checkpoint_<year>.json and the year ledgers",
+    )
+    parser.add_argument(
+        "--output-root",
+        type=Path,
+        default=ROOT / "outputs" / "stage_02_generation_2",
+    )
+    parser.add_argument(
+        "--years",
+        type=lambda value: tuple(int(part) for part in value.split(",")),
+        default=YEARS,
+    )
+    # argparse already rejects unknown arguments; the partition guard is ours.
+    args = parser.parse_args(argv)
+    forbidden = sorted(set(args.years) & {2020, 2022, 2024})
+    if forbidden:
+        parser.error(f"forbidden partitions requested: {forbidden}")
+    return args
 
 
 def dec(value: str) -> Decimal:
@@ -156,7 +204,127 @@ def load() -> tuple[list[MatchEvent], dict[str, str], dict[str, dict], dict]:
     return events, families, metric_by_event, episodes
 
 
-def main() -> None:
+def write_width_and_funnel_reports(
+    *, treated, controls, families, primary, unmatched, by_event
+) -> None:
+    """Amendment 02 width-balance and matching-eligibility reporting.
+
+    Width balance is reported per relationship and control family, pre-match
+    over all admissible events and post-match over the realized pairs. The
+    funnel counts why treated events failed to match, and separately counts
+    candidate evaluations rejected by the width caliper alone.
+    """
+    controls_by_lane: dict[tuple, list] = defaultdict(list)
+    for control in controls:
+        if zone_width_atr(control) is not None:
+            controls_by_lane[(families[control.event_id], _primary_lane_key(control))].append(control)
+
+    width_rows, funnel_rows = [], []
+    for relationship in sorted({event.relationship_id for event in treated}):
+        for family in ("C01", "C02"):
+            lane_treated = [e for e in treated if e.relationship_id == relationship]
+            lane_controls = [
+                e for e in controls
+                if families[e.event_id] == family and e.relationship_id == relationship
+            ]
+            pairs = [
+                pair for pair in primary
+                if pair.control_family == family
+                and by_event[pair.treated_event_id].relationship_id == relationship
+            ]
+
+            # Candidate evaluations rejected by the width caliper alone.
+            width_rejections = 0
+            for event in lane_treated:
+                treated_width = zone_width_atr(event)
+                if treated_width is None:
+                    continue
+                for control in controls_by_lane.get((family, _primary_lane_key(event)), ()):
+                    if control.session_date == event.session_date:
+                        continue
+                    admissible, _ = _width_terms(treated_width, zone_width_atr(control))
+                    if not admissible:
+                        width_rejections += 1
+
+            treated_widths = [w for w in (zone_width_atr(e) for e in lane_treated) if w is not None]
+            control_widths = [w for w in (zone_width_atr(e) for e in lane_controls) if w is not None]
+            matched_treated = [zone_width_atr(by_event[p.treated_event_id]) for p in pairs]
+            matched_control = [zone_width_atr(by_event[p.control_event_id]) for p in pairs]
+            ratios = [c / t for t, c in zip(matched_treated, matched_control)]
+            post_smd = (
+                standardized_mean_difference(matched_treated, matched_control)
+                if pairs else None
+            )
+            width_rows.append(
+                {
+                    "relationship_id": relationship,
+                    "control_family": family,
+                    "matched_pairs": len(pairs),
+                    "mean_treated_width_atr": _mean(matched_treated),
+                    "mean_control_width_atr": _mean(matched_control),
+                    "mean_absolute_width_difference_atr": _mean(
+                        [abs(t - c) for t, c in zip(matched_treated, matched_control)]
+                    ),
+                    "mean_width_ratio": _mean(ratios),
+                    "minimum_width_ratio": min(ratios) if ratios else None,
+                    "maximum_width_ratio": max(ratios) if ratios else None,
+                    "mean_absolute_log_width_ratio": _mean(
+                        [abs((t / c).ln()) for t, c in zip(matched_treated, matched_control)]
+                    ),
+                    "pre_match_width_smd": (
+                        standardized_mean_difference(treated_widths, control_widths)
+                        if treated_widths and control_widths else None
+                    ),
+                    "post_match_width_smd": post_smd,
+                    "post_match_width_balanced": (
+                        abs(post_smd) <= Decimal("0.20") if post_smd is not None else None
+                    ),
+                    "width_caliper_rejections": width_rejections,
+                }
+            )
+
+            reasons = defaultdict(int)
+            for key, reason in unmatched.items():
+                event_family, event_id = key.split("|", 1)
+                if event_family != family:
+                    continue
+                event = by_event.get(event_id)
+                if event is None or event.relationship_id != relationship:
+                    continue
+                reasons[reason] += 1
+            funnel_rows.append(
+                {
+                    "relationship_id": relationship,
+                    "control_family": family,
+                    "treated_events": len(lane_treated),
+                    "control_events": len(lane_controls),
+                    "matched_pairs": len(pairs),
+                    "unmatched_no_lane_controls": reasons["NO_LANE_CONTROLS"],
+                    "unmatched_lane_exhausted": reasons["LANE_CONTROLS_EXHAUSTED"],
+                    "unmatched_caliper_or_session": reasons["PRIMARY_CALIPER_OR_SESSION"],
+                    "unmatched_invalid_treated_width": reasons["INVALID_TREATED_WIDTH"],
+                    "width_caliper_rejections": width_rejections,
+                }
+            )
+
+    for name, rows_out in (("width_balance", width_rows), ("matching_eligibility_funnel", funnel_rows)):
+        fields = tuple(rows_out[0]) if rows_out else ("relationship_id",)
+        (OUTPUT / f"{name}.csv").write_bytes(
+            deterministic_csv_bytes(rows_out, fields, sort_by=fields[:2])
+        )
+
+
+def _mean(values):
+    return sum(values, Decimal(0)) / Decimal(len(values)) if values else None
+
+
+def main(argv: list[str] | None = None) -> None:
+    global OUTPUT, DETAIL, YEARS
+    args = parse_args(argv)
+    DETAIL = args.input_root
+    OUTPUT = args.output_root
+    YEARS = tuple(args.years)
+    OUTPUT.mkdir(parents=True, exist_ok=True)
     code_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     events, families, metrics, episodes = load()
     treated = [event for event in events if event.event_id.startswith("E-")]
@@ -457,6 +625,15 @@ def main() -> None:
     fields = tuple(match_quality[0]) if match_quality else ("relationship_id",)
     (OUTPUT / "match_quality.csv").write_bytes(
         deterministic_csv_bytes(match_quality, fields, sort_by=fields[:2])
+    )
+
+    write_width_and_funnel_reports(
+        treated=treated,
+        controls=controls,
+        families=families,
+        primary=primary,
+        unmatched=unmatched,
+        by_event=by_event,
     )
 
     episode_summary = [

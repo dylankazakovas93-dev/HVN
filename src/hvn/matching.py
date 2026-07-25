@@ -77,8 +77,62 @@ def _lane_key(event: MatchEvent):
     )
 
 
+def _primary_lane_key(event: MatchEvent):
+    """Amendment 02 primary stratum: the Amendment 01 lane without zone width.
+
+    Year stays an exact stratum, so controls from another year can never enter
+    a treated event's candidate set. Width is controlled by caliper, distance
+    term and post-match balance instead of by exact equality.
+    """
+    return (
+        event.relationship_id,
+        event.allocation_method,
+        event.bin_ratio,
+        event.prominence_threshold,
+        event.year,
+        event.approach_side,
+    )
+
+
+TICK_SIZE = Decimal("0.25")
+WIDTH_RATIO_MINIMUM = Decimal("0.67")
+WIDTH_RATIO_MAXIMUM = Decimal("1.50")
+
+
+def zone_width_atr(event: MatchEvent) -> Decimal | None:
+    """ATR-normalized zone width, or None when it is not usable for matching.
+
+    Amendment 02 rejects invalid, missing, zero or nonpositive width and any
+    nonpositive ATR, before the caliper is evaluated.
+    """
+    if event.atr_at_touch is None or event.atr_at_touch <= 0:
+        return None
+    width_points = (event.zone_high_ticks - event.zone_low_ticks) * TICK_SIZE
+    if width_points <= 0:
+        return None
+    return width_points / event.atr_at_touch
+
+
+def _width_terms(
+    treated_width: Decimal, control_width: Decimal
+) -> tuple[bool, Decimal]:
+    """Return whether the pair passes the width caliper, and its log distance.
+
+    The caliper is the literal ratio bound `0.67 <= W_C/W_T <= 1.50`, which is
+    stricter than the log form at the lower end; see STAGE_02_AMENDMENT_02.md.
+    Both stated boundary values are inclusive.
+    """
+    ratio = control_width / treated_width
+    admissible = WIDTH_RATIO_MINIMUM <= ratio <= WIDTH_RATIO_MAXIMUM
+    return admissible, abs((treated_width / control_width).ln())
+
+
 def _components(
-    treated: MatchEvent, control: MatchEvent, *, include_atr: bool
+    treated: MatchEvent,
+    control: MatchEvent,
+    *,
+    include_atr: bool,
+    width_distance: Decimal = Decimal(0),
 ) -> tuple[Decimal, int, Decimal, Decimal, Decimal, Decimal, Decimal]:
     time_difference = abs(
         treated.minute_from_interaction_start - control.minute_from_interaction_start
@@ -93,6 +147,8 @@ def _components(
         treated.interaction_open_distance_atr - control.interaction_open_distance_atr
     )
     poc = abs(treated.poc_distance_atr - control.poc_distance_atr)
+    if treated.atr_at_touch <= 0:
+        raise ValueError(f"nonpositive ATR at touch for {treated.event_id}")
     atr = abs(treated.atr_at_touch - control.atr_at_touch) / treated.atr_at_touch
     distance = (
         Decimal(time_difference) / Decimal(60)
@@ -101,6 +157,7 @@ def _components(
         + Decimal("0.5") * open_distance
         + Decimal("0.5") * poc
         + (atr if include_atr else Decimal(0))
+        + width_distance
     )
     return distance, time_difference, atr, displacement, path, open_distance, poc
 
@@ -153,8 +210,13 @@ def primary_cross_session_match(
 ) -> tuple[tuple[MatchedPair, ...], dict[str, str]]:
     control_events = tuple(control_events)
     controls_by_lane: dict[tuple, list[MatchEvent]] = {}
+    control_width: dict[str, Decimal] = {}
     for control in control_events:
-        controls_by_lane.setdefault(_lane_key(control), []).append(control)
+        width = zone_width_atr(control)
+        if width is None:
+            continue
+        control_width[control.event_id] = width
+        controls_by_lane.setdefault(_primary_lane_key(control), []).append(control)
     used: set[str] = set()
     pairs: list[MatchedPair] = []
     unmatched: dict[str, str] = {}
@@ -170,16 +232,27 @@ def primary_cross_session_match(
         ),
     )
     for treated in ordered:
+        treated_width = zone_width_atr(treated)
+        if treated_width is None:
+            unmatched[treated.event_id] = "INVALID_TREATED_WIDTH"
+            continue
         eligible = []
-        lane_count = 0
-        lane_controls = controls_by_lane.get(_lane_key(treated), ())
+        lane_controls = controls_by_lane.get(_primary_lane_key(treated), ())
+        available = 0
         for control in lane_controls:
             if control.event_id in used:
                 continue
-            lane_count += 1
+            available += 1
             if control.session_date == treated.session_date:
                 continue
-            components = _components(treated, control, include_atr=True)
+            admissible, width_distance = _width_terms(
+                treated_width, control_width[control.event_id]
+            )
+            if not admissible:
+                continue
+            components = _components(
+                treated, control, include_atr=True, width_distance=width_distance
+            )
             _, time_difference, atr, displacement, _, open_distance, _ = components
             if (
                 time_difference > 60
@@ -190,9 +263,12 @@ def primary_cross_session_match(
                 continue
             eligible.append((components[0], control.event_id, control, components))
         if not eligible:
-            unmatched[treated.event_id] = (
-                "NO_LANE_CONTROLS" if lane_count == 0 else "PRIMARY_CALIPER_OR_SESSION"
-            )
+            if not lane_controls:
+                unmatched[treated.event_id] = "NO_LANE_CONTROLS"
+            elif available == 0:
+                unmatched[treated.event_id] = "LANE_CONTROLS_EXHAUSTED"
+            else:
+                unmatched[treated.event_id] = "PRIMARY_CALIPER_OR_SESSION"
             continue
         _, _, control, components = min(eligible)
         used.add(control.event_id)
