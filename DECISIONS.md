@@ -101,3 +101,37 @@ recorded by hand.
 member spans 2018-01-01 to 2019-12-30 and is read under the same year-prefix
 guard. The Stage 2 recomputation covers all five declared partitions. This
 restores the locked partition rather than changing it.
+
+## D-013 — Streaming ledger writer after the 2025 out-of-memory kill
+
+The 2025 checkpoint was killed by the kernel out-of-memory killer at 15.99 GB
+resident during its write phase (`dmesg`: `Out of memory: Killed process 7874`).
+`write_deterministic_gzip_csv` materialized the whole ledger four times over —
+the normalized rows, the CSV payload, its UTF-8 encoding, and the compressed
+buffer — while every other ledger's rows were still live.
+
+The writer now streams normalized rows to the compressor in 50,000-row batches.
+`GzipFile.flush()` is never called, because it emits a `Z_SYNC_FLUSH` marker
+that changes the compressed bytes; an earlier `TextIOWrapper` version was
+rejected for exactly that reason. Output is byte-identical to the previous
+in-memory path, verified against it for unsorted and sorted writes and at
+0, 1, 49,999, 50,000 and 50,001 rows.
+
+No research definition, caliper, metric or ordering is affected. Row
+normalization and sort order are unchanged; only the number of simultaneous
+copies in memory changed.
+
+## D-014 — Corrected forbidden-partition guard test
+
+`test_validation_holdout_and_2018_archives_have_no_stage02_access` asserted
+that no Stage 2 access row names `nq2018`. That premise is wrong. Archive
+names do not partition the data: `nq2021.zip` carries forbidden 2022 rows and
+is legitimately read for 2021, while `nq2018.zip` carries 2018 and the declared
+development year 2019 and is legitimately read for 2019. The old assertion
+would have blocked a declared development partition while permitting an
+archive that genuinely contains forbidden rows.
+
+The replacement asserts the invariant that matters: no Stage 2 access row may
+record 2020, 2022 or 2024 in its parsed-years column, and no row may name
+nq2020.zip, which is wholly a frozen validation partition. This is a stricter
+guard on real leakage and a correction of a false one.
