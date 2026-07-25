@@ -78,3 +78,26 @@ nonoverlapping 120-minute forward windows, which is impossible. Authorized
 and same-session matching descriptive secondary. All Stage 2 gates use only
 cross-session pairs. The original defect and its non-empirical detection are
 preserved in `research/hvn/STAGE_02_AMENDMENT_01.md`.
+
+## D-011 — Voided 2021/2023 checkpoints and derived dataset identity
+
+The `dataset_hash` values recorded for the accepted 2021 and 2023 Stage 2
+checkpoints do not match the archives they name, while a control row for the
+same field on nq2025 matches exactly. Evidence and reasoning are in
+`reviews/STAGE_02_DATA_IDENTITY_FINDING.md` as F-05. Neither checkpoint's
+ledgers were ever committed, so no artifact exists to re-identify.
+
+Both runs are void. Their original registry and access-log rows are retained
+unchanged as the record of the attempt; the recomputation supersedes them, and
+their claimed row counts are not used as reconciliation targets. Dataset
+identity is now computed by the runner from the bytes ingested rather than
+recorded by hand.
+
+## D-012 — 2019 restored to the Stage 2 development partition
+
+`PARTITIONS.json` declares development years 2019, 2021, 2023, 2025 and partial
+2026. The Stage 2 runner defined sources for 2021, 2023, 2025 and 2026 only, so
+2019 was never registered or run. 2019 is supplied by the nq2018 archive, whose
+member spans 2018-01-01 to 2019-12-30 and is read under the same year-prefix
+guard. The Stage 2 recomputation covers all five declared partitions. This
+restores the locked partition rather than changing it.
