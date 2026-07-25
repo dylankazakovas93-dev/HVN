@@ -135,3 +135,37 @@ The replacement asserts the invariant that matters: no Stage 2 access row may
 record 2020, 2022 or 2024 in its parsed-years column, and no row may name
 nq2020.zip, which is wholly a frozen validation partition. This is a stricter
 guard on real leakage and a correction of a false one.
+
+## D-015 — Stage 2 matching Amendment 02 and generation increment
+
+Generation 1 primary matching produced 42 cross-session pairs and returned
+`UNDERPOWERED` for every gate and relationship. Exact `zone_width_bins`
+equality fragmented 3,235 treated events into 3,092 strata. An eligibility-only
+diagnosis, computed without consulting any outcome metric, identified that
+stratum as the binding constraint.
+
+Authorized: exact `zone_width_bins` equality is replaced by an ATR-normalized
+width caliper `0.67 <= W_C/W_T <= 1.50`, a `1.0 * abs(log(W_T/W_C))` distance
+term, and post-match width balance reporting. Year, approach side, relationship,
+allocation method, bin ratio, prominence threshold and control family remain
+exact strata. All Amendment 01 calipers are retained.
+
+This is a new matching generation under section 13, not a bug fix. Generation 1
+artifacts are preserved unchanged in `outputs/stage_02/`; Generation 2 is
+written to `outputs/stage_02_generation_2/`. Details in
+`research/hvn/STAGE_02_AMENDMENT_02.md`.
+
+`STAGE_02_GENERATION_1_MATCHING = UNDERPOWERED` labels the matching design, not
+the HVN hypothesis.
+
+## D-016 — 2019 partition restored to Stage 2 aggregation
+
+`scripts/aggregate_stage_02.py` declared `YEARS = (2021, 2023, 2025, 2026)`,
+excluding the declared development year 2019 whose ledgers were computed and
+accepted under `S02-RECOMP-2019-001`. No specification authorizes that
+exclusion and D-012 restored 2019 to the partition set, so this is an
+implementation defect. Generation 2 aggregates all five declared partitions.
+No event-generation recomputation is required.
+
+Generation 1 remains as produced, over four partitions. Generation 1 and
+Generation 2 pair counts are therefore not directly comparable.
