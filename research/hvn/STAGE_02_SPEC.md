@@ -178,3 +178,20 @@ aggregation; failed and rerun checkpoints remain in the run registry.
 - All empirical redesigns after this lock belong to a new research generation.
   A genuine implementation defect may be corrected only with a documented
   finding, failing regression fixture, minimal fix, and affected reruns.
+
+## Amendment 02 — superseding primary matching stratum
+
+Effective for `STAGE_02_GENERATION_2_MATCHING`, exact `zone_width_bins`
+equality is removed from the primary cross-session stratum. Treated and control
+events must still share exactly `relationship_id`, `allocation_method`,
+`bin_ratio`, `prominence_threshold`, `data_year`, `approach_side` and
+`control_family`, and must come from different interaction-session dates.
+
+Zone width is instead controlled as an ATR-normalized quantity by the caliper
+`0.67 <= W_C/W_T <= 1.50`, by the `1.0 * abs(log(W_T/W_C))` matching-distance
+term, and by pre- and post-match balance reporting in `width_balance.csv`.
+Events with invalid, missing, zero or nonpositive ATR-normalized width are
+rejected before matching. All Amendment 01 calipers are retained unchanged.
+
+Generation 1 remains the authoritative result of the previous locked rule. See
+`STAGE_02_AMENDMENT_02.md`.

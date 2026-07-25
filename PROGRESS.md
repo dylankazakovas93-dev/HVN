@@ -46,3 +46,19 @@
   disjoint 120-minute forward windows.
 - Amendment 01 makes cross-session matching primary and same-session matching
   a separately labelled descriptive analysis.
+- Recomputed all five declared development partitions with dataset hashes
+  derived from the ingested bytes, after finding the prior 2021 and 2023
+  registry hashes did not match their archives (F-05). Both recomputations
+  reproduced the voided row counts exactly, so the earlier computation was
+  sound and only its recorded identity was wrong.
+- Completed 2025 for the first time, after a streaming ledger writer replaced a
+  path that held four full copies of each ledger and exhausted memory.
+- First aggregation under the Amendment 01 matching rule produced 42 primary
+  cross-session pairs and `UNDERPOWERED` for every gate and relationship.
+  Exact `zone_width_bins` equality fragmented 3,235 treated events into 3,092
+  strata (F-07).
+- Amendment 02 replaces that exact stratum with an ATR-normalized width
+  caliper, a log-width distance term and post-match width balance reporting,
+  and opens `STAGE_02_GENERATION_2_MATCHING`. Generation 1 is preserved.
+- Corrected an aggregator defect that silently excluded the declared 2019
+  partition from Generation 1 (D-016).

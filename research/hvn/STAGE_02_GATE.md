@@ -91,3 +91,17 @@ No additional threshold search may upgrade a partial or underpowered result.
 The exact next authorized action after reporting is to stop. Stage 3,
 departure, MFE/MAE, grading, strategy, validation, holdout, and execution work
 remain unauthorized.
+
+## Amendment 02 — gates applied to Generation 2
+
+G01–G08 are applied unchanged to Generation 2 primary cross-session results.
+Minimum pair counts, cross-year consistency, grid stability, concentration
+robustness, match-quality requirements, control-family distinctions,
+session-block inference and expected metric directions are all unmodified.
+
+Post-match width balance enters G07 match validity. A post-match absolute width
+SMD above 0.20 is reported plainly and reflected in G07; it is not resolved by
+adjusting the caliper.
+
+If Generation 2 remains underpowered, that is reported as the result. No
+further stratum may be dropped without a new explicit authorization.

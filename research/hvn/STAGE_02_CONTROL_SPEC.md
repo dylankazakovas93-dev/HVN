@@ -181,3 +181,15 @@ episode, and represented methods, ratios, and prominence thresholds. Events
 never cluster across contracts. Configuration-level inference retains its own
 events. Cross-configuration summaries use episodes and do not treat duplicate
 definitions as independent.
+
+## Amendment 02 — control eligibility and family separation
+
+Control eligibility gains one rejection: a control whose ATR-normalized zone
+width is invalid, missing, zero or nonpositive is excluded from primary
+matching before any caliper is evaluated. Control construction, family
+definitions and clustering are otherwise unchanged.
+
+`C01_NEUTRAL_NON_HVN` and `C02_PROFILE_MASS_MATCHED_NON_HVN` remain separate
+throughout matching, diagnostics and gates. No result from one family may be
+relabelled as the other. Control reuse remains forbidden within a relationship,
+allocation method, bin ratio, prominence threshold, year and control family.

@@ -135,3 +135,19 @@ Stable sorts precede aggregation. Decimal inputs remain exact through paired
 differences; documented numerical conversion may be used only inside bootstrap
 mean/quantile calculations and is verified against deterministic fixtures.
 A byte-identical complete rerun is required.
+
+## Amendment 02 — width reporting and the log-width term
+
+`width_balance.csv` reports, per relationship and control family: mean treated
+and control ATR-normalized width, mean absolute width difference, mean,
+minimum and maximum width ratio, mean absolute log width ratio, pre-match and
+post-match width standardized mean difference, whether the post-match absolute
+width SMD is at most 0.20, and the width-caliper rejection count.
+`matching_eligibility_funnel.csv` reports treated and control counts, matched
+pairs, and each unmatched reason.
+
+The log-width distance term uses `Decimal.ln()` under the ambient context
+precision. Unlike the other distance components it is correctly rounded rather
+than exact; ordering ties are broken by control event id, so matching remains
+deterministic. All other statistical procedures, bootstrap construction and
+episode weighting are unchanged.
