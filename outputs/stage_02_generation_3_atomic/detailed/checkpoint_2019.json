@@ -1,0 +1,56 @@
+{
+  "archive": "nq2018.zip",
+  "atomic_events": 2730,
+  "atomic_opportunities": 6019,
+  "bars": 430528,
+  "code_sha": "8aa2b50b2bb4c9f80ad486fc2a1295dd454a4921",
+  "control_events": 5172,
+  "control_opportunities": 11415,
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "departure_rows": 31608,
+  "excursion_rows": 39455,
+  "ledgers": {
+    "atomic_events_2019.csv.gz": {
+      "bytes": 205529,
+      "sha256": "6db19e1b05620e6fdf46d55a2728c38a0a8efd5b26be0e267fbf90e47e9807b5"
+    },
+    "atomic_opportunities_2019.csv.gz": {
+      "bytes": 224001,
+      "sha256": "c2237bf67e5120dfc1e87cc7324d8e8173b9296af0784668ba6486387d8d34ef"
+    },
+    "atomic_profiles_2019.csv.gz": {
+      "bytes": 194952,
+      "sha256": "dc2d57cc0dd4819d7b372e91e5838fcb1ca310a549bfcb028604cb608a22ccc2"
+    },
+    "control_events_2019.csv.gz": {
+      "bytes": 292637,
+      "sha256": "4bd69216bbcdeb2f47807141859c6cfa12e8ea283a7dc380b605d3b3cc182732"
+    },
+    "control_opportunities_2019.csv.gz": {
+      "bytes": 324913,
+      "sha256": "efdce5298ad894e4f74fe43cb0fabda1506fd54a04383c0c6c6146f2186a2f7b"
+    },
+    "departure_excursions_2019.csv.gz": {
+      "bytes": 2494848,
+      "sha256": "4cd4957615f05adf88e148aadffef0ae497564cd60ce83b5803dfee61f238aba"
+    },
+    "departures_2019.csv.gz": {
+      "bytes": 380327,
+      "sha256": "8f8e51f54be812f47d46fb7dcf8cd48f5bdde3ecfe2e28b2c4e1fe26b50f7b5d"
+    },
+    "proximity_metrics_2019.csv.gz": {
+      "bytes": 2888268,
+      "sha256": "3c68692e1438bec2e80c5a2c25fcd043c5495c851dcac17bc9b0c4c87427ef48"
+    },
+    "residence_metrics_2019.csv.gz": {
+      "bytes": 369185,
+      "sha256": "796c2137c4210263e1c37477cf72d2569a0c17ecc7bf389d4574cb23354c3732"
+    }
+  },
+  "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+  "profiles": 6852,
+  "proximity_rows": 39510,
+  "reproduction_command": "PYTHONPATH=src python3 scripts/run_atomic_year.py --year 2019 --data-root <data-root> --output-root stage_02_generation_3_atomic",
+  "residence_rows": 31608,
+  "year": 2019
+}

@@ -48,10 +48,13 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     output = args.output_root.resolve()
-    for reserved in ("outputs/stage_02/", "outputs/stage_02_generation_2/"):
-        if str(output).endswith(reserved.rstrip("/")) or reserved.rstrip("/") in str(
-            output.relative_to(ROOT) if output.is_relative_to(ROOT) else output
-        ):
+    # Path comparison, not substring: outputs/stage_02_generation_3_atomic is
+    # not inside outputs/stage_02 even though its name starts with it.
+    for reserved in (
+        ROOT / "outputs" / "stage_02",
+        ROOT / "outputs" / "stage_02_generation_2",
+    ):
+        if output == reserved or reserved in output.parents:
             parser.error(f"refusing to write into a preserved generation: {output}")
 
     code_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()

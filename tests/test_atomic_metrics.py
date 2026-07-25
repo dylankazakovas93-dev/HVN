@@ -432,3 +432,48 @@ def test_no_future_bar_can_change_event_classification():
         assert result.approach_side == APPROACH_FROM_BELOW
         assert result.touch_class == WICK_ONLY_SAME_SIDE
         assert result.forward_start_index == 2
+
+
+# --- generation isolation ----------------------------------------------------
+
+def test_runner_refuses_to_write_into_a_preserved_generation(tmp_path):
+    """Path comparison, not substring: the Generation 3 directory name starts
+    with the Generation 1 directory name and must still be allowed."""
+    import importlib.util
+    import sys
+
+    root = __import__("pathlib").Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "run_atomic_year", root / "scripts/run_atomic_year.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["run_atomic_year"] = module
+    spec.loader.exec_module(module)
+
+    for blocked in ("outputs/stage_02", "outputs/stage_02/detailed",
+                    "outputs/stage_02_generation_2"):
+        with pytest.raises(SystemExit):
+            module.main([
+                "--year", "2019", "--data-root", str(tmp_path),
+                "--output-root", str(root / blocked),
+            ])
+    # The Generation 3 root is not inside either preserved generation.
+    generation_3 = (root / "outputs/stage_02_generation_3_atomic").resolve()
+    for reserved in (root / "outputs/stage_02", root / "outputs/stage_02_generation_2"):
+        assert generation_3 != reserved.resolve()
+        assert reserved.resolve() not in generation_3.parents
+
+
+def test_atomic_pipeline_never_imports_the_broad_node_extractor():
+    """Generation 3 must not build events from the expanded/merged nodes."""
+    import ast
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "src/hvn/atomic_pipeline.py").read_text()
+    names = {
+        node.id if isinstance(node, ast.Name) else node.attr
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, (ast.Name, ast.Attribute))
+    }
+    assert "extract_hvns" not in names
+    assert "extract_atomic_hvns" in names
