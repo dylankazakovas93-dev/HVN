@@ -61,6 +61,12 @@ class ControlZone:
         return self.control_low - pad, self.control_high + pad
 
     @property
+    def atomic_id(self) -> str:
+        """Zone identity, so a control satisfies the same interface as an
+        AtomicHvn wherever the metric engines take a zone."""
+        return self.control_id
+
+    @property
     def peak_price(self) -> Decimal:
         """Centre of the control window, the analogue of the peak price."""
         return self.control_center
