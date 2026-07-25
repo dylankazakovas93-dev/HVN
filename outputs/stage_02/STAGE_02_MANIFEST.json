@@ -1,0 +1,639 @@
+{
+  "code_sha": "3da695ce0d4e62251ef93bfdf6fe85655651c3b7",
+  "files": [
+    {
+      "bytes": 33365,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/DETAILED_LEDGER_SCHEMAS.json",
+      "sha256": "4d819750074f0120d3a88aa4d2020c1128bf29704892b9df6a5f9ba47696476f"
+    },
+    {
+      "bytes": 8480,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/LEDGER_HASHES.csv",
+      "sha256": "0e9deaca9ff798a3ec821ef26e2636486fac25edcefd4d9f561681c02e0f9467"
+    },
+    {
+      "bytes": 56963,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_events_2019.csv.gz",
+      "sha256": "cef8355299574f8783c38ee41093b45179486d98fc6e3339ae091fd02c9daf8b"
+    },
+    {
+      "bytes": 59567,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_events_2021.csv.gz",
+      "sha256": "189fd3847121f2cdc194db11933107c9db34b4871349c748c6bb40a9eace6f94"
+    },
+    {
+      "bytes": 58946,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_events_2023.csv.gz",
+      "sha256": "a86341cea846c8b00547986c6efcbc7eb0f90c5f56a2adeb66f7ad0a1df976ee"
+    },
+    {
+      "bytes": 58303,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_events_2025.csv.gz",
+      "sha256": "3ea220f24a68cbc7b67ed6c7c82cdf368f98b26d6cf6c1c2f3f3b2c63b9950c5"
+    },
+    {
+      "bytes": 57516,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_events_2026.csv.gz",
+      "sha256": "05ee85beefe1d8f526f998aa666910d2bc26c1eabf1c07c268ade559b234a16d"
+    },
+    {
+      "bytes": 5623,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_opportunities_2019.csv.gz",
+      "sha256": "e1142083bf4636817056b51649644530e7d500fc05c2ddecf45fdb688b64dbe0"
+    },
+    {
+      "bytes": 18067,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_opportunities_2021.csv.gz",
+      "sha256": "d7475717e741963c96a3c246d83f76a3985d6f14319129b919502c5d4fafb7b5"
+    },
+    {
+      "bytes": 12454,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_opportunities_2023.csv.gz",
+      "sha256": "1f5cdb3fd7c63a72bad0f1180fa0e4e74ec17900fdff7f63d2b8a1c16b984a01"
+    },
+    {
+      "bytes": 2385,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_opportunities_2025.csv.gz",
+      "sha256": "53b151e36f9b2ca0db711a94ec7829c7062bdc87e0892a8a223b105f66f8dc45"
+    },
+    {
+      "bytes": 10712,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/control_opportunities_2026.csv.gz",
+      "sha256": "4db88ca101521341d06dec03556ebb6c94e2827c1679d90f9622865f3b1697df"
+    },
+    {
+      "bytes": 6104,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/economic_episode_ledger.csv.gz",
+      "sha256": "702d958cb92727b56ae7bb0d01d705aaa867470fbb0bdb2abf3e57db9e13aa28"
+    },
+    {
+      "bytes": 6238,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/episode_events_2019.csv.gz",
+      "sha256": "dc1a1d22b3d9fbbd53abad37f28320e1ae5b4f0eebfbffe28ffe412b01546865"
+    },
+    {
+      "bytes": 6560,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/episode_events_2021.csv.gz",
+      "sha256": "0ab519c09847136b2610faa9e208bb7ae8fe01ea2a92eec0663600dc0787e0c0"
+    },
+    {
+      "bytes": 6530,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/episode_events_2023.csv.gz",
+      "sha256": "c4e43b5d7c5ba45d61e533cd054b921bef1a73565bd1d49acb7c2fda52d5dba4"
+    },
+    {
+      "bytes": 6734,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/episode_events_2025.csv.gz",
+      "sha256": "4e6a2ea812db16e3023e908cc5f654b7672cd5d7573d0c3b7f575e0be602febf"
+    },
+    {
+      "bytes": 6125,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/episode_events_2026.csv.gz",
+      "sha256": "8863cdb3d640f7f1cb579b9a58c3478661ee13a6963b4b236f66736b22e3da36"
+    },
+    {
+      "bytes": 45993,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/events_2019.csv.gz",
+      "sha256": "9a4bd522d050135254bb30d578bc7a78339081b42f7d4995b93a9bf882208d84"
+    },
+    {
+      "bytes": 46508,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/events_2021.csv.gz",
+      "sha256": "543815c8bfd7ab9d9fb825bf24e9c0988e45778f6be48250b818546f0f56b67b"
+    },
+    {
+      "bytes": 47127,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/events_2023.csv.gz",
+      "sha256": "74cd2d93e16b528f210fec2088fa84fa26e3bd7ae062e67a5a4debdae5239ac0"
+    },
+    {
+      "bytes": 48442,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/events_2025.csv.gz",
+      "sha256": "7cd96abf6a3b0ee2a519f6f7ec65a91dbe9d11dbd70b8e7e1ba8f8c1a8ff5abc"
+    },
+    {
+      "bytes": 46841,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/events_2026.csv.gz",
+      "sha256": "cc753fec5582e8333a9f09cad1925edf57b389f6193cac2a9fe4d3d6aea4f4a6"
+    },
+    {
+      "bytes": 42897,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/forward_metrics_2019.csv.gz",
+      "sha256": "f459df3cec011401010139b1a25c8248d3970ea78d8adf0f4c54e36f3c998b45"
+    },
+    {
+      "bytes": 45305,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/forward_metrics_2021.csv.gz",
+      "sha256": "87659aeeebf870fecc25b4733649b97e3ded8c92ea0674ab502e8ca958c82d68"
+    },
+    {
+      "bytes": 44544,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/forward_metrics_2023.csv.gz",
+      "sha256": "9c562b66d9cef902d157239bec774ef65a3d12ded76b375addc59286fcae1e39"
+    },
+    {
+      "bytes": 44014,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/forward_metrics_2025.csv.gz",
+      "sha256": "cef0450c9253383c55166ecc3977faee6fb28dbfda350119e0f897a59985c7cf"
+    },
+    {
+      "bytes": 45775,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/forward_metrics_2026.csv.gz",
+      "sha256": "38c3f56f6a862a47098c06aa00f727c771f84aeaa44853022622bf373335f960"
+    },
+    {
+      "bytes": 31991,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_events_2019.csv.gz",
+      "sha256": "5fe705ef90002542eaf076acdb10ad2e3316524db82e9dd87c265fa51b4a2cb2"
+    },
+    {
+      "bytes": 32377,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_events_2021.csv.gz",
+      "sha256": "97a06ced42b6a6a88a6ac85b06e3a10ef2cab4b863cf51210e036d68d847120c"
+    },
+    {
+      "bytes": 32308,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_events_2023.csv.gz",
+      "sha256": "3c52051b62fb6f19b78241787ee755db6a3e7b14e617835e6b1ad0125fdbc9c3"
+    },
+    {
+      "bytes": 32739,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_events_2025.csv.gz",
+      "sha256": "3f28106088e5d6aac745e09d0d07031790d6fb0ac25aad81e13d49dde0ff2709"
+    },
+    {
+      "bytes": 31248,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_events_2026.csv.gz",
+      "sha256": "871c5dae59a8dac8e89b82fdddf327123cafd598cfaafe09ed4c09b65493bab4"
+    },
+    {
+      "bytes": 6434,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_ledger_primary.csv.gz",
+      "sha256": "54be3916e2a0755e076e5fd669e7b07cfb0445b4e0c8854855cbb86dc96d043e"
+    },
+    {
+      "bytes": 37517,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/match_ledger_secondary.csv.gz",
+      "sha256": "65ba92fa7f712d64fadfdbb592aeae1b80bcf0be4d2811ca0a23aa2b66c5220d"
+    },
+    {
+      "bytes": 19430,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/opportunities_2019.csv.gz",
+      "sha256": "bc01d58cdd3d7afe63fb2a6da720cbc0bd79a3e34a6a4227d03eb8bb3a4758c8"
+    },
+    {
+      "bytes": 25456,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/opportunities_2021.csv.gz",
+      "sha256": "57fdc11a0e041e9f255cef1e537c3436609dc8a34fc74b260ce247ce93cd5642"
+    },
+    {
+      "bytes": 24975,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/opportunities_2023.csv.gz",
+      "sha256": "0aeca3ee7ce94cf82be00c61dcada58ca22808f837ad5ad783ded010940e24c5"
+    },
+    {
+      "bytes": 27173,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/opportunities_2025.csv.gz",
+      "sha256": "3b6ab2716c41bf73e6bc7ed9df682f42e137e61711dc26980de404455fe9c4cb"
+    },
+    {
+      "bytes": 27727,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/opportunities_2026.csv.gz",
+      "sha256": "5dad9b097b171b0855000c504f77b3bd996264f10c0b76522f0defb8448f1b7c"
+    },
+    {
+      "bytes": 4341,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/profiles_2019.csv.gz",
+      "sha256": "360d69b06092bfea000fb65213a022d9655182d760c1b60cbadb3b2d17d3648f"
+    },
+    {
+      "bytes": 4437,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/profiles_2021.csv.gz",
+      "sha256": "32012ed615f19865888080a53386f92c127b5fc90a200e0a250dc84a63e64fbd"
+    },
+    {
+      "bytes": 4453,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/profiles_2023.csv.gz",
+      "sha256": "0223f517107b84b9eca076efb58d125ce1ad2019c95c5b9609445abc0fd3f143"
+    },
+    {
+      "bytes": 4347,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/profiles_2025.csv.gz",
+      "sha256": "0057d9998977f1bad6b7bd0c830c25589cad9aa46d1494786a4276d5458c7a08"
+    },
+    {
+      "bytes": 4215,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/audit_samples/profiles_2026.csv.gz",
+      "sha256": "e2ebda19f6e126033a88a72a0303563743ad7be94256a84583c2898f101e912d"
+    },
+    {
+      "bytes": 3306,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/concentration_results.csv",
+      "sha256": "52e30020309714025064d698b3df75b85b98287689bd7865e56202f40c43b409"
+    },
+    {
+      "bytes": 118,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/control_summary.csv",
+      "sha256": "cef6ecf6bdff3c2b835d7a2e14f82ebf29ebec614e2e16815c38ec926c9a301b"
+    },
+    {
+      "bytes": 471,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/checkpoint_2019.json",
+      "sha256": "a4f251cc006b3b2e0021f25b4fd144a27089fdccac9774cdba83b2fb46756017"
+    },
+    {
+      "bytes": 473,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/checkpoint_2021.json",
+      "sha256": "e235370a9ccc6cac3aeb130703d3152ea46ec246a641ca30b1fd71bf577eb1b6"
+    },
+    {
+      "bytes": 472,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/checkpoint_2023.json",
+      "sha256": "f312faf2a45a9946012648586ee43af72925e665255aac4a71a2295ae51f99a8"
+    },
+    {
+      "bytes": 474,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/checkpoint_2025.json",
+      "sha256": "69c31ee7c9b0551495be800b216b64d56949e0223cea88f93a9a1647ee276666"
+    },
+    {
+      "bytes": 471,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/checkpoint_2026.json",
+      "sha256": "4311555b91b84556fad5079dea16412df901f726ed6709584ed9a1f9556290aa"
+    },
+    {
+      "bytes": 28512153,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_events_2019.csv.gz",
+      "sha256": "9724c67ca0afb5db6b1c5faac59bcd5ab910cf52f505cb0e3d72311f89b4e0f9"
+    },
+    {
+      "bytes": 46614486,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_events_2021.csv.gz",
+      "sha256": "d5ed3a418f73c7859e031e453d50a7f7c65dc53884c5f8b431680304b17682c9"
+    },
+    {
+      "bytes": 47519498,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_events_2023.csv.gz",
+      "sha256": "1a18e21248a8ded0f7b718664864b462fa7ac04bc6bea4927db2652d66d31920"
+    },
+    {
+      "bytes": 65001392,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_events_2025.csv.gz",
+      "sha256": "433f463fb19549049a7cc7776d22bcf64f0b26c4575b1d66cfd86a83a5357b4b"
+    },
+    {
+      "bytes": 23068988,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_events_2026.csv.gz",
+      "sha256": "d6a80b0ae20b2f359a182de74a55df790ea8f8d3e501da4b24ec82816b0f42e0"
+    },
+    {
+      "bytes": 7860168,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_opportunities_2019.csv.gz",
+      "sha256": "129f2dd950e71973175b6e0afbbd9fdaaca72bf7eeb35f8f4247ee8c0c6239fc"
+    },
+    {
+      "bytes": 14055223,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_opportunities_2021.csv.gz",
+      "sha256": "8f0eb771e82ea01903c0de0d5c3bfe598a34439f886667d7aec41906e88205c5"
+    },
+    {
+      "bytes": 12929994,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_opportunities_2023.csv.gz",
+      "sha256": "3fe0a42ac92c54dcf9aeffe3f526c666b531fd1391be3406f86e9b17274f722d"
+    },
+    {
+      "bytes": 17040062,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_opportunities_2025.csv.gz",
+      "sha256": "cf660b2078234a2cce191bd6acbf3d204d4a3c4702c14012e6a4f9d0a0b509e2"
+    },
+    {
+      "bytes": 7443653,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/control_opportunities_2026.csv.gz",
+      "sha256": "fc01a2646f9c6757ce51d4faae93bf4e73e76e8cda6352613a8f8a3a2102c5e0"
+    },
+    {
+      "bytes": 255289,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/economic_episode_ledger.csv.gz",
+      "sha256": "39823371aae717f9a38ff13d0cc925e16ef0d65836cd7e95e19ca948e37f1076"
+    },
+    {
+      "bytes": 21395,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/episode_events_2019.csv.gz",
+      "sha256": "71ade5c824a15449507e79b8bbaae08bc2fc8321d6c6bebf07a75bd0be37a9d3"
+    },
+    {
+      "bytes": 25705,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/episode_events_2021.csv.gz",
+      "sha256": "9e20a22ea4dc51f5dd7e10664f39aa4ba9fec6d933dde0eaa5528094efded5a0"
+    },
+    {
+      "bytes": 22421,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/episode_events_2023.csv.gz",
+      "sha256": "26d15ffc8415e5de0f6751d0ad1b677a4fff57f3ce2bb4fc749fa503abb2f878"
+    },
+    {
+      "bytes": 23621,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/episode_events_2025.csv.gz",
+      "sha256": "ded4cb95f8da8671fd845e42fc11722d6403a2f50c7b8b593a33fa0431a4df69"
+    },
+    {
+      "bytes": 9565,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/episode_events_2026.csv.gz",
+      "sha256": "66175ff910fbe73675332dd04f66f56a7fd192b9e39dedb35caa2f341c9d5b9b"
+    },
+    {
+      "bytes": 521881,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/events_2019.csv.gz",
+      "sha256": "62cf93d5f3ee2f72edb6851ef0bd176b8f8a6b97fb347408c11ec9adb5a479ed"
+    },
+    {
+      "bytes": 623365,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/events_2021.csv.gz",
+      "sha256": "4e09f933c10259c09cb340fac54268288d7556aea9c5183f709adf919c930972"
+    },
+    {
+      "bytes": 592007,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/events_2023.csv.gz",
+      "sha256": "bbf847769fc5d2831146714e1650e2434289f0535250064516eb71cfb2eb54e4"
+    },
+    {
+      "bytes": 611396,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/events_2025.csv.gz",
+      "sha256": "0e4b44bb9db94ed93933fb3bbc60ac7e236c9852cf94e9199b1c1404a94b711a"
+    },
+    {
+      "bytes": 252210,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/events_2026.csv.gz",
+      "sha256": "e2c8ef1d340d75df5b9f9c91d05fa3497989ceff762d7edf453a51a2847aca27"
+    },
+    {
+      "bytes": 88886468,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/forward_metrics_2019.csv.gz",
+      "sha256": "93ffdd27aa9178de447a46f3dab0af6a18135daf43af1e5a2fb41dacea8de8c4"
+    },
+    {
+      "bytes": 143725069,
+      "commit_eligible": false,
+      "path": "outputs/stage_02/detailed/forward_metrics_2021.csv.gz",
+      "sha256": "9d4fa3a157001997df905f0dd111e951e6b8d0062f2a4e4489ad37b51e56b9cd"
+    },
+    {
+      "bytes": 144409693,
+      "commit_eligible": false,
+      "path": "outputs/stage_02/detailed/forward_metrics_2023.csv.gz",
+      "sha256": "0cf778e6873d53b8160b46e352f3a0f0be5db56ef41d6f24c57dd9f8d38514de"
+    },
+    {
+      "bytes": 203007015,
+      "commit_eligible": false,
+      "path": "outputs/stage_02/detailed/forward_metrics_2025.csv.gz",
+      "sha256": "57622063b7c09d42862a9816b208330f7eec8a0637757000e7558146975ae913"
+    },
+    {
+      "bytes": 72543975,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/forward_metrics_2026.csv.gz",
+      "sha256": "82c0d4c9cb4e170644dced760b7fee4d64a4f539b172707ccceddcba00aba1e6"
+    },
+    {
+      "bytes": 11130371,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_events_2019.csv.gz",
+      "sha256": "0d8ae204c0fad8512a74ce6c2871d7208346574c01cc212479f7fd3a2be8dd65"
+    },
+    {
+      "bytes": 18763668,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_events_2021.csv.gz",
+      "sha256": "c628d10b0435705695546e501e7108f49bb43a6e712ab966056d73636d22a037"
+    },
+    {
+      "bytes": 19437057,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_events_2023.csv.gz",
+      "sha256": "a9c1d74c67f9cdd9839aaa7ba8a40aa34d66e7c3d49422cdcb8704b9fa2b8cbd"
+    },
+    {
+      "bytes": 25126487,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_events_2025.csv.gz",
+      "sha256": "d59114235ad52ac1d4af41bf82260c527ceee59bdd5e945c26c3bd51fae8e89d"
+    },
+    {
+      "bytes": 8865917,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_events_2026.csv.gz",
+      "sha256": "797f7fed775d93a345a734e9d0c063bda435efa5c32e8858d850c89f698c3055"
+    },
+    {
+      "bytes": 6434,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_ledger_primary.csv.gz",
+      "sha256": "54be3916e2a0755e076e5fd669e7b07cfb0445b4e0c8854855cbb86dc96d043e"
+    },
+    {
+      "bytes": 341170,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/match_ledger_secondary.csv.gz",
+      "sha256": "b30eb2ec72e9575b23f904abaeb7b97ba73344555277faea4b2760ebbee2e3ee"
+    },
+    {
+      "bytes": 291565,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/opportunities_2019.csv.gz",
+      "sha256": "144cf6a124ef804cf3c82c0cc2604fc089189f4b9063b9039c507fd6d23c9df2"
+    },
+    {
+      "bytes": 424133,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/opportunities_2021.csv.gz",
+      "sha256": "0a8d0e9d019402128e7201232d633e0342815562eb0ca5d617e41e88d24575d9"
+    },
+    {
+      "bytes": 394975,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/opportunities_2023.csv.gz",
+      "sha256": "220c2b54a3c0e23981f021dca873bb003b6bf74b86b8446b7acd0578bebc0edf"
+    },
+    {
+      "bytes": 446676,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/opportunities_2025.csv.gz",
+      "sha256": "68ddfa5524b1baa1d1b4524693bc3ca60426e707615b3435800cf5b1f168f8a5"
+    },
+    {
+      "bytes": 204495,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/opportunities_2026.csv.gz",
+      "sha256": "f395b83498fb0e4b5034aa69a75d1c7d5c514fdd18be3332ba86477c00362b22"
+    },
+    {
+      "bytes": 108454,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/profiles_2019.csv.gz",
+      "sha256": "94b846711371bd67e580227ea2d162f70e2901b262f300ce8a2ab1ab03f39b42"
+    },
+    {
+      "bytes": 116192,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/profiles_2021.csv.gz",
+      "sha256": "bf309d3719493767c01b23f19ce6175fd34113b3374a607adbe3de111db02904"
+    },
+    {
+      "bytes": 114589,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/profiles_2023.csv.gz",
+      "sha256": "79aaec1ffa11c91d22651a8125906927b31afab3339454e8864f4a85871a2f78"
+    },
+    {
+      "bytes": 115885,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/profiles_2025.csv.gz",
+      "sha256": "97b93bb9674de14e5b829a1111998f594b399d4e08d0c59f28eb862d6e84310a"
+    },
+    {
+      "bytes": 49367,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/detailed/profiles_2026.csv.gz",
+      "sha256": "750164775e517e5d6e8ab61fb8f9bc4b64663ade4f72c94db386e542035b27d0"
+    },
+    {
+      "bytes": 116,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/economic_episode_summary.csv",
+      "sha256": "5974b0e161a5991101afbaec42e6daf5ab123945f86934e4fb1b8d4ab4d13094"
+    },
+    {
+      "bytes": 156,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/event_summary.csv",
+      "sha256": "e20d904d802e0d6dae76362d9ce4c9c14ec757deba96d881e856aa1c54ebc027"
+    },
+    {
+      "bytes": 12765,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/gate_results.csv",
+      "sha256": "f2bd0aef64560750a6df5513c626df0c272740cf0697f393bc433099d80b1bac"
+    },
+    {
+      "bytes": 1659,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/grid_stability.csv",
+      "sha256": "fb863de932f8d0b0a30d4494359f708831367c4036681478c1975c2f1349a802"
+    },
+    {
+      "bytes": 1139,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/match_quality.csv",
+      "sha256": "6706e10304d5be8537aa35de74185062e2c8b4139ea2dafaf3ad6776845971c3"
+    },
+    {
+      "bytes": 156,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/opportunity_summary.csv",
+      "sha256": "e20d904d802e0d6dae76362d9ce4c9c14ec757deba96d881e856aa1c54ebc027"
+    },
+    {
+      "bytes": 4927,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/paired_primary_results.csv",
+      "sha256": "100a567dcb72ac287f14aff30c120e0d9e30eee90dd66134e0ec3523f9d22c95"
+    },
+    {
+      "bytes": 35206,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/paired_secondary_results.csv",
+      "sha256": "41bd303b318dfe79d40ac62e4b570a6bd0735b5e4f7e4e6c6197c63d3f57af2e"
+    },
+    {
+      "bytes": 1896,
+      "commit_eligible": true,
+      "path": "outputs/stage_02/year_results.csv",
+      "sha256": "26b10fa3f59cc117ee42916f46ef877d56485259f575c33c3f62dce52b159e29"
+    }
+  ],
+  "primary_pairs": 42,
+  "secondary_pairs": 2370,
+  "unmatched": 6428,
+  "year_2019": "ABSENT_FROM_SUPPLIED_ARCHIVES",
+  "years_available": [
+    2021,
+    2023,
+    2025,
+    2026
+  ]
+}
