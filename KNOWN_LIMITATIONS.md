@@ -79,3 +79,17 @@
   populations.
 - Sample-support conditions S21-S23 are checked on 2019 alone. Passing them
   there does not guarantee adequate non-POC counts in every later partition.
+
+## Generation 3 Amendment 03
+
+- The activity percentile uses a ties-share-lowest convention. Under heavy
+  tying, for example small integer TPO counts in sparse overnight profiles, a
+  large group of bins can share one percentile value, so the 90.0 gate can be
+  conservative in thin profiles and reject bins that are in the top group.
+- The two new gates are structural sanity conditions, not evidence about
+  behaviour. A node passing them is globally significant and locally distinct
+  within its own profile; nothing follows about what price does afterwards.
+- POC nodes bypass both new gates by design, so the POC and non-POC populations
+  are qualified by increasingly different rules and remain non-comparable.
+- Amendment 03 is final. If Pilot V4's sample-support or density conditions
+  fail, the authorized response is to report the failure, not to amend again.

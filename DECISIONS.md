@@ -239,3 +239,40 @@ intersects, so it is a proxy rather than transaction-level volume at price;
 time-at-price is the independent corroboration. The geometric mean collapses
 toward zero when either input does, so neither can compensate for the other's
 absence.
+
+## D3-010 — Final Generation 3 detector (Amendment 03)
+
+Pilot V3 passed every structural condition but accepted 28,489 unique non-POC
+nodes, 91.4% of accepted unique nodes, about eight per profile, with a median
+local activity prominence near 1.07 and a minimum below 1.00. Nodes weaker than
+their own local background were qualifying. Discovered from structural
+quantities only; no forward outcome was inspected.
+
+Authorized final definition `GLOBAL_SIGNIFICANCE_AND_LOCAL_DISTINCTNESS` adds
+two gates to the Amendment 02 floors: `peak_activity_percentile >= 90.0`
+against the active bins of the same completed source profile, and
+`local_activity_prominence >= 1.10` on composite activity over the frozen
++/- 0.50 ATR neighbourhood. All Amendment 02 floors are retained unchanged.
+
+The Amendment 01 veto of 1.50 volume prominence stays rejected: 1.10 on
+composite activity requires only that a node exceed its background, not that it
+be isolated. POC rules, value areas and the profile model are unchanged.
+
+Pilot V3 is preserved and labelled
+`GENERATION_3_PILOT_V3 = STRUCTURALLY_VALID_BUT_SUPERSEDED_BEFORE_OUTCOME_ANALYSIS`.
+No further detector amendment is authorized after Pilot V4 unless a mechanical
+or causal defect is found.
+
+## D3-011 — Percentile and prominence conventions frozen
+
+`peak_activity_percentile` is `100 * |{active bins with strictly lower
+activity}| / |{active bins}|`, so ties share the lowest percentile of their
+group, matching the convention already used elsewhere. It uses exact Decimal
+arithmetic and integer counts, is platform-independent, and uses no future data.
+Exactly 90.0 passes.
+
+`local_activity_prominence` divides the candidate's peak composite activity by
+the median composite activity of the +/- 0.50 ATR neighbourhood excluding the
+candidate's own bins. A missing, empty, zero or nonpositive baseline is invalid
+and fails the gate; a zero baseline is never infinite prominence. Exactly 1.10
+passes. Volume and TPO prominence remain annotations and cannot veto.
