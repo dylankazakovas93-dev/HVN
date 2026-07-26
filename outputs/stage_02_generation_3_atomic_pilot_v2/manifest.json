@@ -1,0 +1,66 @@
+{
+  "accepted": 10395,
+  "amendment": "STAGE_02_GENERATION_3_AMENDMENT_01",
+  "archive": "nq2018.zip",
+  "artifacts": {
+    "bin_normalization_summary.csv": {
+      "bytes": 440162,
+      "sha256": "982e851c265c193e5d545b177f78bfc3b8fa24bec5c96c9952809797fc464baf"
+    },
+    "control_summary.csv": {
+      "bytes": 169,
+      "sha256": "ff16f45235fcdbd3f8093c2483cae690e5b378164f1085c0b135bd34dab2e771"
+    },
+    "detailed/accepted_atomic_nodes_2019.csv.gz": {
+      "bytes": 702410,
+      "sha256": "1b59676092729f5c81c7c53b1dcca06205a4f7e62ab6e867bea7cd6421b9f4b4"
+    },
+    "detailed/atomic_candidates_2019.csv.gz": {
+      "bytes": 20872264,
+      "sha256": "e64fcc5b1bedca412e9260b0134487641e6736429853d0e5747b9846fba1af0b"
+    },
+    "detailed/rejected_atomic_nodes_2019.csv.gz": {
+      "bytes": 20307740,
+      "sha256": "04013591dbbd7ccaf28dd484e22689cdc1ea040a6435549d1f5f21ff681bd4bf"
+    },
+    "node_location_summary.csv": {
+      "bytes": 362,
+      "sha256": "72315d4a82db6a3b0e00c09a78c72e838733526a609693de22dfcae2b95bc3e5"
+    },
+    "node_width_summary.csv": {
+      "bytes": 1474,
+      "sha256": "b307ae80d6812bb9a532c70e4650b04dbc01f6cd421b26b17026177809939e77"
+    },
+    "poc_summary.csv": {
+      "bytes": 431892,
+      "sha256": "363262227eccbaf697fe2320bea9af1ba500afb2072a044b6f6ca1e58b9f9186"
+    },
+    "profile_summary.csv": {
+      "bytes": 1033780,
+      "sha256": "0d63bb7a119618e7db2730e547206895b39f8af6d9e3568ab91448f0bb0008ea"
+    },
+    "structural_reconciliation.csv": {
+      "bytes": 356,
+      "sha256": "e1a15ce2447412954d864646f5899d8fbaee865167b8354817c7a3f736d01404"
+    },
+    "tpo_value_area_summary.csv": {
+      "bytes": 441776,
+      "sha256": "807d8ef8832aef721ef0b0d7a90d95051139d0c0ad4a84ce469ee5b5c5954041"
+    },
+    "volume_value_area_summary.csv": {
+      "bytes": 442215,
+      "sha256": "7d848448f15f30cbf4d5e972cf7967d7a0bbff52b483bd72cf771be6c2dd1fd1"
+    }
+  },
+  "bars": 430528,
+  "candidates": 388854,
+  "code_sha": "0a247034f6512db7fa15a5a1f94790d1b208c3e7",
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "forward_outcomes_computed": false,
+  "generation": "GENERATION_3_PILOT_V2_SESSION_NORMALIZED",
+  "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+  "mode": "structural_only",
+  "profiles": 6852,
+  "reproduction_command": "PYTHONPATH=src python3 scripts/run_atomic_pilot_v2.py --year 2019 --data-root <data-root> --structural-only",
+  "year": 2019
+}

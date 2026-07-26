@@ -1,0 +1,15 @@
+check,value
+accepted,10395
+accepted_nonpoc,129
+accepted_poc_atomic,10266
+broad_plateaus_excluded,3420
+candidates,388854
+max_accepted_width_bins,4
+poc_broad,4
+profiles,6852
+rejected,378459
+tpo_value_areas_contiguous_with_poc_inside,3426
+tpo_value_areas_total,3426
+value_areas_below_70pct,0
+value_areas_contiguous_with_poc_inside,3426
+value_areas_total,3426
