@@ -1,0 +1,86 @@
+{
+  "accepted": 8594,
+  "amendment": "STAGE_02_GENERATION_3_AMENDMENT_03",
+  "archive": "nq2018.zip",
+  "artifacts": {
+    "activity_percentile_summary.csv": {
+      "bytes": 211,
+      "sha256": "4d9dc3fe64cc975b5948b1273c585360cc21a0149ab7a307fbbae31a44c37b2e"
+    },
+    "composite_bin_summary.csv": {
+      "bytes": 440162,
+      "sha256": "982e851c265c193e5d545b177f78bfc3b8fa24bec5c96c9952809797fc464baf"
+    },
+    "control_summary.csv": {
+      "bytes": 827,
+      "sha256": "994a060e9826e39cce92b6d1db8b69c336579aa3090d9c902d1567936485ac25"
+    },
+    "detailed/accepted_atomic_nodes_2019.csv.gz": {
+      "bytes": 1675360,
+      "sha256": "9d85b62230d4f95e8e095b4f8d3d9965284e65ae77cb7a1cb21142ac95781fab"
+    },
+    "detailed/composite_candidates_2019.csv.gz": {
+      "bytes": 19358360,
+      "sha256": "082e0f478935cedc2d6af116e8a1db472987484f0462189757c38cd968449360"
+    },
+    "detailed/composite_controls_2019.csv.gz": {
+      "bytes": 1064887,
+      "sha256": "4ec57df666330ce9407a6af5b29a64d2a3206cb3e740af3c80c6cbcc65a1044c"
+    },
+    "detailed/rejected_atomic_nodes_2019.csv.gz": {
+      "bytes": 17931147,
+      "sha256": "6bab84ffd05cbf73bd44a009f5329c44a3f7eb2db800fb96746ac58418e4736f"
+    },
+    "node_class_summary.csv": {
+      "bytes": 284,
+      "sha256": "676a3011ad64c928f457581503e98c3dc568f288c4ea45a764ee14d3e9c91d3c"
+    },
+    "node_location_summary.csv": {
+      "bytes": 493,
+      "sha256": "5b3f32622a1358682a90b8a9eb95b0509b3774b03724e92740e53f636b277f3c"
+    },
+    "node_width_summary.csv": {
+      "bytes": 1941,
+      "sha256": "3e6eb274c665c82f9983ee117ecede1b679ab87fd71a417b7a9c6a6ffe41a3e8"
+    },
+    "poc_summary.csv": {
+      "bytes": 431892,
+      "sha256": "363262227eccbaf697fe2320bea9af1ba500afb2072a044b6f6ca1e58b9f9186"
+    },
+    "profile_summary.csv": {
+      "bytes": 1033780,
+      "sha256": "0d63bb7a119618e7db2730e547206895b39f8af6d9e3568ab91448f0bb0008ea"
+    },
+    "prominence_summary.csv": {
+      "bytes": 56,
+      "sha256": "089a0ed61533e6546a44983764413ba29993beee35fcab335a3a1db5782e3c20"
+    },
+    "rejection_summary.csv": {
+      "bytes": 276,
+      "sha256": "85f0900eadccdc176cadbf3ea67b484c9a620cc30395d30de8675001d385e7f8"
+    },
+    "structural_reconciliation.csv": {
+      "bytes": 370,
+      "sha256": "6c3e8f78820f856370a5555083f1fafbb0d4d336b04a96887ace00659d471e4b"
+    },
+    "tpo_value_area_summary.csv": {
+      "bytes": 441776,
+      "sha256": "807d8ef8832aef721ef0b0d7a90d95051139d0c0ad4a84ce469ee5b5c5954041"
+    },
+    "volume_value_area_summary.csv": {
+      "bytes": 442215,
+      "sha256": "7d848448f15f30cbf4d5e972cf7967d7a0bbff52b483bd72cf771be6c2dd1fd1"
+    }
+  },
+  "bars": 430528,
+  "candidates": 116114,
+  "code_sha": "5c08da5640f534f3487097c8c360f3aa3e25edf0",
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "forward_outcomes_computed": false,
+  "generation": "GENERATION_3_PILOT_V4_GLOBAL_AND_LOCAL",
+  "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+  "mode": "structural_only",
+  "profiles": 6852,
+  "reproduction_command": "PYTHONPATH=src python3 scripts/run_atomic_pilot_v4.py --year 2019 --data-root <data-root> --structural-only",
+  "year": 2019
+}
