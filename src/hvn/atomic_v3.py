@@ -373,3 +373,156 @@ def _rejection_reason(
     if zone_a < MIN_ZONE_ACTIVITY_DENSITY:
         return COMPOSITE_ACTIVITY_TOO_LOW
     return ""
+
+
+C01_NEUTRAL = "C01_NEUTRAL"
+C02_ACTIVITY_MATCHED = "C02_ACTIVITY_MATCHED"
+
+
+@dataclass(frozen=True, slots=True)
+class CompositeControl:
+    control_id: str
+    profile_id: str
+    control_family: str
+    matched_node_id: str
+    start_bin_index: int
+    end_bin_index: int
+    width_bins: int
+    control_low: Decimal
+    control_high: Decimal
+    control_center: Decimal
+    zone_volume_density_ratio: Decimal
+    zone_tpo_density_ratio: Decimal
+    zone_activity_density_ratio: Decimal
+
+    @property
+    def atomic_id(self) -> str:
+        return self.control_id
+
+    @property
+    def peak_price(self) -> Decimal:
+        return self.control_center
+
+    @property
+    def atomic_low(self) -> Decimal:
+        return self.control_low
+
+    @property
+    def atomic_high(self) -> Decimal:
+        return self.control_high
+
+    def contains(self, price: Decimal) -> bool:
+        return self.control_low <= price < self.control_high
+
+    def touched_by(self, low: Decimal, high: Decimal) -> bool:
+        return not (high < self.control_low or low >= self.control_high)
+
+    def distance_atr(self, price: Decimal, atr: Decimal) -> Decimal:
+        if self.contains(price):
+            return Decimal(0)
+        gap = (
+            self.control_low - price
+            if price < self.control_low
+            else price - self.control_high
+        )
+        return gap / atr
+
+    def peak_distance_atr(self, price: Decimal, atr: Decimal) -> Decimal:
+        return abs(price - self.control_center) / atr
+
+    def band(self, expansion_atr: Decimal, atr: Decimal) -> tuple[Decimal, Decimal]:
+        pad = expansion_atr * atr
+        return self.control_low - pad, self.control_high + pad
+
+    def in_band(self, price: Decimal, expansion_atr: Decimal, atr: Decimal) -> bool:
+        low, high = self.band(expansion_atr, atr)
+        return low <= price < high
+
+
+def select_composite_controls(
+    profile: FrozenProfile,
+    tpo_by_index: dict,
+    nodes: tuple[CompositeNode, ...],
+    node: CompositeNode,
+    *,
+    taken: set | None = None,
+) -> tuple[CompositeControl, ...]:
+    """One C01 and one C02 control for `node`, from frozen features only.
+
+    C01_NEUTRAL is the eligible window whose composite activity is closest to
+    the profile average. C02_ACTIVITY_MATCHED is the eligible window whose
+    composite activity is closest to the treated node's, so C02 asks whether
+    local peak geometry matters once general activity is controlled for.
+
+    Eligible windows never overlap the POC, any accepted node, a composite
+    local maximum, another control already taken in this lane, or price space
+    outside the frozen grid. No post-touch information is used.
+    """
+    norm = profile_normalization(profile, tpo_by_index)
+    if not norm.valid:
+        return ()
+    bins_by_index = {b.bin_index: b for b in profile.bins}
+    indices = sorted(bins_by_index)
+    if not indices:
+        return ()
+    _, _, activity = density_ratios(profile, tpo_by_index, norm)
+
+    blocked: set[int] = set()
+    for other in nodes:
+        if other.accepted or other.node_class in (POC_ATOMIC, POC_BROAD):
+            blocked |= set(range(other.start_bin_index, other.end_bin_index + 1))
+    for run in composite_local_maxima(profile, activity):
+        blocked |= {b.bin_index for b in run}
+    if taken:
+        blocked |= taken
+
+    width = node.width_bins
+    lowest, highest = indices[0], indices[-1]
+    candidates = []
+    for start in range(lowest, highest - width + 2):
+        end = start + width - 1
+        span = list(range(start, end + 1))
+        if end > highest or any(i in blocked for i in span):
+            continue
+        if any(i not in bins_by_index for i in span):
+            continue
+        zone_volume = sum(
+            (bins_by_index[i].profile_weight for i in span), Decimal(0)
+        )
+        zone_tpo = sum((tpo_by_index.get(i, Decimal(0)) for i in span), Decimal(0))
+        width_fraction = Decimal(width) / Decimal(norm.n_active)
+        zone_v = (zone_volume / norm.v_total) / width_fraction
+        zone_t = (zone_tpo / norm.t_total) / width_fraction
+        candidates.append((start, end, zone_v, zone_t, geometric_mean(zone_v, zone_t)))
+    if not candidates:
+        return ()
+
+    def build(choice, family):
+        start, end, zone_v, zone_t, zone_a = choice
+        low = bins_by_index[start].bin_low
+        high = bins_by_index[end].bin_high
+        return CompositeControl(
+            control_id=f"{profile.profile_id}-K{start:06d}-{family[:3]}",
+            profile_id=profile.profile_id,
+            control_family=family,
+            matched_node_id=node.node_id,
+            start_bin_index=start,
+            end_bin_index=end,
+            width_bins=width,
+            control_low=low,
+            control_high=high,
+            control_center=(low + high) / 2,
+            zone_volume_density_ratio=zone_v,
+            zone_tpo_density_ratio=zone_t,
+            zone_activity_density_ratio=zone_a,
+        )
+
+    neutral = min(candidates, key=lambda c: (abs(c[4] - Decimal(1)), c[0]))
+    matched = min(
+        candidates,
+        key=lambda c: (abs(c[4] - node.zone_activity_density_ratio), c[0]),
+    )
+    out = [build(neutral, C01_NEUTRAL)]
+    if matched[0] != neutral[0]:
+        out.append(build(matched, C02_ACTIVITY_MATCHED))
+    return tuple(out)

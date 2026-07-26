@@ -297,3 +297,59 @@ def test_percentile_ties_share_the_lowest_rank():
     ranks = percentile_ranks({0: Decimal(5), 1: Decimal(5), 2: Decimal(9)})
     assert ranks[0] == ranks[1] == Decimal(0)
     assert ranks[2] == Decimal(2) / Decimal(3)
+
+
+# 28/29/30. Composite controls.
+def test_controls_avoid_nodes_poc_and_composite_maxima():
+    from hvn.atomic_v3 import (
+        C01_NEUTRAL, C02_ACTIVITY_MATCHED, composite_local_maxima,
+        density_ratios, select_composite_controls,
+    )
+    volume = [1, 1, 1, 70, 75, 80, 75, 70, 1, 1, 120, 1, 1, 1, 5, 6, 5, 1, 1, 1]
+    profile = build_profile(volume, atr="40")
+    tpo = {b.bin_index: Decimal(v) for b, v in zip(profile.bins, volume)}
+    nodes, _ = classify_composite_nodes(profile, tpo)
+    node = next(n for n in nonpoc(nodes) if n.accepted)
+    controls = select_composite_controls(profile, tpo, nodes, node)
+    assert controls, "expected at least a neutral control"
+    assert {c.control_family for c in controls} <= {C01_NEUTRAL, C02_ACTIVITY_MATCHED}
+
+    norm = profile_normalization(profile, tpo)
+    _, _, activity = density_ratios(profile, tpo, norm)
+    peak_bins = {b.bin_index for run in composite_local_maxima(profile, activity) for b in run}
+    node_bins = set()
+    for other in nodes:
+        if other.accepted or other.node_class in (POC_ATOMIC, POC_BROAD):
+            node_bins |= set(range(other.start_bin_index, other.end_bin_index + 1))
+    for control in controls:
+        span = set(range(control.start_bin_index, control.end_bin_index + 1))
+        assert control.width_bins == node.width_bins
+        assert not (span & peak_bins), "control overlaps a composite maximum"
+        assert not (span & node_bins), "control overlaps a node or the POC"
+
+
+def test_controls_use_only_frozen_features_and_are_deterministic():
+    import ast
+    import inspect
+    from pathlib import Path
+
+    from hvn.atomic_v3 import select_composite_controls
+
+    tree = ast.parse(inspect.getsource(select_composite_controls).lstrip())
+    function = tree.body[0]
+    if (function.body and isinstance(function.body[0], ast.Expr)
+            and isinstance(function.body[0].value, ast.Constant)):
+        function.body = function.body[1:]        # drop the docstring
+    body = ast.unparse(function).lower()
+    for token in ("forward", "horizon", "proximity", "residence", "departure",
+                  "excursion", "outcome"):
+        assert token not in body, token
+
+    volume = [1, 1, 1, 70, 75, 80, 75, 70, 1, 1, 120, 1, 1, 1, 5, 6, 5, 1, 1, 1]
+    profile = build_profile(volume, atr="40")
+    tpo = {b.bin_index: Decimal(v) for b, v in zip(profile.bins, volume)}
+    nodes, _ = classify_composite_nodes(profile, tpo)
+    node = next(n for n in nonpoc(nodes) if n.accepted)
+    first = select_composite_controls(profile, tpo, nodes, node)
+    second = select_composite_controls(profile, tpo, nodes, node)
+    assert [c.control_id for c in first] == [c.control_id for c in second]
