@@ -169,3 +169,42 @@ No event-generation recomputation is required.
 
 Generation 1 remains as produced, over four partitions. Generation 1 and
 Generation 2 pair counts are therefore not directly comparable.
+
+## D3-005 — Session-normalized atomic node definition (Generation 3 Amendment 01)
+
+Pilot V1's relative-prominence-only detector inverted the selection: dense
+peaks were rejected because their neighbours were also heavy, while sparse tail
+bumps qualified because theirs were nearly empty. 25 of 6,019 peaks contained
+the POC and the widest zone spanned 51 bins and 6.10 ATR. Diagnosed entirely
+from structural quantities, with no forward outcome inspected.
+
+Authorized replacement `SESSION_NORMALIZED_ATOMIC_NODES` combines
+profile-normalized volume concentration, TPO concentration, retained local
+prominence, a hard 1-5 bin width limit, explicit POC treatment with a
+prominence exemption, and 70% volume and TPO value areas as annotations.
+
+All normalization occurs inside the single completed frozen source profile, so
+overnight and RTH profiles are never compared by raw volume. Thresholds are
+frozen in `research/hvn/STAGE_02_GENERATION_3_AMENDMENT_01.md` and were not
+searched.
+
+Pilot V1 is preserved and labelled
+`GENERATION_3_PILOT_V1 = REJECTED_STRUCTURAL_DEFINITION`. Its forward-outcome
+tables remain unread. Pilot V2 writes to
+`outputs/stage_02_generation_3_atomic_pilot_v2/`.
+
+## D3-006 — Zero local baseline fails rather than qualifies
+
+V1 treated a zero neighbourhood median as infinite prominence and qualified the
+candidate. Under Amendment 01 a zero baseline makes prominence undefined and
+the candidate fails the prominence condition. Combined with the session-relative
+volume floor, this closes the path by which empty neighbourhoods admitted
+trivial bumps.
+
+## D3-007 — POC exempt from local prominence, not from concentration
+
+A profile's maximum-volume price can sit among heavy neighbours, which is
+precisely the case V1 rejected. `POC_ATOMIC` is therefore exempt from the
+prominence threshold and from the TPO density floor, but must still satisfy the
+1-5 bin width limit, valid totals, and a zone volume density ratio of at least
+1.50. POC and non-POC nodes remain separate classes everywhere.

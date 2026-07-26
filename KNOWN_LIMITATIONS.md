@@ -43,3 +43,24 @@
   across the two generations.
 - Generation 1's `UNDERPOWERED` verdict describes the Generation 1 matching
   rule. It is not evidence for or against the HVN hypothesis.
+
+## Generation 3 Amendment 01
+
+- The volume profile is an allocation of one-minute OHLCV bar volume across the
+  bins each bar's range intersects. It is not transaction-level volume at price
+  and must never be described as such. The TPO construction is an independent
+  time-at-price proxy over completed bars, not a tick-level measure.
+- All thresholds are relative to the single completed source profile. A node
+  qualifying in a quiet overnight profile and one qualifying in a busy RTH
+  profile are comparable in session-relative terms only; their raw traded
+  volumes may differ by a large factor.
+- The 70% value areas use a rough contiguous expansion, not the classical
+  70%-of-TPO-count construction, and the final added bin may overshoot 70%.
+- Value-area location is an annotation in this amendment. If a later generation
+  makes it an eligibility filter, that is a new research generation.
+- Percentile ranks use a frozen convention in which ties share the lowest
+  percentile of their group. Under heavy tying, for example integer TPO counts
+  in sparse profiles, a large fraction of bins can share one percentile value.
+- The 1-5 bin width limit is a definitional choice, not an empirical one.
+  Broad plateaus are preserved and reported, never truncated, but they are
+  excluded from atomic interaction events, so the study says nothing about them.
