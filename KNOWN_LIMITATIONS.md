@@ -64,3 +64,18 @@
 - The 1-5 bin width limit is a definitional choice, not an empirical one.
   Broad plateaus are preserved and reported, never truncated, but they are
   excluded from atomic interaction events, so the study says nothing about them.
+
+## Generation 3 Amendment 02
+
+- The composite activity score is the geometric mean of two proxies. It
+  inherits both proxies' limitations: uniform volume allocation across a bar's
+  range, and TPO counted over completed one-minute bars rather than ticks.
+- Non-POC eligibility no longer involves any prominence or percentile
+  condition. A qualifying non-POC node may sit immediately beside equally
+  active prices; that is intended, and it means node isolation must be read
+  from the recorded prominence annotations rather than assumed.
+- POC and non-POC nodes are qualified by different rules and are never pooled.
+  Any comparison between them is a comparison of two differently defined
+  populations.
+- Sample-support conditions S21-S23 are checked on 2019 alone. Passing them
+  there does not guarantee adequate non-POC counts in every later partition.

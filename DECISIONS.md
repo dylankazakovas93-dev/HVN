@@ -208,3 +208,34 @@ precisely the case V1 rejected. `POC_ATOMIC` is therefore exempt from the
 prominence threshold and from the TPO density floor, but must still satisfy the
 1-5 bin width limit, valid totals, and a zone volume density ratio of at least
 1.50. POC and non-POC nodes remain separate classes everywhere.
+
+## D3-008 — Composite volume/TPO atomic nodes (Generation 3 Amendment 02)
+
+Pilot V2 passed every structural condition but produced 2,681 unique POC nodes
+against 43 unique non-POC nodes, with R01 and R02 contributing none. That is a
+population-definition problem measured from frozen source-profile structure, not
+an outcome finding, and no forward outcome was inspected.
+
+Authorized replacement `COMPOSITE_VOLUME_TPO_ATOMIC_NODES` detects non-POC
+candidates from a composite activity profile, the geometric mean of the volume
+and TPO density ratios, and qualifies them on zone volume density 1.25, peak
+volume density 1.50, zone TPO density 1.00, composite activity 1.35 and width
+1-5 bins. Thresholds are fixed and may not be tuned after any outcome.
+
+Pilot V2 is labelled
+`GENERATION_3_PILOT_V2 = STRUCTURALLY_VALID_BUT_SUPERSEDED_BEFORE_OUTCOME_ANALYSIS`
+and preserved intact. Pilot V3 writes to a separate directory.
+
+## D3-009 — Local prominence becomes descriptive, TPO stays in the detector
+
+V2 required non-POC nodes to clear a local prominence of 1.50 against their
++/- 0.50 ATR neighbourhood, which vetoes a busy price embedded among other busy
+prices. Prominence is now recorded for volume, TPO and composite activity as an
+annotation and analysis stratum, and may not appear as a rejection reason.
+
+TPO remains in both candidate discovery and qualification. The volume profile
+allocates each completed bar's volume uniformly across the bins its range
+intersects, so it is a proxy rather than transaction-level volume at price;
+time-at-price is the independent corroboration. The geometric mean collapses
+toward zero when either input does, so neither can compensate for the other's
+absence.
