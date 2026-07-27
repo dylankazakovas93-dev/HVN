@@ -1,13 +1,41 @@
 # Project Status
 
-Status: **STAGE_02 GENERATION 2 MATCHING — AMENDMENT 02 AUTHORIZED**
+Status: **STAGE_02 GENERATION 4 HVN ZONES — SPECIFICATIONS LOCKED, STRUCTURAL PILOT PENDING**
 
 ```text
 STAGE_02_GENERATION_1_MATCHING = UNDERPOWERED
+STAGE_02_GENERATION_3_2019     = COMPUTATIONALLY_VALID_BUT_NOT_A_VALID_TEST_OF_THE_INTENDED_HVN_ZONE_HYPOTHESIS
+STAGE_02_GENERATION_4          = SPECIFICATIONS_LOCKED
 ```
 
-That label describes the Generation 1 matching design. It is **not** a verdict
-on the HVN hypothesis, which Generation 1 could not test.
+The Generation 1 label describes the Generation 1 matching design. It is **not**
+a verdict on the HVN hypothesis, which Generation 1 could not test.
+
+## Generation 3 (`outputs/stage_02_generation_3_final/`, `_atomic`, pilots V2-V4)
+
+The atomic detector and its accepted 2019 outcome checkpoint are preserved in
+full and remain computationally valid for the one-tick object they measured.
+Median accepted node width was 0.25 points, so `inside_close_share` measured
+whether a future one-minute close landed on essentially one exact tick. That is
+not the intended HVN zone, so the checkpoint is reclassified as above and is not
+cited as evidence about HVN zones in either direction.
+
+The remaining partition sweep is stopped: 2021, 2023, 2025 and partial 2026 were
+never run under the one-tick definition, and no later Generation 3 partition was
+ever accepted. See D-G4-001.
+
+## Generation 4 (`STAGE_02_GENERATION_4_HVN_ZONES`)
+
+Generation 4 replaces atomic price points with causally frozen, smoothed,
+multi-bin high-volume/high-occupancy zones. Six specifications are locked before
+any empirical execution: charter, zone spec, outcome spec, control spec,
+statistics spec and gate. No zone may be one tick wide
+(`minimum_zone_width_ticks = max(4, ceil(0.10 ATR / 0.25))`).
+
+Next authorized action: implement the smoothed-zone detector with fixtures, then
+run the 2019 structural-only pilot into
+`outputs/stage_02_generation_4_hvn_zones_pilot/` and evaluate G4-S01 through
+G4-S19. No Generation 4 forward outcome has been computed or opened.
 
 ## Development partitions
 

@@ -313,3 +313,61 @@ corrected ratio, and the exclusion of binary counts from the composite.
 
 I had previously recorded this behaviour as an inherent property of per-bar TPO
 construction. That characterization was wrong.
+
+## D-G4-001 — Generation 3 reclassified; Generation 4 opens the HVN-zone object
+
+Date: 2026-07-27
+
+The accepted Generation 3 2019 checkpoint is classified:
+
+```text
+GENERATION_3_2019_ATOMIC_POINT_RESULT =
+COMPUTATIONALLY_VALID_BUT_NOT_A_VALID_TEST_OF_THE_INTENDED_HVN_ZONE_HYPOTHESIS
+```
+
+The reason is structural, not evidential. Median accepted node width was 0.25
+points and most accepted nodes were exactly one NQ tick wide, so
+`inside_close_share` measured whether a future one-minute close landed on
+essentially one exact tick. That is not the economically meaningful volume-node
+region this project set out to test.
+
+Consequences:
+
+1. The remaining Generation 3 partition sweep is stopped. 2021, 2023, 2025 and
+   partial 2026 are **not** run under the one-tick atomic definition. No later
+   Generation 3 partition was ever accepted.
+2. Generation 3 is preserved in full and remains computationally valid **for its
+   stated one-tick object**. Its ledgers, summaries, tests and audit stand.
+3. Generation 3 is **not** reinterpreted as evidence that meaningful HVN zones
+   fail. It is evidence about one-tick points only.
+4. Generation 3 outcomes may not be used to tune any Generation 4 threshold, and
+   Generation 3 H1 may not be compared directly with Generation 4 H1 as though
+   the metric represented the same object.
+
+`STAGE_02_GENERATION_4_HVN_ZONES` replaces atomic price points with causally
+frozen, smoothed, multi-bin high-volume/high-occupancy zones: a contiguous
+multi-price region inside a completed source profile where both allocated
+volume and time-at-price are concentrated, centred on a meaningful local peak
+and separated from surrounding structure by a detectable shoulder or valley.
+
+The research object is changed **before any Generation 4 outcome is observed**.
+The reset is justified by the geometry of the tested objects, not by whether
+the 2019 Generation 3 outcome was favourable or unfavourable — and it was
+unfavourable, which is recorded plainly in the Generation 4 charter precisely so
+that the ordering of reasoning is auditable.
+
+No Generation 4 threshold may be revised after its forward outcomes are opened.
+Generation 4 is the final authorized structural definition for this development
+study; if it does not support the mechanism, the authorized action is to report
+that and stop.
+
+Specifications locked before empirical execution:
+
+```text
+research/hvn/STAGE_02_GENERATION_4_CHARTER.md
+research/hvn/STAGE_02_GENERATION_4_ZONE_SPEC.md
+research/hvn/STAGE_02_GENERATION_4_OUTCOME_SPEC.md
+research/hvn/STAGE_02_GENERATION_4_CONTROL_SPEC.md
+research/hvn/STAGE_02_GENERATION_4_STATISTICS_SPEC.md
+research/hvn/STAGE_02_GENERATION_4_GATE.md
+```

@@ -111,3 +111,29 @@
 - Excursion quantities are directional and adverse displacements only. They are
   never profit, loss, MFE or MAE, and no entry, stop, target or execution
   assumption exists anywhere in this study.
+
+## Generation 3 scope
+
+- The accepted Generation 3 2019 checkpoint is
+  `COMPUTATIONALLY_VALID_BUT_NOT_A_VALID_TEST_OF_THE_INTENDED_HVN_ZONE_HYPOTHESIS`.
+  Median accepted node width was 0.25 points and most nodes were one NQ tick
+  wide, so its acceptance metrics describe behaviour at a single exact price,
+  not at a multi-price volume region. It is preserved and must not be cited as
+  evidence about HVN zones in either direction. See D-G4-001.
+- Only 2019 was ever accepted under Generation 3. 2021, 2023, 2025 and partial
+  2026 were never run under the one-tick definition, so no cross-year
+  Generation 3 outcome evidence exists.
+
+## Generation 4 scope
+
+- Generation 4 zones are built from the same one-minute OHLCV proxies. Smoothing
+  identifies profile regions; it does not add transaction-level information, and
+  no claim of exact volume-at-price precision is made.
+- The smoothing bandwidth is a single frozen choice (`0.05 ATR` half-width,
+  minimum 2 ticks). No competing bandwidths are run as alternative primary
+  definitions, so the results are conditional on that bandwidth.
+- Zone width varies by construction, so width is a predefined reporting stratum.
+  Any activity effect that appears only within one width stratum must be
+  reported as a possible width artefact rather than a zone-geometry effect.
+- Generation 4 is the final authorized structural definition for this
+  development study. No further detector generation is authorized.

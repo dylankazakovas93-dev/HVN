@@ -62,3 +62,29 @@
   and opens `STAGE_02_GENERATION_2_MATCHING`. Generation 1 is preserved.
 - Corrected an aggregator defect that silently excluded the declared 2019
   partition from Generation 1 (D-016).
+
+## Stage 2 Generation 4 — 2026-07-27
+
+- Stopped the Generation 3 partition sweep before 2021, 2023, 2025 or partial
+  2026 was run under the one-tick atomic definition. No later Generation 3
+  partition was ever accepted, and the interrupted launch never started, so
+  there were no incomplete outputs to quarantine.
+- Reclassified the accepted Generation 3 2019 checkpoint as
+  `COMPUTATIONALLY_VALID_BUT_NOT_A_VALID_TEST_OF_THE_INTENDED_HVN_ZONE_HYPOTHESIS`
+  on structural grounds: median accepted node width 0.25 points, most nodes one
+  NQ tick wide. The checkpoint, its ledgers and its audit are preserved
+  unchanged (D-G4-001).
+- Opened `STAGE_02_GENERATION_4_HVN_ZONES`, replacing atomic price points with
+  causally frozen, smoothed, multi-bin high-volume/high-occupancy zones.
+- Locked six Generation 4 specifications before any empirical execution:
+  charter, zone spec, outcome spec, control spec, statistics spec and gate.
+  The zone spec fixes the triangular smoothing bandwidth, the 95th-percentile
+  and 1.50 peak gates, the 70% core expansion, the four-tick / 0.10 ATR minimum
+  width, the 0.75 ATR maximum, the zone density and peak-to-valley requirements,
+  the adjacent-peak resolution, the POC zone, physical-zone deduplication, the
+  rejection ordering and structural conditions G4-S01 through G4-S19.
+- Recorded that Generation 4 is the final authorized structural definition for
+  this development study, and that no Generation 4 threshold may be revised
+  after its forward outcomes are opened.
+- No Generation 4 code, pilot or outcome exists yet; no forward outcome has been
+  computed or opened.
