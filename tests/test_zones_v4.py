@@ -23,6 +23,7 @@ from hvn.zones_v4 import (
     _replace_rejection,
     classify_zones,
     construct_tick_profile,
+    maximum_poc_zone_width_ticks,
     maximum_zone_width_ticks,
     minimum_zone_width_ticks,
     profile_activity,
@@ -352,3 +353,17 @@ def test_a_bar_completing_after_the_freeze_time_is_excluded():
     # Sixty one-minute bars fit inside the sixty-minute window; the last does not.
     assert len(profile.source_row_ids) == 60
     assert sum(profile.volume.values(), Decimal(0)) == Decimal(240)
+
+
+def test_the_poc_ceiling_is_not_raised_to_the_minimum_width():
+    """G4-S05: an accepted POC zone can never exceed 1.00 ATR.
+
+    When the four-tick absolute floor already exceeds 1.00 ATR the POC rule
+    `minimum width <= width <= 1.00 ATR` is unsatisfiable, and the POC must be
+    a broad distribution rather than an oversized accepted zone.
+    """
+    # ATR 0.56 points: 1.00 ATR is 2.24 ticks, below the four-tick floor.
+    assert maximum_poc_zone_width_ticks(Decimal("0.56")) == 2
+    assert minimum_zone_width_ticks(Decimal("0.56")) == 4
+    # The non-POC maximum is still clamped upward, as its own rule requires.
+    assert maximum_zone_width_ticks(Decimal("0.56")) == 4

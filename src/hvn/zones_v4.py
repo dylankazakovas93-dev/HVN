@@ -386,13 +386,20 @@ def maximum_zone_width_ticks(atr: Decimal) -> int:
 
 
 def maximum_poc_zone_width_ticks(atr: Decimal) -> int:
-    """floor(1.00 * ATR / 0.25), never smaller than the minimum."""
-    ticks = int(
+    """floor(1.00 * ATR / 0.25).
+
+    Unlike the non-POC maximum this is **not** raised to the minimum width. The
+    POC classification rule is stated literally as
+    `minimum width <= POC zone width <= 1.00 ATR`, so when the four-tick
+    absolute floor already exceeds 1.00 ATR the rule is unsatisfiable and the
+    POC is a `POC_BROAD_DISTRIBUTION`. Clamping here would admit POC zones wider
+    than 1.00 ATR and break G4-S05.
+    """
+    return int(
         (MAX_POC_ZONE_WIDTH_ATR * atr / TICK_SIZE).to_integral_value(
             rounding=ROUND_FLOOR
         )
     )
-    return max(minimum_zone_width_ticks(atr), ticks)
 
 
 def _plateaus(smoothed: dict[int, Decimal], indices: range) -> list[list[int]]:
