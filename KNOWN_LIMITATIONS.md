@@ -137,3 +137,11 @@
   reported as a possible width artefact rather than a zone-geometry effect.
 - Generation 4 is the final authorized structural definition for this
   development study. No further detector generation is authorized.
+- The Generation 4 width rules are expressed in ATR but carry a four-tick
+  absolute floor. At the project's one-minute frozen ATR (2019 median 1.924
+  points) the floor binds in every profile and is itself a median 0.52 ATR
+  minimum width, against a 0.75 ATR maximum. In 197 of 895 2019 profiles the
+  ceiling falls below the floor. The 2019 structural pilot therefore accepted
+  six non-POC zones against a required 300 and was not accepted. The definition
+  was not retuned; the contradiction is recorded and left to a principal
+  decision.

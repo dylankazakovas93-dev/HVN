@@ -5,6 +5,6 @@ R02,prior_rth,NONPOC_HVN_ZONE,3
 R02,prior_rth,POC_HVN_ZONE,42
 R03,full_overnight,NONPOC_HVN_ZONE,2
 R03,full_overnight,POC_HVN_ZONE,33
-R04,midnight,POC_HVN_ZONE,5
+R04,midnight,POC_HVN_ZONE,3
 R05,opening_hour_rth,NONPOC_HVN_ZONE,1
 R05,opening_hour_rth,POC_HVN_ZONE,45

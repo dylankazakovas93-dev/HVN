@@ -88,3 +88,25 @@
   after its forward outcomes are opened.
 - No Generation 4 code, pilot or outcome exists yet; no forward outcome has been
   computed or opened.
+- Implemented the smoothed-zone detector (`src/hvn/zones_v4.py`, 22 fixtures) and
+  the structural pilot runner, and ran the 2019 structural-only pilot into
+  `outputs/stage_02_generation_4_hvn_zones_pilot/`. All 17 artifacts are
+  byte-identical on an independent rerun.
+- Found and corrected one implementation defect before acceptance: the POC width
+  ceiling was clamped upward to the minimum zone width, admitting POC zones up to
+  1.80 ATR wide and failing G4-S05. Corrected in `72e6777` with a regression
+  fixture; the pilot was rerun from scratch.
+- Structural conditions G4-S01 through G4-S14 and G4-S17 through G4-S19 pass.
+  **G4-S15 and G4-S16 fail**: six unique non-POC zones exist in 2019 against a
+  required 300, and no relationship reaches the required 20 opportunities.
+- Diagnosed the cause as a width-band collapse at this project's ATR scale, not a
+  sample accident. The frozen ATR is a one-minute Wilder ATR with a 2019 median
+  of 1.924 points, so the four-tick absolute floor binds everywhere and is itself
+  a median 0.52 ATR minimum width against a 0.75 ATR maximum. In 197 of 895
+  profiles the ceiling falls below the floor. 85% of POC candidates exceed their
+  ceiling and become broad distributions, whose span then vetoes 729 non-POC
+  candidates.
+- Stopped before the outcome study: automatic continuation is conditional on all
+  structural conditions passing, and the cause is a specification contradiction
+  whose resolution is the principal's decision. No threshold was retuned and no
+  further detector generation was created.

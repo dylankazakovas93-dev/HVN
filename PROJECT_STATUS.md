@@ -1,11 +1,11 @@
 # Project Status
 
-Status: **STAGE_02 GENERATION 4 HVN ZONES — SPECIFICATIONS LOCKED, STRUCTURAL PILOT PENDING**
+Status: **STAGE_02 GENERATION 4 HVN ZONES — STRUCTURAL PILOT RUN AND NOT ACCEPTED**
 
 ```text
 STAGE_02_GENERATION_1_MATCHING = UNDERPOWERED
 STAGE_02_GENERATION_3_2019     = COMPUTATIONALLY_VALID_BUT_NOT_A_VALID_TEST_OF_THE_INTENDED_HVN_ZONE_HYPOTHESIS
-STAGE_02_GENERATION_4          = SPECIFICATIONS_LOCKED
+STAGE_02_GENERATION_4          = STRUCTURAL_PILOT_NOT_ACCEPTED (G4-S15, G4-S16 fail)
 ```
 
 The Generation 1 label describes the Generation 1 matching design. It is **not**
@@ -32,10 +32,27 @@ any empirical execution: charter, zone spec, outcome spec, control spec,
 statistics spec and gate. No zone may be one tick wide
 (`minimum_zone_width_ticks = max(4, ceil(0.10 ATR / 0.25))`).
 
-Next authorized action: implement the smoothed-zone detector with fixtures, then
-run the 2019 structural-only pilot into
-`outputs/stage_02_generation_4_hvn_zones_pilot/` and evaluate G4-S01 through
-G4-S19. No Generation 4 forward outcome has been computed or opened.
+The detector (`src/hvn/zones_v4.py`) and the 2019 structural pilot are complete.
+Mechanical and causal conditions G4-S01 through G4-S12 all pass, all 17 artifacts
+are byte-identical on an independent rerun, and zero forbidden-year rows were
+admitted. **G4-S15 and G4-S16 fail**: six unique non-POC zones exist in 2019
+against a required 300, and no relationship reaches its required 20
+opportunities.
+
+The cause is a width-band collapse at this project's ATR scale, not a sample
+accident. The frozen ATR is a one-minute Wilder ATR with a 2019 median of 1.924
+points, so the four-tick absolute floor binds everywhere and is itself a median
+0.52 ATR minimum width against a 0.75 ATR maximum; in 197 of 895 profiles the
+ceiling falls below the floor. See
+`outputs/stage_02_generation_4_hvn_zones_pilot/GENERATION_4_STRUCTURAL_REPORT.md`.
+
+The outcome study did not begin: automatic continuation is conditional on all
+structural conditions passing. No Generation 4 forward outcome has been computed
+or opened, no threshold was retuned and no further detector generation was
+created.
+
+Next authorized action: a principal decision on how to resolve the width-band
+contradiction.
 
 ## Development partitions
 
