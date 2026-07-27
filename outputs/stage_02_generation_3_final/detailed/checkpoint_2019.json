@@ -1,0 +1,64 @@
+{
+  "activity_metric_rows": 163840,
+  "bars": 430528,
+  "code_sha": "d8b07c4c7e72badcabb07e7975a2f2a62515e127",
+  "control_events": 10875,
+  "control_opportunities": 17188,
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "departure_rows": 16384,
+  "excursion_rows": 49020,
+  "forward_metric_rows": 81920,
+  "ingestion_audit": {
+    "archive": "nq2018.zip",
+    "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+    "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+    "parsed_years": [
+      2018,
+      2019
+    ],
+    "requested_year": 2019,
+    "rows_admitted": 430528,
+    "rows_excluded_earlier_year": 481125,
+    "rows_excluded_later_year": 0,
+    "rows_skipped_non_outright": 30906
+  },
+  "ledgers": {
+    "activity_metrics_2019.csv.gz": {
+      "bytes": 7586226,
+      "sha256": "86b63ee6f2210ab497c4931b1b972ba1c9417656a3a2b1b095e2c0e3e61297b6"
+    },
+    "control_events_2019.csv.gz": {
+      "bytes": 1002936,
+      "sha256": "81fbe939af167596be10b1946a715ee1041ec73881841c8e3d03c23a4ee880f5"
+    },
+    "control_opportunities_2019.csv.gz": {
+      "bytes": 1050095,
+      "sha256": "e85fe47b5fb4e6488d254d5f4f249734b3571e396402a4367131dea99a4eb8ae"
+    },
+    "departure_metrics_2019.csv.gz": {
+      "bytes": 128496,
+      "sha256": "35fc643618ce0a6ea5a08846c92783b965d996322b479469c63312d83065623b"
+    },
+    "excursion_metrics_2019.csv.gz": {
+      "bytes": 1301317,
+      "sha256": "c748e89603a891dd9e99d4ac4fa7e0254c74df105336732a5d565f1bbfda2d0d"
+    },
+    "forward_metrics_2019.csv.gz": {
+      "bytes": 2930552,
+      "sha256": "9ccce1997e497df9f4e4e0f457335b424e91f70c18c8e3b93d581faf68abcf91"
+    },
+    "node_events_2019.csv.gz": {
+      "bytes": 830719,
+      "sha256": "61ce9efdeb777d14eddb7d540a43773bffb82ef23fd977fd4d2f36051d9be4a5"
+    },
+    "node_opportunities_2019.csv.gz": {
+      "bytes": 905205,
+      "sha256": "e99361820c0942496a324b27ca9cf7bb5f58d2e6f23a4353ff8067805d2e09bf"
+    }
+  },
+  "node_events": 5509,
+  "node_opportunities": 8594,
+  "reproduction_command": "PYTHONPATH=src python3 scripts/run_gen3_year.py --year 2019 --data-root <data-root>",
+  "runtime_seconds": 309.1,
+  "year": 2019
+}
