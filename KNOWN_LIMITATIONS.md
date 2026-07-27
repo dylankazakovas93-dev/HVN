@@ -96,13 +96,15 @@
 
 ## Generation 3 outcome metrics
 
-- TPO occupancy is binary per bar: a single wide bar that spans both the node
-  and its reference band contributes one occupancy to each, so its TPO capture
-  share is 1 regardless of how little of the bar's range lay inside the node.
-  The width-normalized TPO concentration ratio therefore rises with bar width in
-  a way the allocated-volume ratio does not. This asymmetry is inherent to a
-  per-bar TPO construction over one-minute data and is why the composite
-  activity ratio is the geometric mean of both rather than TPO alone.
+- TPO occupancy is **bin-level**: each completed post-touch bar adds one TPO to
+  every bin it occupies. A bar spanning the whole reference band therefore
+  yields a TPO concentration ratio of exactly 1 regardless of node width, and
+  wide bars do not inflate the ratio. An earlier implementation counted one TPO
+  per intersecting bar, which is a zone-touch frequency rather than occupancy;
+  that was a defect, corrected before any empirical run. See D-G3-001.
+- Binary zone-touch counts are preserved separately as `bars_touching_node`,
+  `bars_touching_band` and `node_touch_bar_share`. They are descriptive only and
+  never enter the composite volume-TPO concentration metric.
 - Concentration ratios are formed as a single division,
   `(node_quantity * band_ticks) / (band_quantity * node_ticks)`, so the
   repeating width share cannot compound into the result.

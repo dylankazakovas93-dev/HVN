@@ -276,3 +276,40 @@ the median composite activity of the +/- 0.50 ATR neighbourhood excluding the
 candidate's own bins. A missing, empty, zero or nonpositive baseline is invalid
 and fails the gate; a zero baseline is never infinite prominence. Exactly 1.10
 passes. Volume and TPO prominence remain annotations and cannot veto.
+
+## D-G3-001 — Pre-empirical defect: bin-level TPO occupancy
+
+The first implementation of `post_touch_TPO_concentration_ratio` counted one
+TPO per bar that intersected the node, and one per bar that intersected the
+reference band. That is a **zone-touch frequency**, not TPO occupancy, and it
+inflated the ratio with bar width: a single bar spanning the whole band produced
+a node TPO capture share of 1 and a ratio of `band_bins / node_bins` rather
+than 1.
+
+The locked activity specification requires bin-level occupancy. Corrected so
+each completed post-touch bar adds one TPO to **every bin it occupies**:
+
+```text
+T_node = sum of bin-level TPO counts across node bins
+T_band = sum of bin-level TPO counts across all reference-band bins
+node_TPO_capture_share = T_node / T_band
+node_width_share       = node_bin_count / band_bin_count
+ratio                  = capture share / width share
+```
+
+A bar spanning the complete band now yields exactly 1 at any node width.
+
+The binary counts are retained separately as `bars_touching_node`,
+`bars_touching_band` and `node_touch_bar_share`. They are descriptive and are
+structurally excluded from the composite metric, which is asserted by test.
+
+**No empirical outcome was generated under the incorrect implementation.** The
+defect was found and corrected before the outcome pipeline was wired and before
+any partition was run, so no result, ledger, summary or statistic requires
+recomputation. Eight regression fixtures cover the band-spanning bar, the
+node-only bar, the non-node bar, a hand-built three-bar occupancy matrix,
+zero-range bars, the half-open boundary convention, the composite using the
+corrected ratio, and the exclusion of binary counts from the composite.
+
+I had previously recorded this behaviour as an inherent property of per-bar TPO
+construction. That characterization was wrong.

@@ -131,21 +131,25 @@ def test_local_band_occupancy_uses_the_atr_band():
 # --- activity concentration --------------------------------------------------
 
 def test_activity_concentration_is_one_when_evenly_spread():
-    """A bar spanning the whole band evenly gives ratio 1 by construction."""
+    """A bar spanning the whole band gives ratio 1 for volume AND for TPO.
+
+    Bin-level TPO: the bar adds one TPO to each of the band's 360 bins, 40 of
+    which are node bins, so the capture share equals the width share exactly.
+    """
     band_low, band_high = LOW - ATR, HIGH + ATR
     forward = (bar(0, 960, Decimal(band_high) - Decimal("0.25"), 960, 1005, "100"),)
     r = activity_metrics(forward, LOW, HIGH, band_low, band_high,
                          band_name="atr", horizons=(1,))[0]
     assert r.undefined_reason == ""
-    # node holds 40 of the band's 360 ticks; volume splits in that proportion
     assert r.node_width_share == Decimal(40) / Decimal(360)
+    assert r.node_tpo == 40 and r.band_tpo == 360
+    assert r.node_tpo_capture_share == Decimal(40) / Decimal(360)
     assert r.volume_concentration_ratio == 1
-    # TPO occupancy is binary per bar: one bar spanning both node and band
-    # counts once in each, so TPO capture is 1 and its width-normalized ratio
-    # is 9. The composite is sqrt(1 * 9) = 3. This asymmetry between allocated
-    # volume and per-bar occupancy is inherent to TPO and is documented.
-    assert r.tpo_concentration_ratio == 9
-    assert r.activity_concentration_ratio == 3
+    assert r.tpo_concentration_ratio == 1
+    assert r.activity_concentration_ratio == 1
+    # The binary zone-touch counts are preserved separately.
+    assert r.bars_touching_node == 1 and r.bars_touching_band == 1
+    assert r.node_touch_bar_share == 1
 
 
 def test_activity_concentration_exceeds_one_when_price_sits_in_the_node():
@@ -157,6 +161,7 @@ def test_activity_concentration_exceeds_one_when_price_sits_in_the_node():
     assert r.node_volume_capture_share == 1
     assert r.node_tpo_capture_share == 1
     assert r.activity_concentration_ratio == Decimal(360) / Decimal(40)
+    assert r.tpo_concentration_ratio == Decimal(360) / Decimal(40)
 
 
 def test_activity_zero_denominators_are_reported_not_discarded():
@@ -259,3 +264,139 @@ def test_no_metric_reads_beyond_its_horizon():
     ra = residence_metrics(head, LOW, HIGH, ATR, horizons=(5,))[0]
     rb = residence_metrics(head + tail, LOW, HIGH, ATR, horizons=(5,))[0]
     assert ra == rb
+
+
+# --- bin-level TPO occupancy (pre-empirical defect D-G3-001) ------------------
+
+def band_of(node_low, node_high, pad):
+    return node_low - pad, node_high + pad
+
+
+def test_bar_spanning_the_whole_band_gives_tpo_concentration_exactly_one():
+    """The authorization's worked example, at its stated scale.
+
+    band 12 bins, node 4 bins, one bar occupying all 12:
+    T_node 4, T_band 12, capture 4/12, width 4/12, ratio 1.
+    """
+    node_low, node_high = Decimal(1000), Decimal(1001)          # 4 ticks
+    band_low, band_high = Decimal(999), Decimal(1002)           # 12 ticks
+    spanning = bar(0, 999, Decimal("1001.75"), 999, 1000, "120")
+    r = activity_metrics((spanning,), node_low, node_high, band_low, band_high,
+                         band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 4
+    assert r.band_tpo == 12
+    assert r.node_tpo_capture_share == Decimal(4) / Decimal(12)
+    assert r.node_width_share == Decimal(4) / Decimal(12)
+    assert r.tpo_concentration_ratio == 1
+
+
+def test_bar_occupying_only_the_node_gives_band_over_node_bins():
+    node_low, node_high = Decimal(1000), Decimal(1001)          # 4 ticks
+    band_low, band_high = Decimal(999), Decimal(1002)           # 12 ticks
+    inside_only = bar(0, 1000, Decimal("1000.75"), 1000, 1000, "40")
+    r = activity_metrics((inside_only,), node_low, node_high, band_low, band_high,
+                         band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 4 and r.band_tpo == 4
+    assert r.tpo_concentration_ratio == Decimal(12) / Decimal(4)
+
+
+def test_bar_occupying_only_a_non_node_part_of_the_band_gives_zero():
+    node_low, node_high = Decimal(1000), Decimal(1001)
+    band_low, band_high = Decimal(999), Decimal(1002)
+    outside_node = bar(0, 999, Decimal("999.75"), 999, 999, "40")
+    r = activity_metrics((outside_node,), node_low, node_high, band_low, band_high,
+                         band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 0 and r.band_tpo == 4
+    assert r.node_tpo_capture_share == 0
+    assert r.tpo_concentration_ratio == 0
+    assert r.activity_concentration_ratio == 0
+
+
+def test_multiple_bars_reconcile_against_a_hand_built_occupancy_matrix():
+    """Three bars over a 12-bin band, counted by hand.
+
+    bins  999.00 999.25 999.50 999.75 | 1000.00 1000.25 1000.50 1000.75 | ...
+    b0 spans 999.00-999.75          -> 4 band bins, 0 node bins
+    b1 spans 1000.00-1000.50        -> 3 band bins, 3 node bins
+    b2 spans 999.75-1000.25         -> 3 band bins, 2 node bins
+    totals: T_band = 10, T_node = 5
+    """
+    node_low, node_high = Decimal(1000), Decimal(1001)
+    band_low, band_high = Decimal(999), Decimal(1002)
+    bars = (
+        bar(0, 999, Decimal("999.75"), 999, 999, "10"),
+        bar(1, 1000, Decimal("1000.50"), 1000, 1000, "10"),
+        bar(2, Decimal("999.75"), Decimal("1000.25"), Decimal("999.75"), 1000, "10"),
+    )
+    r = activity_metrics(bars, node_low, node_high, band_low, band_high,
+                         band_name="atr", horizons=(3,))[0]
+    assert r.band_tpo == 10
+    assert r.node_tpo == 5
+    assert r.node_tpo_capture_share == Decimal(5) / Decimal(10)
+    assert r.tpo_concentration_ratio == (Decimal(5) / Decimal(10)) / (
+        Decimal(4) / Decimal(12)
+    )
+    # Binary counts differ from bin-level counts and are kept separate.
+    assert r.bars_touching_node == 2
+    assert r.bars_touching_band == 3
+
+
+def test_zero_range_bar_occupies_exactly_one_bin():
+    node_low, node_high = Decimal(1000), Decimal(1001)
+    band_low, band_high = Decimal(999), Decimal(1002)
+    r = activity_metrics((flat(0, 1000, "10"),), node_low, node_high,
+                         band_low, band_high, band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 1 and r.band_tpo == 1
+    r = activity_metrics((flat(0, 999, "10"),), node_low, node_high,
+                         band_low, band_high, band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 0 and r.band_tpo == 1
+
+
+def test_boundary_bins_follow_the_frozen_half_open_convention():
+    """[low, high): the high edge belongs to the next zone, not this one."""
+    node_low, node_high = Decimal(1000), Decimal(1001)
+    band_low, band_high = Decimal(999), Decimal(1002)
+    # exactly at node_high -> band bin, not a node bin
+    r = activity_metrics((flat(0, 1001, "10"),), node_low, node_high,
+                         band_low, band_high, band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 0 and r.band_tpo == 1
+    # exactly at node_low -> a node bin
+    r = activity_metrics((flat(0, 1000, "10"),), node_low, node_high,
+                         band_low, band_high, band_name="atr", horizons=(1,))[0]
+    assert r.node_tpo == 1
+    # exactly at band_high -> outside the band entirely
+    r = activity_metrics((flat(0, 1002, "10"),), node_low, node_high,
+                         band_low, band_high, band_name="atr", horizons=(1,))[0]
+    assert r.band_tpo == 0 and r.undefined_reason == "ZERO_BAND_VOLUME"
+
+
+def test_composite_uses_the_corrected_bin_level_tpo_ratio():
+    node_low, node_high = Decimal(1000), Decimal(1001)
+    band_low, band_high = Decimal(999), Decimal(1002)
+    bars = (
+        bar(0, 1000, Decimal("1000.75"), 1000, 1000, "90"),      # node only
+        bar(1, 999, Decimal("999.75"), 999, 999, "10"),          # band only
+    )
+    r = activity_metrics(bars, node_low, node_high, band_low, band_high,
+                         band_name="atr", horizons=(2,))[0]
+    expected_tpo = (Decimal(4) / Decimal(8)) / (Decimal(4) / Decimal(12))
+    expected_volume = (Decimal(90) / Decimal(100)) / (Decimal(4) / Decimal(12))
+    assert r.tpo_concentration_ratio == expected_tpo
+    assert r.volume_concentration_ratio == expected_volume
+    from hvn.gen3_outcomes import _sqrt
+    assert r.activity_concentration_ratio == _sqrt(expected_volume * expected_tpo)
+
+
+def test_binary_touch_counts_never_enter_the_composite():
+    import ast
+    import inspect
+
+    from hvn.gen3_outcomes import activity_metrics as fn
+
+    tree = ast.parse(inspect.getsource(fn).lstrip())
+    source = ast.unparse(tree)
+    # The composite is built from v_ratio and t_ratio only.
+    assert "activity_concentration_ratio=_sqrt(v_ratio * t_ratio)" in source
+    assert "bars_touching_node" in source          # recorded
+    for forbidden in ("_sqrt(bars_touching", "bars_touching_node /"):
+        assert forbidden not in source

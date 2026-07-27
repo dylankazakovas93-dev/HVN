@@ -254,6 +254,11 @@ class ActivityResult:
     band_volume: Decimal
     node_tpo: int
     band_tpo: int
+    # Binary zone-touch frequency, preserved separately. These never enter the
+    # composite concentration metric.
+    bars_touching_node: int
+    bars_touching_band: int
+    node_touch_bar_share: Decimal | None
     node_volume_capture_share: Decimal | None
     node_tpo_capture_share: Decimal | None
     node_width_share: Decimal | None
@@ -285,7 +290,10 @@ def activity_metrics(
     """Volume and TPO captured by the node relative to its reference band.
 
     Post-touch bar volume is allocated uniformly across the ticks the bar
-    occupies, matching the Stage 1 allocation convention.
+    occupies, matching the Stage 1 allocation convention. TPO occupancy is
+    **bin-level**: each bar adds one TPO to every bin it occupies, so a bar
+    spanning the whole reference band yields a TPO concentration ratio of
+    exactly 1 regardless of node width.
     """
     _, node_ticks = _tick_range(node_low, node_high - TICK)
     _, band_ticks = _tick_range(band_low, band_high - TICK)
@@ -294,6 +302,7 @@ def activity_metrics(
         window = forward[:horizon]
         node_volume = band_volume = Decimal(0)
         node_tpo = band_tpo = 0
+        bars_touching_node = bars_touching_band = 0
         for bar in window:
             first, count = _tick_range(bar.low, bar.high)
             if count <= 0:
@@ -308,8 +317,11 @@ def activity_metrics(
                         in_node += 1
             node_volume += per_tick * Decimal(in_node)
             band_volume += per_tick * Decimal(in_band)
-            node_tpo += 1 if in_node else 0
-            band_tpo += 1 if in_band else 0
+            # Bin-level TPO: one per occupied bin, not one per intersecting bar.
+            node_tpo += in_node
+            band_tpo += in_band
+            bars_touching_node += 1 if in_node else 0
+            bars_touching_band += 1 if in_band else 0
 
         reason = ""
         if not window:
@@ -321,10 +333,16 @@ def activity_metrics(
         elif band_ticks <= 0:
             reason = "ZERO_BAND_WIDTH"
 
+        touch_share = (
+            Decimal(bars_touching_node) / Decimal(bars_touching_band)
+            if bars_touching_band
+            else None
+        )
         if reason:
             out.append(ActivityResult(horizon, band_name, node_volume, band_volume,
-                                      node_tpo, band_tpo, None, None, None,
-                                      None, None, None, reason))
+                                      node_tpo, band_tpo, bars_touching_node,
+                                      bars_touching_band, touch_share,
+                                      None, None, None, None, None, None, reason))
             continue
 
         v_share = node_volume / band_volume
@@ -346,6 +364,9 @@ def activity_metrics(
                 band_volume=band_volume,
                 node_tpo=node_tpo,
                 band_tpo=band_tpo,
+                bars_touching_node=bars_touching_node,
+                bars_touching_band=bars_touching_band,
+                node_touch_bar_share=touch_share,
                 node_volume_capture_share=v_share,
                 node_tpo_capture_share=t_share,
                 node_width_share=width_share,
