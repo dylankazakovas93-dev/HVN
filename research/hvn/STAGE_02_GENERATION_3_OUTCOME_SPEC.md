@@ -138,3 +138,51 @@ time-to-touch ratio.
 
 A zone that attracts price more often is a **different finding** from a zone
 that creates acceptance once touched, and the two are never conflated.
+
+## 12. Archive containers versus research partitions (clarification)
+
+This clarifies a data-container detail. It is **not** a change to the research
+sample or to outcome methodology.
+
+A research partition is defined by **parsed timestamps**, never by an archive
+filename. `nq2018.zip` contains both 2018 and 2019 rows and is a legitimate
+source for the authorized 2019 partition, exactly as `nq2021.zip` contains
+forbidden 2022 rows and is a legitimate source for 2021.
+
+Resolution order:
+
+1. prefer an existing staged, verified 2019-only dataset if present;
+2. verify its sha256 against the accepted 2019 dataset hash;
+3. if valid, use it and do not reopen the mixed archive;
+4. otherwise read the mixed archive **only** through the year-filtered
+   ingestion path;
+5. stream rows and admit only timestamps belonging to the requested year;
+6. raise immediately if any row outside that year would reach a constructed
+   Bar, profile, event, ledger, summary or statistic.
+
+**Applied state:** no staged 2019-only dataset exists, so rule 4 applies. The
+container `nq2018.zip` hashes to
+`910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203`, matching the
+accepted 2019 dataset hash.
+
+Every ingestion records: source archive name, parsed years encountered, rows
+admitted, rows excluded as an earlier year, rows excluded as a later year, rows
+skipped as non-outright, admitted-dataset sha256 and producing code SHA.
+
+Verified on the real archive for 2019:
+
+```text
+archive                     nq2018.zip
+parsed_years                [2018, 2019]
+rows_admitted               430,528     (matches the accepted checkpoint)
+rows_excluded_earlier_year  481,125     (2018, never parsed into a Bar)
+rows_excluded_later_year    0
+rows_skipped_non_outright   30,906      (calendar spreads)
+2018 rows admitted          0
+years in admitted bars      [2019]
+```
+
+The access log distinguishes **container access** — traversing an archive that
+happens to hold other years — from **empirical-year access**, which is the set
+of admitted rows. No structural or outcome statistic is computed or reported for
+2018 at any point.
