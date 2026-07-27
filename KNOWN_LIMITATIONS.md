@@ -93,3 +93,19 @@
   are qualified by increasingly different rules and remain non-comparable.
 - Amendment 03 is final. If Pilot V4's sample-support or density conditions
   fail, the authorized response is to report the failure, not to amend again.
+
+## Generation 3 outcome metrics
+
+- TPO occupancy is binary per bar: a single wide bar that spans both the node
+  and its reference band contributes one occupancy to each, so its TPO capture
+  share is 1 regardless of how little of the bar's range lay inside the node.
+  The width-normalized TPO concentration ratio therefore rises with bar width in
+  a way the allocated-volume ratio does not. This asymmetry is inherent to a
+  per-bar TPO construction over one-minute data and is why the composite
+  activity ratio is the geometric mean of both rather than TPO alone.
+- Concentration ratios are formed as a single division,
+  `(node_quantity * band_ticks) / (band_quantity * node_ticks)`, so the
+  repeating width share cannot compound into the result.
+- Excursion quantities are directional and adverse displacements only. They are
+  never profit, loss, MFE or MAE, and no entry, stop, target or execution
+  assumption exists anywhere in this study.
