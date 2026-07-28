@@ -26,6 +26,15 @@ from .gen4_outcomes import (
     interaction_session,
     returned_inside,
 )
+from .gen5_impulse import (
+    IMPULSE_LOOKBACK_BARS,
+    FORWARD_HORIZONS_BARS,
+    SeasonalVolume,
+    compute_impulse,
+    dominant_direction,
+    dwell_bucket,
+    forward_outcome,
+)
 from .interactions import ApproachSide, Relationship, TouchClass, relationship_window
 from .models import Bar, ProfileFamily
 from .zones_v4 import NONPOC_HVN_ZONE, POC_HVN_ZONE
@@ -107,6 +116,7 @@ def measure_event(
     low: Decimal,
     high: Decimal,
     atr: Decimal,
+    seasonal: SeasonalVolume | None = None,
 ) -> dict:
     """Every forward quantity for one touch, from the next completed bar on."""
     forward = window_bars[touch.index + 1 :]
@@ -213,7 +223,88 @@ def measure_event(
         row[f"band_continued_{horizon}m"] = after.continued
         row[f"band_continuation_evaluated_{horizon}m"] = after.evaluated
         row[f"band_displacement_{horizon}m_atr"] = after.displacement_atr
+
+    # Amendment 04: directional impulse into and out of the zone, and whether
+    # the move that followed continued or reverted.
+    row |= _impulse_block(window_bars, touch, low=low, high=high, atr=atr, seasonal=seasonal)
     return row
+
+
+def _impulse_block(
+    window_bars: list[Bar],
+    touch: Touch,
+    *,
+    low: Decimal,
+    high: Decimal,
+    atr: Decimal,
+    seasonal: SeasonalVolume | None,
+) -> dict:
+    """Approach and departure impulse, dwell, and the forward outcome.
+
+    The approach window ends at the touch bar and is therefore known at the
+    touch bar's close. The departure window begins at the next completed bar,
+    and the forward outcome is measured from the end of that departure window,
+    so no quantity used to classify an event overlaps the outcome it predicts.
+    """
+    forward = window_bars[touch.index + 1 :]
+    out: dict = {}
+
+    approach = window_bars[max(0, touch.index - IMPULSE_LOOKBACK_BARS + 1) : touch.index + 1]
+    approach_direction = dominant_direction(approach) if len(approach) >= 2 else None
+    for label, direction in (("up", 1), ("down", -1)):
+        result = compute_impulse(approach, direction=direction, atr=atr, seasonal=seasonal)
+        out[f"approach_{label}_displacement_atr"] = result.directional_displacement_atr
+        out[f"approach_{label}_volume_ratio"] = result.directional_volume_ratio
+        out[f"approach_{label}_efficiency"] = result.efficiency
+    out["approach_impulse_direction"] = approach_direction
+    out["approach_impulse_evaluated"] = approach_direction is not None
+
+    # Dwell: completed bars price stays within 1 ATR of the zone after the touch.
+    dwell = band_residence(
+        forward,
+        zone_low=low,
+        zone_high=high,
+        atr=atr,
+        window_complete=len(forward) >= max(FORWARD_HORIZONS_BARS),
+        band_atr=Decimal(1),
+    )
+    out["dwell_bars"] = dwell.minutes_inside
+    out["dwell_bucket"] = dwell_bucket(dwell.minutes_inside)
+    out["dwell_left"] = dwell.left_band
+    out["dwell_censored"] = dwell.censored
+
+    departure = forward[:IMPULSE_LOOKBACK_BARS]
+    if len(departure) < 2:
+        out["departure_impulse_evaluated"] = False
+        return out
+    direction = dominant_direction(departure)
+    result = compute_impulse(departure, direction=direction, atr=atr, seasonal=seasonal)
+    out["departure_impulse_evaluated"] = result.evaluated
+    out["departure_direction"] = "UP" if direction == 1 else "DOWN"
+    out["departure_displacement_atr"] = result.directional_displacement_atr
+    out["departure_displacement_bucket"] = result.displacement_bucket
+    out["departure_volume_ratio"] = result.directional_volume_ratio
+    out["departure_volume_bucket"] = result.volume_bucket
+    out["departure_efficiency"] = result.efficiency
+    out["departure_efficiency_bucket"] = result.efficiency_bucket
+    out["departure_net_close_atr"] = result.net_close_change_atr
+    out["departure_seasonal_baseline"] = result.seasonal_baseline_available
+
+    reference = departure[-1].close
+    after = forward[IMPULSE_LOOKBACK_BARS:]
+    for horizon in FORWARD_HORIZONS_BARS:
+        outcome = forward_outcome(
+            after,
+            direction=direction,
+            reference_close=reference,
+            atr=atr,
+            horizon_bars=horizon,
+        )
+        out[f"impulse_outcome_evaluated_{horizon}b"] = outcome.evaluated
+        out[f"impulse_continued_{horizon}b"] = outcome.continued
+        out[f"impulse_reverted_{horizon}b"] = outcome.reverted
+        out[f"impulse_signed_move_{horizon}b_atr"] = outcome.signed_move_atr
+    return out
 
 
 def interaction_bars(
@@ -247,6 +338,7 @@ def events_for_interval(
     high: Decimal,
     atr: Decimal,
     base: dict,
+    seasonal=None,
 ) -> tuple[list[dict], dict]:
     """First-touch and re-touch rows for one interval, plus its touch summary.
 
@@ -269,7 +361,9 @@ def events_for_interval(
     }
     rows: list[dict] = []
     for order, touch in enumerate(touches):
-        measured = measure_event(window_bars, touch, low=low, high=high, atr=atr)
+        measured = measure_event(
+            window_bars, touch, low=low, high=high, atr=atr, seasonal=seasonal
+        )
         rows.append(
             base
             | measured

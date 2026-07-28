@@ -22,6 +22,7 @@ from pathlib import Path
 
 from hvn.atr import wilder_atr
 from hvn.gen4_controls import select_controls
+from hvn.gen5_impulse import SeasonalVolume
 from hvn.gen4_outcomes import (
     CONTINUATION_HORIZONS_MINUTES,
     DISPLACEMENT_THRESHOLDS_ATR,
@@ -103,6 +104,9 @@ def build(bars, *, year, code_sha):
     }
     atrs = {s: AtrSelector(wilder_atr(v)) for s, v in by_symbol.items()}
     selector = ContractSelector(by_symbol)
+    # One seasonal volume baseline per contract, built from that contract's own
+    # history. Each lookup uses only sessions strictly before the bar's own.
+    seasonals = {s: SeasonalVolume(v) for s, v in by_symbol.items()}
 
     events: list[dict] = []
     intervals: list[dict] = []
@@ -186,6 +190,7 @@ def build(bars, *, year, code_sha):
                         high=zone.zone_high,
                         atr=profile.atr_value,
                         base=base | {"arm": "TREATED", "physical_zone_id": zone.physical_zone_id},
+                        seasonal=seasonals[symbol],
                     )
                     events.extend(rows)
                     intervals.append(summary)
@@ -204,6 +209,7 @@ def build(bars, *, year, code_sha):
                                 "physical_zone_id": zone.physical_zone_id,
                                 "matched_zone_id": zone.zone_id,
                             },
+                            seasonal=seasonals[symbol],
                         )
                         events.extend(crows)
                         intervals.append(csummary)
