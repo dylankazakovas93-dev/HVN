@@ -1,0 +1,16 @@
+{
+  "first_touch_events_with_impulse": 12566,
+  "full_years": [
+    2019,
+    2021,
+    2023,
+    2025
+  ],
+  "horizons_bars": [
+    15,
+    30,
+    60
+  ],
+  "minimum_events_per_cell": 30,
+  "primary_control": "C02_ACTIVITY_MATCHED"
+}
