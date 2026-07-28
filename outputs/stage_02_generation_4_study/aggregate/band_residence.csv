@@ -1,0 +1,5 @@
+population,control_arm,treated_events,control_events,treated_median_minutes,control_median_minutes,treated_mean_minutes,control_mean_minutes,treated_p90_minutes,control_p90_minutes,full_years_treated_longer,underpowered
+NONPOC,C01_NEUTRAL,1357,1347,8,8,53.2,51.6,149,155,1/4,False
+NONPOC,C02_ACTIVITY_MATCHED,1357,1213,8,8,53.2,51.0,149,136,2/4,False
+POC,C01_NEUTRAL,3120,3105,5,4,36.7,36.4,101,101,2/4,False
+POC,C02_ACTIVITY_MATCHED,3120,2204,5,4,36.7,32.8,101,85,1/4,False

@@ -369,6 +369,231 @@ def session_table(events: list[dict]) -> list[dict]:
     return out
 
 
+
+def _quantile(values: list, fraction: Decimal):
+    if not values:
+        return None
+    ordered = sorted(values)
+    position = int((fraction * Decimal(len(ordered) - 1)).to_integral_value())
+    return ordered[position]
+
+
+def capped_displacement_table(events: list[dict]) -> list[dict]:
+    """How far price got from the zone within a fixed window.
+
+    Unlike the open-ended threshold family this cannot saturate: every event
+    with a complete window contributes a distance, so the two arms are compared
+    on their whole distributions rather than on a pass rate near 100%.
+    """
+    first = [e for e in events if is_true(e["is_first_touch"]) and e["year"] in FULL_YEARS]
+    out = []
+    for horizon in (15, 30, 60):
+        for population in ("NONPOC", "POC"):
+            arms: dict[str, dict] = {}
+            for arm in (TREATED, *CONTROLS):
+                rows = [
+                    e
+                    for e in first
+                    if e["population"] == population
+                    and e["arm"] == arm
+                    and is_true(e[f"excursion_evaluated_{horizon}m"])
+                ]
+                reach = [Decimal(e[f"max_excursion_{horizon}m_atr"]) for e in rows]
+                net = [abs(Decimal(e[f"net_close_{horizon}m_atr"])) for e in rows]
+                arms[arm] = {
+                    "events": len(rows),
+                    "median": _quantile(reach, Decimal("0.5")),
+                    "p25": _quantile(reach, Decimal("0.25")),
+                    "p75": _quantile(reach, Decimal("0.75")),
+                    "p90": _quantile(reach, Decimal("0.90")),
+                    "median_net": _quantile(net, Decimal("0.5")),
+                    "per_year": {
+                        year: _quantile(
+                            [
+                                Decimal(e[f"max_excursion_{horizon}m_atr"])
+                                for e in rows
+                                if e["year"] == year
+                            ],
+                            Decimal("0.5"),
+                        )
+                        for year in FULL_YEARS
+                    },
+                }
+            treated = arms[TREATED]
+            for arm in CONTROLS:
+                control = arms[arm]
+                farther = sum(
+                    1
+                    for year in FULL_YEARS
+                    if treated["per_year"][year] is not None
+                    and control["per_year"][year] is not None
+                    and treated["per_year"][year] > control["per_year"][year]
+                )
+                out.append(
+                    {
+                        "horizon_minutes": horizon,
+                        "population": population,
+                        "control_arm": arm,
+                        "treated_events": treated["events"],
+                        "control_events": control["events"],
+                        "treated_median_excursion_atr": _round(treated["median"]),
+                        "control_median_excursion_atr": _round(control["median"]),
+                        "ratio": ratio(treated["median"], control["median"]),
+                        "treated_p75": _round(treated["p75"]),
+                        "control_p75": _round(control["p75"]),
+                        "treated_p90": _round(treated["p90"]),
+                        "control_p90": _round(control["p90"]),
+                        "treated_median_net_atr": _round(treated["median_net"]),
+                        "control_median_net_atr": _round(control["median_net"]),
+                        "full_years_treated_farther": f"{farther}/4",
+                        "underpowered": treated["events"] < UNDERPOWERED,
+                    }
+                )
+    return out
+
+
+def _round(value):
+    return value.quantize(Decimal("0.001")) if isinstance(value, Decimal) else value
+
+
+def band_residence_table(events: list[dict]) -> list[dict]:
+    """Minutes price lingers within 5 ATR of the zone before committing."""
+    first = [e for e in events if is_true(e["is_first_touch"]) and e["year"] in FULL_YEARS]
+    out = []
+    for population in ("NONPOC", "POC"):
+        arms: dict[str, dict] = {}
+        for arm in (TREATED, *CONTROLS):
+            rows = [
+                e
+                for e in first
+                if e["population"] == population
+                and e["arm"] == arm
+                and is_true(e["band_left"])
+            ]
+            minutes = [int(e["band_minutes_inside"]) for e in rows]
+            arms[arm] = {
+                "events": len(rows),
+                "median": _quantile(minutes, Decimal("0.5")),
+                "p75": _quantile(minutes, Decimal("0.75")),
+                "p90": _quantile(minutes, Decimal("0.90")),
+                "mean": (
+                    (Decimal(sum(minutes)) / Decimal(len(minutes))).quantize(Decimal("0.1"))
+                    if minutes
+                    else None
+                ),
+                "per_year": {
+                    year: _quantile(
+                        [int(e["band_minutes_inside"]) for e in rows if e["year"] == year],
+                        Decimal("0.5"),
+                    )
+                    for year in FULL_YEARS
+                },
+            }
+        treated = arms[TREATED]
+        for arm in CONTROLS:
+            control = arms[arm]
+            longer = sum(
+                1
+                for year in FULL_YEARS
+                if treated["per_year"][year] is not None
+                and control["per_year"][year] is not None
+                and treated["per_year"][year] > control["per_year"][year]
+            )
+            out.append(
+                {
+                    "population": population,
+                    "control_arm": arm,
+                    "treated_events": treated["events"],
+                    "control_events": control["events"],
+                    "treated_median_minutes": treated["median"],
+                    "control_median_minutes": control["median"],
+                    "treated_mean_minutes": treated["mean"],
+                    "control_mean_minutes": control["mean"],
+                    "treated_p90_minutes": treated["p90"],
+                    "control_p90_minutes": control["p90"],
+                    "full_years_treated_longer": f"{longer}/4",
+                    "underpowered": treated["events"] < UNDERPOWERED,
+                }
+            )
+    return out
+
+
+def absorption_table(events: list[dict]) -> list[dict]:
+    """The absorption reading: does lingering longer predict follow-through?
+
+    Events are grouped into quartiles of time spent inside the 5 ATR band, cut
+    on the **control** arm's distribution so the banding cannot be shaped by the
+    treated result. If resting interest accumulates while price lingers, the
+    longest-residence quartile should continue more often after breaking out.
+    """
+    first = [
+        e
+        for e in events
+        if is_true(e["is_first_touch"])
+        and e["year"] in FULL_YEARS
+        and is_true(e["band_left"])
+    ]
+    out = []
+    for population in ("NONPOC", "POC"):
+        control_minutes = sorted(
+            int(e["band_minutes_inside"])
+            for e in first
+            if e["population"] == population and e["arm"] == PRIMARY_CONTROL
+        )
+        if len(control_minutes) < 8:
+            continue
+        cuts = [
+            _quantile(control_minutes, Decimal(str(f))) for f in ("0.25", "0.5", "0.75")
+        ]
+        for arm in (TREATED, PRIMARY_CONTROL):
+            rows = [
+                e for e in first if e["population"] == population and e["arm"] == arm
+            ]
+            for index, label in enumerate(("Q1_shortest", "Q2", "Q3", "Q4_longest")):
+                low = cuts[index - 1] if index else None
+                high = cuts[index] if index < 3 else None
+                bucket = [
+                    e
+                    for e in rows
+                    if (low is None or int(e["band_minutes_inside"]) > low)
+                    and (high is None or int(e["band_minutes_inside"]) <= high)
+                ]
+                for horizon in (15, 30, 60):
+                    evaluated = [
+                        e
+                        for e in bucket
+                        if is_true(e[f"band_continuation_evaluated_{horizon}m"])
+                    ]
+                    continued = sum(
+                        1 for e in evaluated if is_true(e[f"band_continued_{horizon}m"])
+                    )
+                    volumes = [
+                        Decimal(e["breakout_volume_ratio"])
+                        for e in evaluated
+                        if e["breakout_volume_ratio"] not in ("", None)
+                    ]
+                    out.append(
+                        {
+                            "population": population,
+                            "arm": arm,
+                            "residence_quartile": label,
+                            "horizon_minutes": horizon,
+                            "events": len(evaluated),
+                            "median_band_minutes": _quantile(
+                                [int(e["band_minutes_inside"]) for e in evaluated],
+                                Decimal("0.5"),
+                            ),
+                            "continued": continued,
+                            "continued_pct": pct(continued, len(evaluated)),
+                            "median_breakout_volume_ratio": _round(
+                                _quantile(volumes, Decimal("0.5"))
+                            ),
+                            "underpowered": len(evaluated) < UNDERPOWERED,
+                        }
+                    )
+    return out
+
+
 def write(path: Path, rows: list[dict]) -> None:
     if not rows:
         path.write_text("")
@@ -400,6 +625,9 @@ def main(argv=None) -> None:
     write(output / "envelope.csv", envelope_table(events))
     write(output / "continuation.csv", continuation_table(events))
     write(output / "by_anchor_and_session.csv", session_table(events))
+    write(output / "capped_displacement.csv", capped_displacement_table(events))
+    write(output / "band_residence.csv", band_residence_table(events))
+    write(output / "absorption.csv", absorption_table(events))
 
     summary = {
         "full_years": list(FULL_YEARS),

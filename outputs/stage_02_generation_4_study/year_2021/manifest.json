@@ -18,8 +18,8 @@
       "sha256": "34d264a9bcd4e5121ca8493a1259669feadb4e7a8d5305c0652b79e8e353b2a6"
     },
     "event_ledger.csv.gz": {
-      "bytes": 2033797,
-      "sha256": "8c6d773baefc334e05c917c508ed9bf123cef532df80bb6a68a934f279abe7b2"
+      "bytes": 3889119,
+      "sha256": "8727a66d0baa31add78a8215eae4e129c2df61aa52fb47febb3dbf76e5654d33"
     },
     "interval_ledger.csv.gz": {
       "bytes": 182798,
@@ -31,7 +31,7 @@
     }
   },
   "bars": 454877,
-  "code_sha": "15037c4afea94a059bb1525d4273b98bc39243f9",
+  "code_sha": "231e794958dffb2667b1c94e64693ab41cb3b196",
   "dataset_sha256": "0336cfac5fe804a4c756ff9372a0bad314e526c389e5dd8da3774883a29b2f62",
   "events": 29186,
   "first_touches": 3383,
