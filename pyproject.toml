@@ -19,6 +19,8 @@ hvn-stage1 = "hvn.cli:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+# tests/ is on sys.path so fixtures can be shared between test modules.
+pythonpath = ["src", "tests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
