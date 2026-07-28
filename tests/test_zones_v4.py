@@ -103,22 +103,37 @@ def test_smoothing_renormalizes_at_the_profile_edge():
 
 
 def test_no_zone_may_be_one_tick_wide():
-    # 0.10 * 20.00 / 0.25 = 8 ticks.
-    assert minimum_zone_width_ticks(Decimal("20.00")) == 8
-    # 0.10 * 5.00 / 0.25 = 2 ticks, raised to the four-tick absolute floor.
-    assert minimum_zone_width_ticks(Decimal("5.00")) == 4
-    # The floor holds for any ATR, however small.
-    assert minimum_zone_width_ticks(Decimal("0.50")) == 4
+    """Amendment 01: max(3 ticks, ceil(0.40 ATR / 0.25))."""
+    # 0.40 * 20.00 / 0.25 = 32 ticks.
+    assert minimum_zone_width_ticks(Decimal("20.00")) == 32
+    # 0.40 * 1.924 / 0.25 = 3.08 -> 4 ticks (ceiling).
+    assert minimum_zone_width_ticks(Decimal("1.924")) == 4
+    # 0.40 * 1.00 / 0.25 = 1.6 -> 2, raised to the three-tick absolute floor.
+    assert minimum_zone_width_ticks(Decimal("1.00")) == 3
+    # The floor holds for any ATR, however small, so one tick is impossible.
+    assert minimum_zone_width_ticks(Decimal("0.10")) == 3
 
 
 def test_maximum_width_is_never_below_the_minimum():
-    # 0.75 * 20.00 / 0.25 = 60 ticks.
-    assert maximum_zone_width_ticks(Decimal("20.00")) == 60
-    # 0.75 * 1.00 / 0.25 = 3 ticks, which is below the four-tick minimum.
-    assert maximum_zone_width_ticks(Decimal("1.00")) == 4
-    assert maximum_zone_width_ticks(Decimal("1.00")) == minimum_zone_width_ticks(
-        Decimal("1.00")
+    """Amendment 01: floor(1.50 ATR / 0.25), clamped up to the minimum."""
+    # 1.50 * 20.00 / 0.25 = 120 ticks.
+    assert maximum_zone_width_ticks(Decimal("20.00")) == 120
+    # 1.50 * 1.924 / 0.25 = 11.5 -> 11 ticks, comfortably above the minimum of 4.
+    assert maximum_zone_width_ticks(Decimal("1.924")) == 11
+    # 1.50 * 0.40 / 0.25 = 2.4 -> 2, below the three-tick floor, so clamped.
+    assert maximum_zone_width_ticks(Decimal("0.40")) == 3
+    assert maximum_zone_width_ticks(Decimal("0.40")) == minimum_zone_width_ticks(
+        Decimal("0.40")
     )
+
+
+def test_the_amended_band_is_wide_enough_to_hold_zones():
+    """The scale contradiction Amendment 01 corrects: min < max with room."""
+    atr = Decimal("1.924")  # 2019 median frozen profile ATR, in points
+    low = minimum_zone_width_ticks(atr)
+    high = maximum_zone_width_ticks(atr)
+    assert low < high
+    assert high - low + 1 >= 6, "the admissible band must not collapse again"
 
 
 # ---------------------------------------------------------------------------
@@ -356,14 +371,17 @@ def test_a_bar_completing_after_the_freeze_time_is_excluded():
 
 
 def test_the_poc_ceiling_is_not_raised_to_the_minimum_width():
-    """G4-S05: an accepted POC zone can never exceed 1.00 ATR.
+    """G4-S05: an accepted POC zone can never exceed its ATR ceiling.
 
-    When the four-tick absolute floor already exceeds 1.00 ATR the POC rule
-    `minimum width <= width <= 1.00 ATR` is unsatisfiable, and the POC must be
-    a broad distribution rather than an oversized accepted zone.
+    Amendment 01 sets that ceiling at 2.50 ATR. When the three-tick absolute
+    floor already exceeds 2.50 ATR the POC rule
+    `minimum width <= width <= 2.50 ATR` is unsatisfiable, and the POC must be a
+    broad distribution rather than an oversized accepted zone.
     """
-    # ATR 0.56 points: 1.00 ATR is 2.24 ticks, below the four-tick floor.
-    assert maximum_poc_zone_width_ticks(Decimal("0.56")) == 2
-    assert minimum_zone_width_ticks(Decimal("0.56")) == 4
+    # ATR 0.20 points: 2.50 ATR is 2 ticks, below the three-tick floor.
+    assert maximum_poc_zone_width_ticks(Decimal("0.20")) == 2
+    assert minimum_zone_width_ticks(Decimal("0.20")) == 3
     # The non-POC maximum is still clamped upward, as its own rule requires.
-    assert maximum_zone_width_ticks(Decimal("0.56")) == 4
+    assert maximum_zone_width_ticks(Decimal("0.20")) == 3
+    # At a realistic ATR the POC ceiling is well above the minimum.
+    assert maximum_poc_zone_width_ticks(Decimal("1.924")) == 19

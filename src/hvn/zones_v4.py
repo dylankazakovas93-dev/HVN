@@ -1,5 +1,9 @@
 """Generation 4 smoothed multi-tick HVN zones.
 
+Width and percentile constants follow
+`research/hvn/STAGE_02_GENERATION_4_AMENDMENT_01.md`, which re-scaled them to the
+project's one-minute ATR before any Generation 4 forward outcome was opened.
+
 Implements `research/hvn/STAGE_02_GENERATION_4_ZONE_SPEC.md`. Every threshold
 here is frozen by that specification and may never be revised after a
 Generation 4 forward outcome is opened.
@@ -34,7 +38,7 @@ from .models import AtrPoint, Bar, ProfileWindow
 SMOOTHING_SPAN_ATR = Decimal("0.05")          # half-width, in ATR
 MIN_SMOOTHING_HALF_WIDTH_TICKS = 2
 
-MIN_PEAK_ACTIVITY_PERCENTILE = Decimal("95.0")
+MIN_PEAK_ACTIVITY_PERCENTILE = Decimal("90.0")
 MIN_PEAK_ACTIVITY_DENSITY = Decimal("1.50")
 
 BASIN_FLOOR_ACTIVITY = Decimal("1.00")
@@ -42,10 +46,10 @@ BASIN_MAX_DISTANCE_ATR = Decimal("1.00")
 
 CORE_EXPANSION_FRACTION = Decimal("0.70")
 
-MIN_ZONE_WIDTH_ATR = Decimal("0.10")
-MIN_ZONE_WIDTH_TICKS_FLOOR = 4
-MAX_ZONE_WIDTH_ATR = Decimal("0.75")
-MAX_POC_ZONE_WIDTH_ATR = Decimal("1.00")
+MIN_ZONE_WIDTH_ATR = Decimal("0.40")
+MIN_ZONE_WIDTH_TICKS_FLOOR = 3
+MAX_ZONE_WIDTH_ATR = Decimal("1.50")
+MAX_POC_ZONE_WIDTH_ATR = Decimal("2.50")
 
 MIN_ZONE_VOLUME_DENSITY = Decimal("1.25")
 MIN_ZONE_TPO_DENSITY = Decimal("1.00")
@@ -370,7 +374,7 @@ def profile_activity(profile: TickProfile) -> ProfileActivity:
 
 
 def minimum_zone_width_ticks(atr: Decimal) -> int:
-    """max(4 ticks, ceil(0.10 * ATR / 0.25)). No zone may be one tick wide."""
+    """max(3 ticks, ceil(0.40 * ATR / 0.25)). See Amendment 01."""
     ticks = (MIN_ZONE_WIDTH_ATR * atr / TICK_SIZE).to_integral_value(
         rounding=ROUND_CEILING
     )
@@ -378,7 +382,7 @@ def minimum_zone_width_ticks(atr: Decimal) -> int:
 
 
 def maximum_zone_width_ticks(atr: Decimal) -> int:
-    """floor(0.75 * ATR / 0.25), never smaller than the minimum."""
+    """floor(1.50 * ATR / 0.25), never smaller than the minimum."""
     ticks = int(
         (MAX_ZONE_WIDTH_ATR * atr / TICK_SIZE).to_integral_value(rounding=ROUND_FLOOR)
     )
@@ -386,14 +390,14 @@ def maximum_zone_width_ticks(atr: Decimal) -> int:
 
 
 def maximum_poc_zone_width_ticks(atr: Decimal) -> int:
-    """floor(1.00 * ATR / 0.25).
+    """floor(2.50 * ATR / 0.25).
 
     Unlike the non-POC maximum this is **not** raised to the minimum width. The
     POC classification rule is stated literally as
-    `minimum width <= POC zone width <= 1.00 ATR`, so when the four-tick
-    absolute floor already exceeds 1.00 ATR the rule is unsatisfiable and the
+    `minimum width <= POC zone width <= 2.50 ATR`, so when the three-tick
+    absolute floor already exceeds 2.50 ATR the rule is unsatisfiable and the
     POC is a `POC_BROAD_DISTRIBUTION`. Clamping here would admit POC zones wider
-    than 1.00 ATR and break G4-S05.
+    than 2.50 ATR and break G4-S05.
     """
     return int(
         (MAX_POC_ZONE_WIDTH_ATR * atr / TICK_SIZE).to_integral_value(

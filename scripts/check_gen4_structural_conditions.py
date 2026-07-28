@@ -97,7 +97,7 @@ def evaluate(pilot: Path) -> list[dict]:
         1
         for z in nonpoc
         if not (
-            Decimal(z["peak_activity_percentile"]) >= Decimal("95.0")
+            Decimal(z["peak_activity_percentile"]) >= Decimal("90.0")
             and Decimal(z["peak_smoothed_activity"]) >= Decimal("1.50")
             and Decimal(z["zone_volume_density"]) >= Decimal("1.25")
             and Decimal(z["zone_tpo_density"]) >= Decimal("1.00")
@@ -109,7 +109,7 @@ def evaluate(pilot: Path) -> list[dict]:
     below_min_atr = sum(
         1
         for z in accepted
-        if Decimal(z["width_atr"]) < Decimal("0.10")
+        if Decimal(z["width_atr"]) < Decimal("0.40")
         and int(z["width_ticks"]) < int(z["minimum_width_ticks"])
     )
     freeze_violations = sum(
@@ -126,30 +126,30 @@ def evaluate(pilot: Path) -> list[dict]:
         },
         {
             "condition": "G4-S02",
-            "requirement": "no accepted zone narrower than four ticks",
+            "requirement": "no accepted zone narrower than three ticks",
             "observed": f"minimum accepted width {min(widths, default=0)} ticks",
-            "passed": min(widths, default=0) >= 4,
+            "passed": min(widths, default=0) >= 3,
             "kind": "mechanical",
         },
         {
             "condition": "G4-S03",
-            "requirement": "no accepted zone narrower than 0.10 ATR, subject to the four-tick floor",
+            "requirement": "no accepted zone narrower than 0.40 ATR, subject to the three-tick floor",
             "observed": f"{below_min_atr} accepted zones below both the ATR minimum and the tick floor",
             "passed": below_min_atr == 0,
             "kind": "mechanical",
         },
         {
             "condition": "G4-S04",
-            "requirement": "no accepted non-POC zone exceeds 0.75 ATR",
+            "requirement": "no accepted non-POC zone exceeds 1.50 ATR",
             "observed": f"maximum accepted non-POC width {max(nonpoc_atr, default=Decimal(0)):.4f} ATR",
-            "passed": all(w <= Decimal("0.75") for w in nonpoc_atr),
+            "passed": all(w <= Decimal("1.50") for w in nonpoc_atr),
             "kind": "mechanical",
         },
         {
             "condition": "G4-S05",
-            "requirement": "no accepted POC zone exceeds 1.00 ATR",
+            "requirement": "no accepted POC zone exceeds 2.50 ATR",
             "observed": f"maximum accepted POC width {max((Decimal(z['width_atr']) for z in poc), default=Decimal(0)):.4f} ATR",
-            "passed": all(Decimal(z["width_atr"]) <= Decimal("1.00") for z in poc),
+            "passed": all(Decimal(z["width_atr"]) <= Decimal("2.50") for z in poc),
             "kind": "mechanical",
         },
         {
@@ -240,24 +240,24 @@ def evaluate(pilot: Path) -> list[dict]:
         },
         {
             "condition": "G4-S17",
-            "requirement": "median accepted zone width >= 0.10 ATR",
+            "requirement": "median accepted zone width >= 0.40 ATR",
             "observed": f"median {median(accepted_atr):.4f} ATR",
-            "passed": (median(accepted_atr) or Decimal(0)) >= Decimal("0.10"),
+            "passed": (median(accepted_atr) or Decimal(0)) >= Decimal("0.40"),
             "kind": "sample_support",
         },
         {
             "condition": "G4-S18",
-            "requirement": "median accepted zone width >= 4 ticks",
+            "requirement": "median accepted zone width >= 3 ticks",
             "observed": f"median {median(widths)} ticks",
-            "passed": (median(widths) or 0) >= 4,
+            "passed": (median(widths) or 0) >= 3,
             "kind": "sample_support",
         },
         {
             "condition": "G4-S19",
-            "requirement": "95th-percentile accepted non-POC width <= 0.75 ATR",
+            "requirement": "95th-percentile accepted non-POC width <= 1.50 ATR",
             "observed": f"p95 {percentile(nonpoc_atr, Decimal('0.95'))}",
             "passed": (percentile(nonpoc_atr, Decimal("0.95")) or Decimal(0))
-            <= Decimal("0.75"),
+            <= Decimal("1.50"),
             "kind": "sample_support",
         },
     ]
