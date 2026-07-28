@@ -170,3 +170,104 @@ Report the result and stop. No strategy, entry, stop, target or profitability
 figure has been produced at any point, and none is authorized. If the
 displacement family is to be re-cut at a scale that can discriminate, that is a
 new specification decision to be made before any further outcome is opened.
+
+
+---
+
+# Addendum — Amendment 03: capped-window displacement and band residence
+
+Added after the open-ended thresholds were found to saturate. Same five
+partitions, same zones and controls, producing code `4d03e5b`.
+
+## A1. Why the original displacement family failed
+
+99% of events reached 3 ATR and 98% reached 5 ATR. The cause was the clock, not
+the distance: with hours of session available, price covers six points almost
+always. Capping the window at 15, 30 and 60 minutes replaces "did it ever" with
+"how far did it get", which cannot saturate.
+
+## A2. Distance travelled within a fixed window
+
+Median maximum excursion from the nearest zone edge, in ATR, against the
+activity-matched control:
+
+| horizon | population | treated | control | ratio | full years treated farther |
+|---|---|---|---|---|---|
+| 15m | non-POC | 6.14 | 6.31 | 0.973 | 1 of 4 |
+| 15m | POC | 7.90 | 8.20 | 0.963 | 1 of 4 |
+| 30m | non-POC | 8.24 | 8.39 | 0.982 | 1 of 4 |
+| 30m | POC | 10.92 | 11.24 | 0.972 | 1 of 4 |
+| 60m | non-POC | 11.15 | 11.71 | 0.953 | 0 of 4 |
+| 60m | POC | 14.16 | 15.08 | 0.939 | 1 of 4 |
+
+**Every ratio is below one, and the direction holds in three or four years of
+four in every row.** Price travels 2 to 6 percent less far from an HVN zone than
+from a width-matched ordinary zone over the same window, and the gap widens with
+the horizon.
+
+This is the first year-consistent effect in the study on a metric with power. It
+is also small: at 60 minutes the non-POC difference is 0.55 ATR, roughly one
+point on NQ. It is reported as a measured direction, not as a mechanism.
+
+## A3. Time spent within 5 ATR of the zone
+
+| population | control | median (T / C) | mean (T / C) | p90 (T / C) | years treated longer |
+|---|---|---|---|---|---|
+| non-POC | C01 | 8m / 8m | 53.2 / 51.6 | 149 / 155 | 1 of 4 |
+| non-POC | C02 | 8m / 8m | 53.2 / 51.0 | 149 / 136 | 2 of 4 |
+| POC | C01 | 5m / 4m | 36.7 / 36.4 | 101 / 101 | 2 of 4 |
+| POC | C02 | 5m / 4m | 36.7 / 32.8 | 101 / 85 | 1 of 4 |
+
+Medians are equal or one minute apart. The mean and p90 gaps against C02 point
+the same way as A2 — treated holds price slightly longer — but they do not carry
+year consistency, so they are weaker evidence than the displacement result.
+
+## A4. The absorption reading
+
+The hypothesis: if lingering near a zone lets resting interest accumulate, then
+events that lingered longest should continue most often once they break out.
+
+Continuation 30 minutes after leaving the 5 ATR band, by quartile of time spent
+inside it:
+
+| population | arm | Q1 shortest | Q2 | Q3 | Q4 longest |
+|---|---|---|---|---|---|
+| non-POC | treated | 46.1% | 46.5% | 50.0% | 49.1% |
+| non-POC | control | 51.3% | 48.2% | 47.2% | 52.4% |
+| POC | treated | 53.4% | 52.9% | 53.8% | **47.0%** |
+| POC | control | 54.6% | 52.8% | 51.4% | 50.4% |
+
+**Not supported.** Non-POC treated rises from 46% to 49% across the quartiles,
+but its control moves in the opposite direction and ends higher. POC treated
+*falls* from 53% to 47%: the longest-lingering POC events continue least often.
+No arm shows a monotonic rise, and no quartile beats its control by more than a
+few points in a stable direction.
+
+The breakout volume ratio does rise steeply with residence — non-POC treated
+0.97, 1.19, 1.55, 3.42 across the quartiles — but that is mechanical. A longer
+stay in the band means more quiet bars in the baseline, so the same exit bar
+divides by a smaller median. It is not evidence of accumulating interest.
+
+Every breakout-bar volume ratio is recorded in the event ledger, so a volume
+condition can be examined later without recomputing anything.
+
+## A5. Standing of this addendum
+
+The absorption hypothesis was formed **after** the first results were seen. Its
+test here is exploratory. A positive finding would have required confirmation on
+data not yet used; a negative one is simply consistent with everything else in
+the study.
+
+The A2 displacement result was **not** hypothesised in advance either. It is a
+direction observed in a pre-specified metric, with no confidence interval
+computed. It should be treated as the single lead worth pursuing, not as an
+established effect.
+
+## A6. Revised bottom line
+
+Adding a metric with actual discriminating power did not overturn the null, but
+it did narrow it. HVN zones do not attract price more, do not hold it longer in
+any year-consistent way, and do not produce different continuation. They are
+associated with **slightly less** price travel over the following 15 to 60
+minutes — 2 to 6 percent, directionally consistent across years, uncorroborated
+by any other metric and untested for significance.
