@@ -1,0 +1,21 @@
+G4-S01  PASS  source-profile universe reconciles exactly                                          895 tick profiles vs 895 unique Generation 3 (family, session_date, contract)
+G4-S02  PASS  no accepted zone narrower than three ticks                                          minimum accepted width 3 ticks
+G4-S03  PASS  no accepted zone narrower than 0.40 ATR, subject to the three-tick floor            0 accepted zones below both the ATR minimum and the tick floor
+G4-S04  PASS  no accepted non-POC zone exceeds 1.50 ATR                                           maximum accepted non-POC width 1.4992 ATR
+G4-S05  PASS  no accepted POC zone exceeds 2.50 ATR                                               maximum accepted POC width 2.4832 ATR
+G4-S06  PASS  accepted zones do not overlap within one physical profile                           0 overlapping accepted pairs
+G4-S07  PASS  every accepted non-POC zone satisfies all density, percentile and separation gates  0 accepted non-POC zones failing a gate
+G4-S08  PASS  every zone is frozen before its eligible interaction                                0 profiles with a freeze time after the interaction session date
+G4-S09  PASS  raw, smoothed, accepted, broad and rejected ledgers reconcile                       14780 candidates = 1139 accepted + 13641 rejected; 214 broad rows are a subset of the rejected ledger
+G4-S10  n/a   deterministic rerun reproduces content and row order                                verified separately against a second run of the same commit
+G4-S11  PASS  no forbidden year is admitted                                                       0 forbidden-year rows admitted; 481125 excluded as an earlier year
+G4-S12  PASS  no forward outcome is computed or inspected                                         manifest forward_outcomes_computed = False
+G4-S13  PASS  median accepted non-POC zones per physical profile <= 3                             median 0
+G4-S14  PASS  90th percentile accepted non-POC zones per profile <= 6                             p90 1
+G4-S15  FAIL  at least 300 unique non-POC zones exist in 2019                                     248 unique physical non-POC zones
+G4-S16  FAIL  every relationship R01-R05 has at least 20 eligible non-POC opportunities           R01=83, R02=83, R03=95, R04=16, R05=54
+G4-S17  PASS  median accepted zone width >= 0.40 ATR                                              median 1.4597 ATR
+G4-S18  PASS  median accepted zone width >= 3 ticks                                               median 12 ticks
+G4-S19  PASS  95th-percentile accepted non-POC width <= 1.50 ATR                                  p95 1.45952769155755141584204228
+
+17 of 19 evaluated conditions pass; failures: G4-S15, G4-S16

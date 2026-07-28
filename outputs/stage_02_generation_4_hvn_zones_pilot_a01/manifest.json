@@ -1,0 +1,101 @@
+{
+  "accepted_nonpoc_zones": 248,
+  "accepted_zones": 1139,
+  "archive": "nq2018.zip",
+  "artifacts": {
+    "accepted_hvn_zones.csv.gz": {
+      "bytes": 346390,
+      "sha256": "d16d1830cd78986403063bb2603f4cb12666c58c310afef559bdc5e0f002d4d7"
+    },
+    "broad_distributions.csv.gz": {
+      "bytes": 71655,
+      "sha256": "adc56274fca5b36d0db7321783c326243a7aba19b9c00bdd99ab81481280de9a"
+    },
+    "peak_candidates.csv.gz": {
+      "bytes": 4052717,
+      "sha256": "1f95c3fd53012ac9b9833e02b93e495484fc49b66a7266a4f1cb89cbf6a364c3"
+    },
+    "poc_zone_summary.csv": {
+      "bytes": 697450,
+      "sha256": "f6044287c16976d596e5493b40ebf8d638f8a6ff2a0d562d9b963d33acd794f1"
+    },
+    "profile_summary.csv": {
+      "bytes": 280041,
+      "sha256": "23e66b3046f3d8c8d84e881eaf50dfb15ef2ed874b51d92234329c1c6644f7fd"
+    },
+    "raw_tick_profile_summary.csv": {
+      "bytes": 211764,
+      "sha256": "03102abe595ee6d3fab19382a4fabc88aa3f6cbc2f973ec76d204ac58e608d8e"
+    },
+    "rejected_candidates.csv.gz": {
+      "bytes": 3799683,
+      "sha256": "580d988e9ab8b1ac335b2be27884e3426c6b126136ae7cb7dee704a36657c6a0"
+    },
+    "rejection_summary.csv": {
+      "bytes": 609,
+      "sha256": "511ffc49179f94e24982db55948f6dd67574010ef1b0abc37766633255d2eceb"
+    },
+    "relationship_opportunity_summary.csv": {
+      "bytes": 382,
+      "sha256": "ba89abfc69a6dc331d8ec75693c85a9e436f5dddc389549b6692b0d47d745d2d"
+    },
+    "smoothed_profile_summary.csv": {
+      "bytes": 167250,
+      "sha256": "50f38d49fe8acbc4e80c5392a04c29525084084175071bf3c91f91e527f6024d"
+    },
+    "structural_reconciliation.csv": {
+      "bytes": 676,
+      "sha256": "b97ed190aa05293fedf6ea8951d3aabcc5741ba8f7d5c6dca9f8796761064792"
+    },
+    "tpo_value_area_summary.csv": {
+      "bytes": 142266,
+      "sha256": "7c3c0fe23ad6d8af691e4465d6a021fc8d7a65e2a1dbd5b86e8a9c16c5802cc2"
+    },
+    "volume_value_area_summary.csv": {
+      "bytes": 142401,
+      "sha256": "5dbef9f0f4903bb2fdca123a486e8564e61c1b3c5e670c0f311c76cb1191c5b7"
+    },
+    "zone_density_summary.csv": {
+      "bytes": 2036,
+      "sha256": "ab86e008fd7649607fb1a1b62a1b41b016050d2f31ec5368a4c951d0069ac985"
+    },
+    "zone_separation_summary.csv": {
+      "bytes": 601,
+      "sha256": "bde1c7f9f01e041194767eb9aad135c6cce78243502db85e14fa041611dd8d45"
+    },
+    "zone_width_summary.csv": {
+      "bytes": 1087,
+      "sha256": "fc7addc381aa72fef71332ff16d4f63cf0b95fbd532aa202222dcc64130ef1b3"
+    },
+    "zones_per_profile_summary.csv": {
+      "bytes": 127,
+      "sha256": "c66585ef367d177b6c224bd5394ae6861ab81b4cb7c233660ba78bce93b7776f"
+    }
+  },
+  "bars": 430528,
+  "candidates": 14780,
+  "code_sha": "3a2fc20c1e9fbc0c32213427979687242e535ed6",
+  "dataset_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "forward_outcomes_computed": false,
+  "generation": "STAGE_02_GENERATION_4_HVN_ZONES",
+  "ingestion_audit": {
+    "archive": "nq2018.zip",
+    "parsed_years": [
+      2018,
+      2019
+    ],
+    "requested_year": 2019,
+    "rows_admitted": 430528,
+    "rows_excluded_earlier_year": 481125,
+    "rows_excluded_later_year": 0,
+    "rows_skipped_non_outright": 30906
+  },
+  "member": "glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst",
+  "mode": "structural_only",
+  "profiles": 895,
+  "relationship_opportunities": 1468,
+  "reproduction_command": "PYTHONPATH=src python3 scripts/run_gen4_structural_pilot.py --year 2019 --data-root <data-root> --structural-only",
+  "specification": "research/hvn/STAGE_02_GENERATION_4_ZONE_SPEC.md",
+  "unique_physical_nonpoc_zones": 248,
+  "year": 2019
+}

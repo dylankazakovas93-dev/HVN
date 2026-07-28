@@ -1,0 +1,11 @@
+relationship_id,family,zone_class,count
+R01,prior_rth,NONPOC_HVN_ZONE,83
+R01,prior_rth,POC_HVN_ZONE,246
+R02,prior_rth,NONPOC_HVN_ZONE,83
+R02,prior_rth,POC_HVN_ZONE,246
+R03,full_overnight,NONPOC_HVN_ZONE,95
+R03,full_overnight,POC_HVN_ZONE,177
+R04,midnight,NONPOC_HVN_ZONE,16
+R04,midnight,POC_HVN_ZONE,223
+R05,opening_hour_rth,NONPOC_HVN_ZONE,54
+R05,opening_hour_rth,POC_HVN_ZONE,245
