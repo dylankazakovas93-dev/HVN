@@ -1,0 +1,53 @@
+{
+  "amendments": [
+    "AMENDMENT_01",
+    "AMENDMENT_02"
+  ],
+  "archive": "nq2025.zip",
+  "artifacts": {
+    "continuation_summary.csv": {
+      "bytes": 176460,
+      "sha256": "6cfd3c0de0d336b05cfc8d1ea1e9ab14bf0ff9206bc39d134489ea35d2cb4165"
+    },
+    "displacement_distribution.csv": {
+      "bytes": 39862,
+      "sha256": "788646677627d2a6ccb882bf03d5c4c79228347af2c4070abfa61d8a23e874b0"
+    },
+    "envelope_summary.csv": {
+      "bytes": 11566,
+      "sha256": "910e6d0376c27301e3d5562ab402a490b778ab4ebbe5f4adbec720ded574e0fb"
+    },
+    "event_ledger.csv.gz": {
+      "bytes": 2195841,
+      "sha256": "560178376a7ff4084a7893313fcddf56944abe42a83a03b9200ee7df668dd2da"
+    },
+    "interval_ledger.csv.gz": {
+      "bytes": 179096,
+      "sha256": "3252c9a6491b7f85ec131327b5b6902d83ed1cccc63547cc1200e453ebf2d8aa"
+    },
+    "touch_population.csv": {
+      "bytes": 2454,
+      "sha256": "f61e75d1a0141fd9bd98ca34ad78cfa5a9deee0434bb13bddbeca03a3065672d"
+    }
+  },
+  "bars": 456913,
+  "code_sha": "15037c4afea94a059bb1525d4273b98bc39243f9",
+  "dataset_sha256": "b4fcf58ff5db70d2a8d45d605ce5a2742ab003a1cf694ef2721a04562b6608e2",
+  "events": 31043,
+  "first_touches": 3366,
+  "generation": "STAGE_02_GENERATION_4_HVN_ZONES",
+  "ingestion_audit": {
+    "forbidden_year_rows_admitted": 0,
+    "parsed_years": [
+      2025,
+      2026
+    ],
+    "rows_admitted": 456913,
+    "rows_excluded_earlier_year": 0,
+    "rows_excluded_later_year": 1
+  },
+  "intervals": 4871,
+  "profiles": 961,
+  "retouches": 27677,
+  "year": 2025
+}

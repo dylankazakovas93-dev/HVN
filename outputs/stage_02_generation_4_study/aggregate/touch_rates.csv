@@ -1,0 +1,5 @@
+population,control_arm,treated_intervals,control_intervals,treated_touch_rate_pct,control_touch_rate_pct,difference_pp,ratio,full_years_treated_higher,treated_2019,treated_2021,treated_2023,treated_2025,control_2019,control_2021,control_2023,control_2025
+NONPOC,C01_NEUTRAL,2271,2271,61.25,60.85,0.40,1.007,3/4,61.03,62.95,57.10,63.52,59.21,62.79,57.26,63.10
+NONPOC,C02_ACTIVITY_MATCHED,2271,2020,61.25,61.78,-0.53,0.991,1/4,61.03,62.95,57.10,63.52,58.85,64.12,57.14,64.81
+POC,C01_NEUTRAL,4397,4397,71.98,71.64,0.34,1.005,2/4,69.48,73.21,71.83,73.59,68.78,72.26,72.19,73.59
+POC,C02_ACTIVITY_MATCHED,4397,3172,71.98,70.71,1.27,1.018,4/4,69.48,73.21,71.83,73.59,69.02,70.42,71.33,71.82

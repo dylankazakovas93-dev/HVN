@@ -1,0 +1,17 @@
+{
+  "events": 125604,
+  "first_touches": 13982,
+  "first_touches_full_years": 12579,
+  "full_years": [
+    2019,
+    2021,
+    2023,
+    2025
+  ],
+  "intervals": 20630,
+  "primary_control": "C02_ACTIVITY_MATCHED",
+  "supporting_years": [
+    2026
+  ],
+  "unique_physical_zones": 5822
+}

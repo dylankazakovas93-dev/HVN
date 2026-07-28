@@ -1,0 +1,9 @@
+threshold,population,control_arm,treated_events,control_events,treated_reached_pct,control_reached_pct,treated_censored_pct,treated_median_bars,control_median_bars,full_years_treated_faster,underpowered
+3atr,NONPOC,C01_NEUTRAL,1391,1382,99.50,99.28,0.50,3,4,2/4,False
+3atr,NONPOC,C02_ACTIVITY_MATCHED,1391,1248,99.50,99.36,0.50,3,3,1/4,False
+3atr,POC,C01_NEUTRAL,3165,3150,99.62,99.59,0.32,2,2,0/4,False
+3atr,POC,C02_ACTIVITY_MATCHED,3165,2243,99.62,99.73,0.32,2,2,1/4,False
+5atr,NONPOC,C01_NEUTRAL,1391,1382,97.56,97.47,0.93,9,9,0/4,False
+5atr,NONPOC,C02_ACTIVITY_MATCHED,1391,1248,97.56,97.20,0.93,9,9,0/4,False
+5atr,POC,C01_NEUTRAL,3165,3150,98.58,98.57,0.63,6,5,0/4,False
+5atr,POC,C02_ACTIVITY_MATCHED,3165,2243,98.58,98.26,0.63,6,5,0/4,False
