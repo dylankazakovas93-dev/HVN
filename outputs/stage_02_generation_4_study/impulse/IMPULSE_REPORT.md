@@ -130,3 +130,62 @@ identified precisely rather than left as "no signal". Every cell is written to
 marginal tables and the seasonal coverage check.
 
 No strategy, entry, stop, target or profitability figure was produced.
+
+---
+
+# Addendum — displacement re-tested on calibrated buckets
+
+The frozen buckets put 97% of events in one cell, so displacement was never
+tested. Re-cut into quartiles taken from the **control** arm's own distribution,
+which carries no treatment and so cannot be shaped by the treated result. The
+raw value was already in the ledgers, so this is a re-cut, not a re-run.
+
+## Cuts
+
+```text
+non-POC   control n=1,247   quartile cuts at 5.42 / 9.63 / 16.30 ATR
+POC       control n=2,242   quartile cuts at 6.41 / 12.02 / 23.36 ATR
+```
+
+The buckets now span a real range: median displacement runs from 3.17 to 23.30
+ATR (non-POC) and 3.92 to 32.23 ATR (POC). A tenfold difference in impulse size
+between the smallest and largest quartile.
+
+## Continuation is flat across that range
+
+Treated arm, by quartile:
+
+| population | horizon | Q1 | Q2 | Q3 | Q4 | spread | monotonic |
+|---|---|---|---|---|---|---|---|
+| non-POC | 15b | 51.9% | 50.7% | 49.4% | 49.1% | 2.8 pp | yes |
+| non-POC | 30b | 48.1% | 51.3% | 50.0% | 46.7% | 4.6 pp | no |
+| non-POC | 60b | 48.5% | 52.6% | 50.6% | 47.6% | 5.0 pp | no |
+| POC | 15b | 48.7% | 53.2% | 52.0% | 52.5% | 4.5 pp | no |
+| POC | 30b | 51.0% | 52.1% | 49.5% | 50.9% | 2.5 pp | no |
+| POC | 60b | 50.9% | 51.8% | 51.3% | 54.1% | 3.2 pp | no |
+
+**A tenfold change in impulse size moves continuation by under five points, and
+not monotonically in five of six rows.** The one monotonic row runs the wrong
+way for a continuation story: larger impulses continue slightly *less*.
+
+## Why the raw pass count looked encouraging, and why it is not
+
+Sixteen of twenty-four cells met the consistency filter against 7.5 expected
+from noise. Two things account for that, and neither is displacement.
+
+**The cells are not independent.** The three horizons on a given quartile are
+the same events over overlapping windows. There are 8 independent quartile
+cells, not 24, so the noise expectation is 2.5. **Only 1 of 8 quartile cells is
+consistent at all three horizons** — below chance.
+
+**The surviving differences are a population-level offset.** Non-POC treated
+continues 1.30 pp less than its control on average and POC 1.39 pp more, with
+8 of 12 and 9 of 12 cells sharing their population's sign. That offset sits at
+the same level in every quartile. It is a property of the two populations, not
+information carried by displacement.
+
+## Conclusion
+
+Displacement carries no information about whether price continues or reverts
+after leaving an HVN zone. All three impulse terms have now been tested on
+buckets that actually discriminate, and all three are flat.
