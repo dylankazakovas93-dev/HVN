@@ -15,10 +15,14 @@ from decimal import Decimal
 from .gen4_controls import select_controls
 from .gen4_outcomes import (
     CONTINUATION_HORIZONS_MINUTES,
+    DISPLACEMENT_HORIZONS_MINUTES,
     DISPLACEMENT_THRESHOLDS_ATR,
+    band_residence,
     continuation,
+    continuation_after_exit,
     displacement,
     envelope_residence,
+    excursion_at_horizon,
     interaction_session,
     returned_inside,
 )
@@ -167,6 +171,48 @@ def measure_event(
     row["envelope_left"] = envelope.left_envelope
     row["envelope_censored"] = envelope.censored
     row["envelope_minutes_inside"] = envelope.minutes_inside
+
+    # Amendment 03: time-capped displacement, which cannot saturate the way an
+    # open-ended threshold does.
+    for horizon in DISPLACEMENT_HORIZONS_MINUTES:
+        reach = excursion_at_horizon(
+            forward,
+            zone_low=low,
+            zone_high=high,
+            atr=atr,
+            horizon_minutes=horizon,
+        )
+        row[f"excursion_evaluated_{horizon}m"] = reach.evaluated
+        row[f"max_excursion_{horizon}m_atr"] = reach.max_abs_atr
+        row[f"max_up_{horizon}m_atr"] = reach.max_up_atr
+        row[f"max_down_{horizon}m_atr"] = reach.max_down_atr
+        row[f"net_close_{horizon}m_atr"] = reach.net_close_atr
+
+    # Amendment 03: residence inside a 5 ATR band, and what happens on exit.
+    band = band_residence(
+        forward,
+        zone_low=low,
+        zone_high=high,
+        atr=atr,
+        window_complete=window_complete,
+    )
+    row["band_left"] = band.left_band
+    row["band_censored"] = band.censored
+    row["band_minutes_inside"] = band.minutes_inside
+    row["band_exit_direction"] = band.exit_direction
+    row["breakout_volume_ratio"] = band.breakout_volume_ratio
+    for horizon in CONTINUATION_HORIZONS_MINUTES:
+        after = continuation_after_exit(
+            forward,
+            band,
+            zone_low=low,
+            zone_high=high,
+            atr=atr,
+            horizon_minutes=horizon,
+        )
+        row[f"band_continued_{horizon}m"] = after.continued
+        row[f"band_continuation_evaluated_{horizon}m"] = after.evaluated
+        row[f"band_displacement_{horizon}m_atr"] = after.displacement_atr
     return row
 
 

@@ -356,3 +356,132 @@ def test_the_bar_distribution_is_exhaustive_and_sums_to_one_hundred_percent():
 def test_an_empty_population_produces_no_distribution_rows():
     assert bar_count_distribution([]) == []
     assert median_bars([]) is None
+
+
+# ---------------------------------------------------------------------------
+# Amendment 03: capped-window displacement and band residence
+
+from hvn.gen4_outcomes import (  # noqa: E402
+    band_residence,
+    continuation_after_exit,
+    excursion_at_horizon,
+)
+
+
+def test_a_capped_window_cannot_saturate_the_way_an_open_window_does():
+    """Price reaches 3 ATR at bar 40, so a 15-minute window must not see it."""
+    rows = flat("104", 39) + [("108", "109", "109")] + flat("109", 40)
+    forward = bars(rows)
+    short = excursion_at_horizon(
+        forward, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, horizon_minutes=15
+    )
+    assert short.evaluated
+    assert short.max_abs_atr == Decimal("0.5")   # 104 is 1 point above 103
+    long = excursion_at_horizon(
+        forward, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, horizon_minutes=60
+    )
+    assert long.max_abs_atr == Decimal(3)
+
+
+def test_excursion_reports_both_sides_and_the_signed_close():
+    rows = [("96", "105", "104")] + flat("104", 14)
+    result = excursion_at_horizon(
+        bars(rows), zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, horizon_minutes=15
+    )
+    assert result.max_up_atr == Decimal(1)      # 105 is 2 points above 103
+    assert result.max_down_atr == Decimal(2)    # 96 is 4 points below 100
+    assert result.max_abs_atr == Decimal(2)
+    assert result.net_close_atr == Decimal("0.5")
+
+
+def test_a_close_inside_the_zone_has_zero_net_displacement():
+    result = excursion_at_horizon(
+        bars(flat("101", 15)),
+        zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, horizon_minutes=15,
+    )
+    assert result.net_close_atr == 0
+
+
+def test_a_short_window_is_not_evaluated_rather_than_scored_early():
+    result = excursion_at_horizon(
+        bars(flat("104", 9)),
+        zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, horizon_minutes=15,
+    )
+    assert not result.evaluated
+    assert result.max_abs_atr is None
+
+
+def test_band_residence_counts_minutes_until_the_five_atr_boundary():
+    # 5 ATR above the high edge is 103 + 10 = 113.
+    rows = flat("104", 6) + [("112", "113", "113")]
+    result = band_residence(
+        bars(rows), zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        window_complete=True,
+    )
+    assert result.left_band
+    assert result.minutes_inside == 6
+    assert result.exit_direction == UP
+
+
+def test_band_residence_applies_to_every_touch_not_only_near_closes():
+    """Unlike the envelope metric there is no closeness precondition."""
+    rows = flat("110", 3) + [("112", "113", "113")]
+    result = band_residence(
+        bars(rows), zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        window_complete=True,
+    )
+    assert result.left_band and result.minutes_inside == 3
+
+
+def test_an_event_that_never_leaves_the_band_is_censored_when_cut_short():
+    result = band_residence(
+        bars(flat("104", 5)), zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        window_complete=False,
+    )
+    assert not result.left_band and result.censored
+    assert result.minutes_inside == 5
+    assert result.breakout_volume_ratio is None
+
+
+def test_the_breakout_volume_ratio_compares_the_exit_bar_to_the_band():
+    quiet = bars(flat("104", 4))
+    loud = Bar(
+        source_row_id="NQH9|4",
+        close_time=START + timedelta(minutes=5),
+        open=Decimal("112"), high=Decimal("113"),
+        low=Decimal("112"), close=Decimal("113"),
+        volume=Decimal(50), symbol="NQH9",
+    )
+    result = band_residence(
+        quiet + [loud], zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        window_complete=True,
+    )
+    # The four band bars each carry volume 10, so the median is 10.
+    assert result.breakout_volume_ratio == Decimal(5)
+
+
+def test_continuation_after_exit_is_measured_from_the_exit_bar():
+    rows = flat("104", 3) + [("112", "113", "113")] + flat("116", 15)
+    forward = bars(rows)
+    residence = band_residence(
+        forward, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, window_complete=True
+    )
+    result = continuation_after_exit(
+        forward, residence, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        horizon_minutes=15,
+    )
+    assert result.evaluated and result.continued
+    # 116 is 13 points above the 103 edge = 6.5 ATR.
+    assert result.displacement_atr == Decimal("6.5")
+
+
+def test_an_event_that_never_left_the_band_has_no_continuation():
+    forward = bars(flat("104", 30))
+    residence = band_residence(
+        forward, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR, window_complete=True
+    )
+    result = continuation_after_exit(
+        forward, residence, zone_low=ZONE_LOW, zone_high=ZONE_HIGH, atr=ATR,
+        horizon_minutes=15,
+    )
+    assert not result.evaluated

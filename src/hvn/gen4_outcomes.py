@@ -307,3 +307,153 @@ def median_bars(results: list[DisplacementResult]) -> int | None:
     if len(values) % 2:
         return values[middle]
     return (values[middle - 1] + values[middle]) // 2
+
+
+# ---------------------------------------------------------------------------
+# Amendment 03: time-capped displacement and band residence
+#
+# The threshold family above measures whether price ever reached a distance
+# before its session ended. Given hours of window that question saturates: 99%
+# of events reach 3 ATR. Capping the window converts it into "how far did price
+# get in h minutes", which cannot saturate.
+
+DISPLACEMENT_HORIZONS_MINUTES = (15, 30, 60)
+BAND_RESIDENCE_ATR = Decimal("5")
+
+
+@dataclass(frozen=True, slots=True)
+class ExcursionAtHorizon:
+    horizon_minutes: int
+    evaluated: bool
+    max_up_atr: Decimal | None
+    max_down_atr: Decimal | None
+    max_abs_atr: Decimal | None
+    net_close_atr: Decimal | None
+
+
+def excursion_at_horizon(
+    forward: list[Bar] | tuple[Bar, ...],
+    *,
+    zone_low: Decimal,
+    zone_high: Decimal,
+    atr: Decimal,
+    horizon_minutes: int,
+) -> ExcursionAtHorizon:
+    """How far price got from the zone within a fixed window.
+
+    `max_abs_atr` is the larger of the two one-sided excursions, so it measures
+    distance travelled regardless of direction. `net_close_atr` is signed from
+    the zone: positive above, negative below, zero while inside.
+
+    An event with fewer than `horizon_minutes` bars available is not evaluated
+    rather than being scored on a short window.
+    """
+    if len(forward) < horizon_minutes:
+        return ExcursionAtHorizon(horizon_minutes, False, None, None, None, None)
+    window = forward[:horizon_minutes]
+    up = max(
+        ((bar.high - zone_high) / atr for bar in window if bar.high > zone_high),
+        default=Decimal(0),
+    )
+    down = max(
+        ((zone_low - bar.low) / atr for bar in window if bar.low < zone_low),
+        default=Decimal(0),
+    )
+    close = window[-1].close
+    if close >= zone_high:
+        net = (close - zone_high) / atr
+    elif close < zone_low:
+        net = -(zone_low - close) / atr
+    else:
+        net = Decimal(0)
+    return ExcursionAtHorizon(horizon_minutes, True, up, down, max(up, down), net)
+
+
+@dataclass(frozen=True, slots=True)
+class BandResidence:
+    band_atr: Decimal
+    left_band: bool
+    censored: bool
+    minutes_inside: int
+    exit_index: int | None
+    exit_direction: str | None
+    breakout_volume_ratio: Decimal | None
+
+
+def band_residence(
+    forward: list[Bar] | tuple[Bar, ...],
+    *,
+    zone_low: Decimal,
+    zone_high: Decimal,
+    atr: Decimal,
+    window_complete: bool,
+    band_atr: Decimal = BAND_RESIDENCE_ATR,
+) -> BandResidence:
+    """Minutes price stays within `band_atr` of the zone, and how it leaves.
+
+    Unlike `envelope_residence` this applies to every first touch, not only
+    those closing near the zone: the question is how long price lingers in the
+    neighbourhood before committing, whichever side it arrived from.
+
+    `breakout_volume_ratio` is the exit bar's volume over the median volume of
+    the bars that preceded it inside the band. A zero or absent median leaves
+    the ratio undefined rather than dividing by zero.
+    """
+    for index, bar in enumerate(forward):
+        above, below = _excursion_atr(bar, zone_low, zone_high, atr)
+        if above < band_atr and below < band_atr:
+            continue
+        direction = UP if above >= band_atr and above >= below else DOWN
+        prior = [b.volume for b in forward[:index]]
+        ratio = None
+        if prior:
+            ordered = sorted(prior)
+            middle = len(ordered) // 2
+            median_volume = (
+                ordered[middle]
+                if len(ordered) % 2
+                else (ordered[middle - 1] + ordered[middle]) / 2
+            )
+            if median_volume > 0:
+                ratio = bar.volume / median_volume
+        return BandResidence(band_atr, True, False, index, index, direction, ratio)
+    return BandResidence(
+        band_atr, False, not window_complete, len(forward), None, None, None
+    )
+
+
+def continuation_after_exit(
+    forward: list[Bar] | tuple[Bar, ...],
+    residence: BandResidence,
+    *,
+    zone_low: Decimal,
+    zone_high: Decimal,
+    atr: Decimal,
+    horizon_minutes: int,
+) -> ContinuationResult:
+    """Did price keep going after leaving the band, `h` minutes later?
+
+    This is the test of the absorption reading: if lingering in the band builds
+    up resting interest, events that lingered longer should continue more often
+    once they break out.
+    """
+    if not residence.left_band or residence.exit_index is None:
+        return ContinuationResult(residence.band_atr, horizon_minutes, False, None, None)
+    target = residence.exit_index + horizon_minutes
+    if target >= len(forward):
+        return ContinuationResult(residence.band_atr, horizon_minutes, False, None, None)
+    at_exit = forward[residence.exit_index].close
+    at_horizon = forward[target].close
+    if residence.exit_direction == UP:
+        moved = (at_horizon - zone_high) / atr
+        reference = (at_exit - zone_high) / atr
+    else:
+        moved = (zone_low - at_horizon) / atr
+        reference = (zone_low - at_exit) / atr
+    return ContinuationResult(
+        threshold_atr=residence.band_atr,
+        horizon_minutes=horizon_minutes,
+        evaluated=True,
+        continued=moved >= reference,
+        displacement_atr=moved,
+    )
