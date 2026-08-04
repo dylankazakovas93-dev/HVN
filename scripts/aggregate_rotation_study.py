@@ -283,6 +283,113 @@ def excursion_table(events: list[dict]) -> list[dict]:
     return out
 
 
+def q(value):
+    return None if value is None else value.quantize(Decimal("0.001"))
+
+
+def mean(values):
+    if not values:
+        return None
+    return sum(values) / Decimal(len(values))
+
+
+def quality_table(events: list[dict]) -> list[dict]:
+    """Conditional on a rotation happening, how long did it hold and how far?
+
+    "A high node rotates less often" is the theory restating itself. This table
+    conditions on the rotation and asks whether the ones that do happen last
+    longer or travel further than a control's — the question that is not
+    circular. The denominator is rotations, not taps, so every cell here is a
+    strictly smaller sample than the corresponding rotation-grid cell.
+    """
+    out = []
+    for node_class in ("HIGH_VOLUME_NODE", "LOW_VOLUME_NODE"):
+        pool = [e for e in events if e["node_class"] == node_class]
+        for distance in DISTANCES:
+            for deadline in DEADLINES:
+                key = f"{distance}atr_{deadline}b"
+                guard = f"quality_evaluated_{key}"
+                if not pool or guard not in pool[0]:
+                    continue
+                arms = {}
+                for arm in (TREATED, CONTROL):
+                    rows = [
+                        e for e in pool if e["arm"] == arm and is_true(e.get(guard))
+                    ]
+
+                    def series(subset, field):
+                        return [
+                            Decimal(r[field])
+                            for r in subset
+                            if r.get(field) not in ("", None)
+                        ]
+
+                    arms[arm] = {
+                        "n": len(rows),
+                        "held": mean(series(rows, f"bars_held_{key}")),
+                        "extension": mean(series(rows, f"further_extension_{key}")),
+                        "held_per_year": {
+                            y: mean(
+                                series(
+                                    [r for r in rows if r["year"] == y],
+                                    f"bars_held_{key}",
+                                )
+                            )
+                            for y in YEARS
+                        },
+                        "extension_per_year": {
+                            y: mean(
+                                series(
+                                    [r for r in rows if r["year"] == y],
+                                    f"further_extension_{key}",
+                                )
+                            )
+                            for y in YEARS
+                        },
+                    }
+                t, c = arms[TREATED], arms[CONTROL]
+                if t["held"] is None or c["held"] is None:
+                    continue
+
+                def agree(field):
+                    diff = t[field] - c[field]
+                    per = f"{field}_per_year"
+                    return diff, sum(
+                        1
+                        for y in YEARS
+                        if t[per][y] is not None
+                        and c[per][y] is not None
+                        and (t[per][y] - c[per][y]) * diff > 0
+                    )
+
+                held_diff, held_agreeing = agree("held")
+                if t["extension"] is None or c["extension"] is None:
+                    ext_diff, ext_agreeing = None, 0
+                else:
+                    ext_diff, ext_agreeing = agree("extension")
+                out.append(
+                    {
+                        "node_class": node_class,
+                        "distance_atr": distance,
+                        "deadline_bars": deadline,
+                        "treated_rotations": t["n"],
+                        "control_rotations": c["n"],
+                        "treated_mean_bars_held": q(t["held"]),
+                        "control_mean_bars_held": q(c["held"]),
+                        "bars_held_difference": q(held_diff),
+                        "bars_held_years_agreeing": f"{held_agreeing}/4",
+                        "treated_mean_further_extension_atr": q(t["extension"]),
+                        "control_mean_further_extension_atr": q(c["extension"]),
+                        "further_extension_difference_atr": q(ext_diff),
+                        "further_extension_years_agreeing": f"{ext_agreeing}/4",
+                        "consistent": held_agreeing >= 3
+                        and t["n"] >= MIN_EVENTS
+                        and c["n"] >= MIN_EVENTS,
+                    }
+                )
+    return out
+
+
 def write(path: Path, rows: list[dict]) -> None:
     if not rows:
         path.write_text("")
@@ -314,6 +421,8 @@ def main(argv=None) -> None:
     write(output / "rotation_grid.csv", grid)
     write(output / "sustain.csv", sustain)
     write(output / "max_excursion.csv", excursion_table(events))
+    quality = quality_table(events)
+    write(output / "rotation_quality.csv", quality)
 
     chance = sum(comb(4, k) for k in (3, 4)) / 16
     cells = len(grid) + len(sustain)
@@ -324,6 +433,9 @@ def main(argv=None) -> None:
         "cells_tested": cells,
         "cells_passing_consistency": passing,
         "expected_passing_from_noise": round(cells * chance, 1),
+        "quality_cells_tested": len(quality),
+        "quality_cells_passing": sum(1 for r in quality if r["consistent"]),
+        "quality_expected_from_noise": round(len(quality) * chance, 1),
     }
     (output / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     print(json.dumps(summary, indent=2, sort_keys=True))
