@@ -198,3 +198,60 @@ def test_an_empty_window_is_not_evaluated():
     assert not max_excursion(
         [], node_low=LOW, node_high=HIGH, atr=ATR, window_bars=5
     ).evaluated
+
+
+# ---------------------------------------------------------------------------
+# Conditional quality: given a rotation, how long and how far
+
+
+from hvn.rotation import rotation_quality  # noqa: E402
+
+
+def quality(forward, rot, window=20):
+    return rotation_quality(
+        forward, rot, node_low=LOW, node_high=HIGH, atr=ATR, window_bars=window
+    )
+
+
+def test_bars_held_is_a_run_length_not_a_snapshot():
+    # Rotation on bar 1 at 3 ATR (109); holds three bars then falls back inside.
+    rows = [("108", "109", "109")] + flat("110", 2) + flat("104", 10)
+    forward = bars(rows)
+    rot = rotate(forward=forward, distance_atr=Decimal(3), deadline_bars=3)
+    result = quality(forward, rot)
+    assert result.evaluated
+    assert result.bars_held == 3          # the rotation bar plus two more
+    assert result.gave_back
+
+
+def test_a_rotation_that_never_comes_back_holds_the_whole_window():
+    rows = [("108", "109", "109")] + flat("112", 19)
+    forward = bars(rows)
+    rot = rotate(forward=forward, distance_atr=Decimal(3), deadline_bars=3)
+    result = quality(forward, rot)
+    assert result.bars_held == 20
+    assert result.gave_back is False
+
+
+def test_further_extension_separates_a_clip_from_a_thrust():
+    clip = bars([("108", "109", "109")] + flat("109", 19))
+    thrust = bars([("108", "109", "109")] + flat("115", 19))
+    rot_clip = rotate(forward=clip, distance_atr=Decimal(3), deadline_bars=3)
+    rot_thrust = rotate(forward=thrust, distance_atr=Decimal(3), deadline_bars=3)
+    # Both are 3 ATR rotations, but one goes 3 ATR further.
+    assert quality(clip, rot_clip).further_extension_atr == Decimal(0)
+    assert quality(thrust, rot_thrust).further_extension_atr == Decimal(3)
+
+
+def test_a_rotation_that_never_happened_has_no_quality():
+    forward = bars(flat("104", 30))
+    rot = rotate(forward=forward, distance_atr=Decimal(3), deadline_bars=5)
+    assert not quality(forward, rot).evaluated
+
+
+def test_bars_held_stops_at_the_first_break_and_does_not_resume():
+    # Out, back inside, then out again: only the first run counts.
+    rows = [("108", "109", "109")] + flat("104", 2) + flat("112", 10)
+    forward = bars(rows)
+    rot = rotate(forward=forward, distance_atr=Decimal(3), deadline_bars=3)
+    assert quality(forward, rot).bars_held == 1

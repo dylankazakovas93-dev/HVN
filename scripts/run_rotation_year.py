@@ -47,6 +47,7 @@ from hvn.rotation import (
     check_sustain,
     find_rotation,
     max_excursion,
+    rotation_quality,
 )
 from hvn.stage02_ledger import deterministic_csv_bytes, write_deterministic_gzip_csv
 from hvn.stage02_pipeline import AtrSelector
@@ -199,6 +200,21 @@ def measure(forward, node, *, atr, base) -> dict | None:
                 )
                 row[f"sustain_evaluated_{key}_{horizon}b"] = sustain.evaluated
                 row[f"sustained_{key}_{horizon}b"] = sustain.sustained
+            # Conditional on the rotation happening: how long did it hold and
+            # how much further did it go? "A high node rotates less often" is
+            # the theory restating itself; this is the question that is not.
+            quality = rotation_quality(
+                after,
+                rotation,
+                node_low=node.node_low,
+                node_high=node.node_high,
+                atr=atr,
+                window_bars=MAX_EXCURSION_WINDOW,
+            )
+            row[f"quality_evaluated_{key}"] = quality.evaluated
+            row[f"bars_held_{key}"] = quality.bars_held
+            row[f"further_extension_{key}"] = quality.further_extension_atr
+            row[f"gave_back_{key}"] = quality.gave_back
     return row
 
 

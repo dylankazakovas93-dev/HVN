@@ -181,3 +181,70 @@ def max_excursion(
         direction=best_direction,
         rate_atr_per_bar=best / Decimal(bars),
     )
+
+
+@dataclass(frozen=True, slots=True)
+class RotationQuality:
+    """Conditional on a rotation happening, how good was it?
+
+    "A high node rotates less often" is the theory restating itself. The
+    question that is not circular is whether the rotations that *do* happen
+    differ in duration and extension from a control's rotations.
+    """
+
+    evaluated: bool
+    bars_held: int | None
+    further_extension_atr: Decimal | None
+    max_distance_atr: Decimal | None
+    gave_back: bool | None
+
+
+def rotation_quality(
+    forward: list[Bar] | tuple[Bar, ...],
+    rotation: Rotation,
+    *,
+    node_low: Decimal,
+    node_high: Decimal,
+    atr: Decimal,
+    window_bars: int,
+) -> RotationQuality:
+    """Consecutive bars price stays beyond the rotation distance, and how far.
+
+    `bars_held` counts from the rotation bar until the first close back inside
+    the threshold, so it is a run length rather than a snapshot at one horizon.
+    `further_extension_atr` is how much further the move went beyond the
+    distance that defined it, which separates a rotation that merely clipped the
+    threshold from one that kept going.
+    """
+    if not rotation.rotated or rotation.bars_taken is None:
+        return RotationQuality(False, None, None, None, None)
+    start = rotation.bars_taken - 1
+    window = forward[start : start + window_bars]
+    if not window:
+        return RotationQuality(False, None, None, None, None)
+
+    held = 0
+    furthest = Decimal(0)
+    broke = False
+    for bar in window:
+        above, below = _excursions(bar, node_low, node_high, atr)
+        reached = above if rotation.direction == UP else below
+        if reached > furthest:
+            furthest = reached
+        close_distance = (
+            (bar.close - node_high) / atr
+            if rotation.direction == UP
+            else (node_low - bar.close) / atr
+        )
+        if close_distance >= rotation.distance_atr:
+            if not broke:
+                held += 1
+        else:
+            broke = True
+    return RotationQuality(
+        evaluated=True,
+        bars_held=held,
+        further_extension_atr=furthest - rotation.distance_atr,
+        max_distance_atr=furthest,
+        gave_back=broke,
+    )
