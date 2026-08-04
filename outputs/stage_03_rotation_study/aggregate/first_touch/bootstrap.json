@@ -1,0 +1,372 @@
+[
+  {
+    "control_events": 2277,
+    "exceedance": [
+      {
+        "ci_high": 0.613,
+        "ci_low": -0.0342,
+        "excludes_zero": false,
+        "excursion_atr": "1",
+        "observed": 0.2687,
+        "permutation_p": 0.0559
+      },
+      {
+        "ci_high": 0.9214,
+        "ci_low": -0.2007,
+        "excludes_zero": false,
+        "excursion_atr": "1.5",
+        "observed": 0.3453,
+        "permutation_p": 0.2327
+      },
+      {
+        "ci_high": 1.1845,
+        "ci_low": -0.3442,
+        "excludes_zero": false,
+        "excursion_atr": "2",
+        "observed": 0.4108,
+        "permutation_p": 0.2854
+      },
+      {
+        "ci_high": 0.9753,
+        "ci_low": -0.9811,
+        "excludes_zero": false,
+        "excursion_atr": "2.5",
+        "observed": 0.0027,
+        "permutation_p": 0.9955
+      },
+      {
+        "ci_high": 0.6936,
+        "ci_low": -1.5857,
+        "excludes_zero": false,
+        "excursion_atr": "3",
+        "observed": -0.4312,
+        "permutation_p": 0.4757
+      },
+      {
+        "ci_high": 0.7169,
+        "ci_low": -1.8807,
+        "excludes_zero": false,
+        "excursion_atr": "3.5",
+        "observed": -0.5826,
+        "permutation_p": 0.3796
+      },
+      {
+        "ci_high": 1.357,
+        "ci_low": -1.644,
+        "excludes_zero": false,
+        "excursion_atr": "4",
+        "observed": -0.133,
+        "permutation_p": 0.8655
+      },
+      {
+        "ci_high": 2.0997,
+        "ci_low": -1.2392,
+        "excludes_zero": false,
+        "excursion_atr": "4.5",
+        "observed": 0.4458,
+        "permutation_p": 0.6049
+      },
+      {
+        "ci_high": 2.5046,
+        "ci_low": -0.8544,
+        "excludes_zero": false,
+        "excursion_atr": "5",
+        "observed": 0.8455,
+        "permutation_p": 0.3374
+      },
+      {
+        "ci_high": 3.021,
+        "ci_low": -0.2714,
+        "excludes_zero": false,
+        "excursion_atr": "5.5",
+        "observed": 1.3873,
+        "permutation_p": 0.1104
+      },
+      {
+        "ci_high": 3.4436,
+        "ci_low": -0.011,
+        "excludes_zero": false,
+        "excursion_atr": "6",
+        "observed": 1.7207,
+        "permutation_p": 0.0558
+      },
+      {
+        "ci_high": 3.8192,
+        "ci_low": 0.3349,
+        "excludes_zero": true,
+        "excursion_atr": "6.5",
+        "observed": 2.0808,
+        "permutation_p": 0.0203
+      },
+      {
+        "ci_high": 2.9147,
+        "ci_low": -0.3677,
+        "excludes_zero": false,
+        "excursion_atr": "7",
+        "observed": 1.2887,
+        "permutation_p": 0.1274
+      },
+      {
+        "ci_high": 3.5984,
+        "ci_low": 0.2098,
+        "excludes_zero": true,
+        "excursion_atr": "7.5",
+        "observed": 1.9165,
+        "permutation_p": 0.0289
+      },
+      {
+        "ci_high": 3.9174,
+        "ci_low": 0.4152,
+        "excludes_zero": true,
+        "excursion_atr": "8",
+        "observed": 2.181,
+        "permutation_p": 0.0182
+      },
+      {
+        "ci_high": 4.1003,
+        "ci_low": 0.4888,
+        "excludes_zero": true,
+        "excursion_atr": "8.5",
+        "observed": 2.3008,
+        "permutation_p": 0.0134
+      },
+      {
+        "ci_high": 4.047,
+        "ci_low": 0.7095,
+        "excludes_zero": true,
+        "excursion_atr": "9",
+        "observed": 2.3878,
+        "permutation_p": 0.0073
+      },
+      {
+        "ci_high": 3.3442,
+        "ci_low": -0.0876,
+        "excludes_zero": false,
+        "excursion_atr": "9.5",
+        "observed": 1.637,
+        "permutation_p": 0.0632
+      },
+      {
+        "ci_high": 2.6781,
+        "ci_low": -0.7064,
+        "excludes_zero": false,
+        "excursion_atr": "10",
+        "observed": 0.9775,
+        "permutation_p": 0.2658
+      },
+      {
+        "ci_high": 3.2649,
+        "ci_low": -0.0377,
+        "excludes_zero": false,
+        "excursion_atr": "10.5",
+        "observed": 1.6397,
+        "permutation_p": 0.0601
+      },
+      {
+        "ci_high": 2.9815,
+        "ci_low": -0.1689,
+        "excludes_zero": false,
+        "excursion_atr": "11",
+        "observed": 1.4039,
+        "permutation_p": 0.0854
+      }
+    ],
+    "mean_excursion_atr": {
+      "ci_high": 0.4327,
+      "ci_low": 0.014,
+      "excludes_zero": true,
+      "observed": 0.2217,
+      "permutation_p": 0.0436
+    },
+    "node_class": "LOW_VOLUME_NODE",
+    "resamples": 10000,
+    "seed": 20260804,
+    "sessions": 598,
+    "treated_events": 2370
+  },
+  {
+    "control_events": 3329,
+    "exceedance": [
+      {
+        "ci_high": 0.059,
+        "ci_low": -0.2533,
+        "excludes_zero": false,
+        "excursion_atr": "1",
+        "observed": -0.0908,
+        "permutation_p": 0.2524
+      },
+      {
+        "ci_high": 0.2494,
+        "ci_low": -0.5042,
+        "excludes_zero": false,
+        "excursion_atr": "1.5",
+        "observed": -0.1226,
+        "permutation_p": 0.5107
+      },
+      {
+        "ci_high": 0.832,
+        "ci_low": -0.3024,
+        "excludes_zero": false,
+        "excursion_atr": "2",
+        "observed": 0.2641,
+        "permutation_p": 0.3842
+      },
+      {
+        "ci_high": 0.8615,
+        "ci_low": -0.5914,
+        "excludes_zero": false,
+        "excursion_atr": "2.5",
+        "observed": 0.1366,
+        "permutation_p": 0.7163
+      },
+      {
+        "ci_high": 0.5223,
+        "ci_low": -1.4265,
+        "excludes_zero": false,
+        "excursion_atr": "3",
+        "observed": -0.4476,
+        "permutation_p": 0.3577
+      },
+      {
+        "ci_high": 0.5009,
+        "ci_low": -1.7311,
+        "excludes_zero": false,
+        "excursion_atr": "3.5",
+        "observed": -0.612,
+        "permutation_p": 0.2846
+      },
+      {
+        "ci_high": 1.273,
+        "ci_low": -1.028,
+        "excludes_zero": false,
+        "excursion_atr": "4",
+        "observed": 0.1255,
+        "permutation_p": 0.8327
+      },
+      {
+        "ci_high": 2.3247,
+        "ci_low": -0.2074,
+        "excludes_zero": false,
+        "excursion_atr": "4.5",
+        "observed": 1.0735,
+        "permutation_p": 0.1027
+      },
+      {
+        "ci_high": 1.9129,
+        "ci_low": -0.6929,
+        "excludes_zero": false,
+        "excursion_atr": "5",
+        "observed": 0.6063,
+        "permutation_p": 0.3654
+      },
+      {
+        "ci_high": 1.6943,
+        "ci_low": -1.1028,
+        "excludes_zero": false,
+        "excursion_atr": "5.5",
+        "observed": 0.3205,
+        "permutation_p": 0.6417
+      },
+      {
+        "ci_high": 2.2253,
+        "ci_low": -0.57,
+        "excludes_zero": false,
+        "excursion_atr": "6",
+        "observed": 0.8463,
+        "permutation_p": 0.2421
+      },
+      {
+        "ci_high": 2.3711,
+        "ci_low": -0.5293,
+        "excludes_zero": false,
+        "excursion_atr": "6.5",
+        "observed": 0.9229,
+        "permutation_p": 0.216
+      },
+      {
+        "ci_high": 2.4756,
+        "ci_low": -0.5362,
+        "excludes_zero": false,
+        "excursion_atr": "7",
+        "observed": 0.9705,
+        "permutation_p": 0.2059
+      },
+      {
+        "ci_high": 1.833,
+        "ci_low": -1.0928,
+        "excludes_zero": false,
+        "excursion_atr": "7.5",
+        "observed": 0.3858,
+        "permutation_p": 0.5997
+      },
+      {
+        "ci_high": 1.4986,
+        "ci_low": -1.361,
+        "excludes_zero": false,
+        "excursion_atr": "8",
+        "observed": 0.074,
+        "permutation_p": 0.9167
+      },
+      {
+        "ci_high": 2.4885,
+        "ci_low": -0.4678,
+        "excludes_zero": false,
+        "excursion_atr": "8.5",
+        "observed": 1.0263,
+        "permutation_p": 0.1695
+      },
+      {
+        "ci_high": 2.211,
+        "ci_low": -0.6593,
+        "excludes_zero": false,
+        "excursion_atr": "9",
+        "observed": 0.7764,
+        "permutation_p": 0.29
+      },
+      {
+        "ci_high": 2.1097,
+        "ci_low": -0.7261,
+        "excludes_zero": false,
+        "excursion_atr": "9.5",
+        "observed": 0.6779,
+        "permutation_p": 0.348
+      },
+      {
+        "ci_high": 2.4543,
+        "ci_low": -0.2584,
+        "excludes_zero": false,
+        "excursion_atr": "10",
+        "observed": 1.0908,
+        "permutation_p": 0.1183
+      },
+      {
+        "ci_high": 2.9179,
+        "ci_low": 0.1473,
+        "excludes_zero": true,
+        "excursion_atr": "10.5",
+        "observed": 1.5353,
+        "permutation_p": 0.0287
+      },
+      {
+        "ci_high": 2.7028,
+        "ci_low": -0.0732,
+        "excludes_zero": false,
+        "excursion_atr": "11",
+        "observed": 1.3171,
+        "permutation_p": 0.0673
+      }
+    ],
+    "mean_excursion_atr": {
+      "ci_high": 0.2219,
+      "ci_low": -0.1429,
+      "excludes_zero": false,
+      "observed": 0.0417,
+      "permutation_p": 0.6571
+    },
+    "node_class": "HIGH_VOLUME_NODE",
+    "resamples": 10000,
+    "seed": 20260804,
+    "sessions": 752,
+    "treated_events": 3319
+  }
+]
