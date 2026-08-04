@@ -1,0 +1,41 @@
+{
+  "bars": 456913,
+  "code_sha": "c9ddc499b262ca1bbc6ba8f74413d36c119b2787",
+  "dataset_sha256": "b4fcf58ff5db70d2a8d45d605ce5a2742ab003a1cf694ef2721a04562b6608e2",
+  "forbidden_year_rows_admitted": 0,
+  "ingestion_audit": {
+    "parsed_years": [
+      2025,
+      2026
+    ],
+    "rows_admitted": 456913
+  },
+  "node_rows": 118550,
+  "parameters": {
+    "live_bars": 120,
+    "reanchor_minutes": 60,
+    "rolling_sessions": 20,
+    "rotation_deadlines_bars": [
+      3,
+      5,
+      10
+    ],
+    "rotation_distances_atr": [
+      "0.5",
+      "1.0",
+      "2.0",
+      "3.0"
+    ],
+    "sustain_horizons_bars": [
+      5,
+      10,
+      20
+    ],
+    "tap_band_atr": "0.5",
+    "tap_min_bars": 3
+  },
+  "profiles_built": 7436,
+  "study": "STAGE_03_ROTATION",
+  "tapped_rows": 4547,
+  "year": 2025
+}

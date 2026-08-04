@@ -1,0 +1,3 @@
+node_class,treated_events,control_events,treated_median_excursion_atr,control_median_excursion_atr,treated_p90_atr,control_p90_atr,treated_median_rate,control_median_rate,full_years_agreeing
+HIGH_VOLUME_NODE,5867,5914,6.952,7.047,16.663,16.918,0.189,0.194,3/4
+LOW_VOLUME_NODE,3061,3184,7.016,6.865,16.385,16.046,0.192,0.190,4/4

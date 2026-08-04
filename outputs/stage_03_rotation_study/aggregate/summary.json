@@ -1,0 +1,12 @@
+{
+  "cells_passing_consistency": 72,
+  "cells_tested": 96,
+  "expected_passing_from_noise": 30.0,
+  "tapped_events": 18026,
+  "years": [
+    2019,
+    2021,
+    2023,
+    2025
+  ]
+}
