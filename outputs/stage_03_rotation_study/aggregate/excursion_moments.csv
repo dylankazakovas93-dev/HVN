@@ -1,0 +1,3 @@
+node_class,treated_n,control_n,treated_mean_atr,control_mean_atr,difference_atr,years_agreeing
+LOW_VOLUME_NODE,3061,3184,8.745,8.585,0.161,4/4
+HIGH_VOLUME_NODE,5867,5914,8.829,8.994,-0.166,4/4
