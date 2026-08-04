@@ -2,6 +2,9 @@
   "cells_passing_consistency": 72,
   "cells_tested": 96,
   "expected_passing_from_noise": 30.0,
+  "quality_cells_passing": 24,
+  "quality_cells_tested": 24,
+  "quality_expected_from_noise": 7.5,
   "tapped_events": 18026,
   "years": [
     2019,
