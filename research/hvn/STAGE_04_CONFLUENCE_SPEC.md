@@ -37,8 +37,17 @@ Five, each anchored differently so they do not see the same thing.
 | P3 | Globex developing | 18:00 ET session open to the current hourly close |
 | P4 | cash developing | 09:30 ET to the current hourly close |
 | P5 | prior RTH | the previous session's full 09:30–16:00 |
+| P6 | anchored VWAP, Globex | volume-weighted average price from 18:00 ET to the current hourly close |
+| P7 | anchored VWAP, cash | volume-weighted average price from 09:30 ET to the current hourly close |
+| P8 | anchored VWAP, prior RTH | the previous session's full-session VWAP, carried forward as a fixed level |
+| P9 | anchored VWAP, rolling | volume-weighted average price over the trailing 20 sessions |
 
 P1 is carried over as built. Stage 1 profile construction is not altered.
+
+VWAP is a separate source class from the profiles: a profile answers "where did
+volume sit", a VWAP band answers "how far is price from where volume sat, in
+units of its own dispersion". They disagree often enough to be worth counting as
+independent votes, which is the whole point of a confluence test.
 
 ## Level types
 
@@ -51,6 +60,9 @@ Within each source, at each hourly evaluation:
 | L3 | value edge | VAH and VAL |
 | L4 | POC | highest smoothed activity tick |
 | L5 | TPO extreme | thin by time rather than volume, see below |
+| L6 | VWAP band | a band edge on sources P6–P9, both band definitions below |
+
+L1–L5 apply to profile sources P1–P5. L6 applies to VWAP sources P6–P9.
 
 ## Value area, both definitions
 
@@ -60,6 +72,26 @@ Computed both ways and tested separately. Neither is selected on result.
   tick-pair from the POC in the conventional way.
 - **VA-SIGMA** — bands at 1, 2, 3 and 4 standard deviations of the
   volume-weighted price distribution about its volume-weighted mean.
+
+## VWAP bands, both definitions
+
+Computed both ways on every VWAP source and tested separately. Neither is
+selected on result. Both are causal — the dispersion at an hourly close uses
+only bars up to that close.
+
+- **VWAP-SIGMA** — bands at 1, 2, 3 and 4 volume-weighted standard deviations of
+  price about the anchored VWAP.
+- **VWAP-PCT** — bands at fixed percentage offsets from the anchored VWAP:
+  0.25%, 0.50%, 1.00% and 1.50%. Predeclared, chosen to span roughly the same
+  ground as the sigma bands on a typical session without being fitted to any.
+
+The two are not redundant. A sigma band widens when the session is volatile; a
+percentage band does not. Which of them lines up better with the profile levels
+is itself a result worth having, so both are reported side by side and the
+comparison is stated before either is compared against the control.
+
+A VWAP band level is the band edge, given a width of ±0.25 ATR so it can join
+the confluence test on the same footing as a node interval.
 
 ## TPO extreme thresholds
 
@@ -109,7 +141,10 @@ Binding, not advisory:
 3. Any headline claim requires session-clustered bootstrap and a session-level
    permutation test, as in `scripts/bootstrap_lvn_excursion.py`.
 4. The number of cells tested is reported, so the multiple-comparison cost is
-   visible rather than implied.
+   visible rather than implied. With nine sources, six level types, two value
+   area definitions, two band definitions and four confluence degrees, this
+   stage tests far more cells than any previous one. The chance rate is stated
+   in the same table as the pass count, every time, without exception.
 5. Monotonicity in k is stated as pass or fail before any individual cell is
    discussed.
 
