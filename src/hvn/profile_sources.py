@@ -278,3 +278,44 @@ def tpo_extremes(profile: RollingProfile, *, threshold: str) -> list[tuple[Decim
     return [
         (profile.tick_low(low), profile.tick_high(high)) for low, high in _runs(chosen)
     ]
+
+
+# ---------------------------------------------------------------------------
+# Bar timeframe: ATR is wanted on 1-minute and 5-minute series
+
+
+def resample(bars: list[Bar], minutes: int) -> list[Bar]:
+    """Aggregate 1-minute bars into `minutes`-minute bars on wall-clock buckets.
+
+    A bucket is stamped with the close time of its last constituent bar, so a
+    resampled bar is never knowable before its parts are. Partial trailing
+    buckets are kept: at 10:03 the developing 5-minute bar is real information,
+    and dropping it would silently shift every ATR later in the session.
+    """
+    if minutes <= 1:
+        return list(bars)
+    buckets: dict[int, list[Bar]] = {}
+    for bar in sorted(bars, key=lambda b: b.close_time):
+        # Bucket on the bar's start, not its close. A 1-minute bar closing at
+        # 10:05 covers 10:04-10:05 and belongs to the 10:00-10:05 aggregate; on
+        # close time it would land in the next bucket and every aggregate would
+        # be stamped one minute late.
+        start = bar.close_time - timedelta(minutes=1)
+        key = int(start.timestamp()) // (minutes * 60)
+        buckets.setdefault(key, []).append(bar)
+    out = []
+    for key in sorted(buckets):
+        group = buckets[key]
+        out.append(
+            Bar(
+                source_row_id=group[-1].source_row_id,
+                close_time=group[-1].close_time,
+                open=group[0].open,
+                high=max(b.high for b in group),
+                low=min(b.low for b in group),
+                close=group[-1].close,
+                volume=sum((b.volume for b in group), Decimal(0)),
+                symbol=group[-1].symbol,
+            )
+        )
+    return out

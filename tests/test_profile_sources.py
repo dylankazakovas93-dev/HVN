@@ -281,3 +281,41 @@ def test_the_cash_vwap_is_absent_before_the_cash_open():
     bars = run(datetime(2019, 3, 4, 1, 0, tzinfo=NY), 60)
     anchor = datetime(2019, 3, 4, 2, 0, tzinfo=NY)
     assert build_vwap(bars, anchor, source=P7_VWAP_CASH) is None
+
+
+# ---------------------------------------------------------------------------
+# Resampling for the 5-minute ATR
+
+
+def test_resampling_preserves_the_extremes_and_sums_the_volume():
+    from hvn.profile_sources import resample
+
+    start = datetime(2019, 3, 4, 10, 0, tzinfo=NY)
+    bars = [
+        bar(start + timedelta(minutes=i + 1), str(100 + i), str(110 + i), "10")
+        for i in range(5)
+    ]
+    five = resample(bars, 5)
+    assert len(five) == 1
+    assert five[0].high == max(b.high for b in bars)
+    assert five[0].low == min(b.low for b in bars)
+    assert five[0].volume == Decimal(50)
+
+
+def test_a_resampled_bar_is_stamped_with_its_last_constituent_close():
+    from hvn.profile_sources import resample
+
+    start = datetime(2019, 3, 4, 10, 0, tzinfo=NY)
+    bars = run(start, 10)
+    five = resample(bars, 5)
+    for aggregated in five:
+        contributors = [b for b in bars if b.close_time <= aggregated.close_time]
+        assert aggregated.close_time == max(b.close_time for b in contributors[-5:])
+        assert aggregated.close_time <= bars[-1].close_time
+
+
+def test_one_minute_resampling_is_the_identity():
+    from hvn.profile_sources import resample
+
+    bars = run(datetime(2019, 3, 4, 10, 0, tzinfo=NY), 10)
+    assert resample(bars, 1) == bars

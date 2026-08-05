@@ -104,22 +104,52 @@ Three, predeclared:
 ## Confluence
 
 Two levels from **different sources** are confluent when their price intervals
-overlap after each is widened by ±0.25 ATR. Confluence degree `k` is the number
+overlap after each is widened by a tolerance. Confluence degree `k` is the number
 of **distinct sources** contributing, never the number of levels — two levels
 from the same source are one vote.
+
+**Tolerance is a tested axis, not a constant.** Levels drawn by different
+constructions have no reason to agree to the tick, and a tolerance too tight
+would report "no confluence exists" when the real finding is that the levels
+cluster loosely. Three values, all predeclared and all reported:
+
+    0.25 ATR    tight
+    1.00 ATR    moderate
+    2.00 ATR    loose
+
+Wider tolerance mechanically raises k, so confluence degree is only ever
+compared **within** a tolerance, never across. A k=3 at 2.00 ATR is not the same
+object as a k=3 at 0.25 ATR and the tables never pool them.
+
+## ATR timeframe
+
+ATR is computed on both a 1-minute and a 5-minute bar series, causally in both
+cases, and every tolerance and outcome is expressed in each. The 1-minute ATR is
+what Stage 3 used; the 5-minute is closer to the scale a level is drawn at. Both
+are reported; neither is selected on result.
 
 Reported for k = 1, 2, 3, and >= 4. A cell with fewer than 30 first-touch events
 in either arm is written but marked unsupported.
 
 ## Interaction and outcome
 
-Unchanged from Stage 3 so the results are comparable:
+**Nearest barrier, not every level.** Stage 3 tested every node it found. That
+is not how a level is used and it inflates the population with levels price was
+never near. Here, at each hourly anchor, only the nearest confluent level
+**above** the prevailing price and the nearest **below** it are carried forward.
+Two barriers per anchor per configuration, whatever k they happen to carry.
+
+This is deliberately crude, and crude is the point: it needs no threshold, it
+cannot be tuned, and it is the same object a chart reader would look at.
+
+Otherwise unchanged from Stage 3 so the results stay comparable:
 
 - tap validity: within 0.5 ATR for 3 consecutive bars, beginning within 60 bars
   of the anchor
-- **first-touch reduction**: one shelf per session; overlapping price regions
+- **first-touch reduction**: one barrier per session; overlapping price regions
   in the same session are one observation
 - excursion recorded continuously over 60 bars, threshold-free
+- rotation at 3 ATR within 5, 20 and 60 minutes
 
 Added: **rotation at three timescales**, 3 ATR reached within 5, 20 and 60
 minutes. This separates a fast rotation from a slow drift covering the same
