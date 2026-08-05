@@ -25,7 +25,14 @@ from decimal import Decimal
 from pathlib import Path
 
 from hvn.atr import wilder_atr
-from hvn.confluence import ABOVE, BELOW, TOLERANCES_ATR, cluster_levels, nearest_barriers
+from hvn.confluence import (
+    ABOVE,
+    BELOW,
+    MAX_CLUSTER_WIDTH_ATR,
+    TOLERANCES_ATR,
+    cluster_levels,
+    nearest_barriers,
+)
 from hvn.gen4_outcomes import interaction_session
 from hvn.io import databento_rows_with_audit
 from hvn.profile_sources import resample
@@ -81,15 +88,21 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def control_band(levels, price, low, high, direction):
+def control_band(levels, price, low, high, direction, tolerance):
     """Same width, same side, same distance — at a price no source marked.
+
+    Clearance is judged against the levels *widened by the same tolerance* used
+    to cluster them. Clearing only the raw intervals would let a control sit
+    inside a cluster's tolerance zone — close enough that every source in that
+    cluster would have counted it as the same level — which would quietly make
+    the control a treated case.
 
     Stepping outward is deterministic and stops at the first clear placement, so
     the control is as close to the treated barrier's distance as a level-free
     location allows. The realised distance is recorded rather than assumed.
     """
     width = high - low
-    occupied = [(level.low, level.high) for level in levels]
+    occupied = [level.widened(tolerance) for level in levels]
 
     def clear(candidate_low, candidate_high):
         return not any(
@@ -222,7 +235,9 @@ def build(bars, *, year, code_sha, max_anchors=0):
                     continue
                 for tolerance in TOLERANCES_ATR:
                     clusters = cluster_levels(
-                        level_set.levels, tolerance=tolerance * atr
+                        level_set.levels,
+                        tolerance=tolerance * atr,
+                        max_width=MAX_CLUSTER_WIDTH_ATR * atr,
                     )
                     barriers = nearest_barriers(clusters, price)
                     for direction, cluster in barriers.items():
@@ -256,7 +271,7 @@ def build(bars, *, year, code_sha, max_anchors=0):
 
                         placement = control_band(
                             level_set.levels, price, cluster.low, cluster.high,
-                            direction,
+                            direction, tolerance * atr,
                         )
                         if placement is None:
                             continue

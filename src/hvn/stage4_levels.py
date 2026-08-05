@@ -36,7 +36,8 @@ from .rolling_profile import (
     detect_nodes,
     rolling_activity,
 )
-from .vwap_sources import (
+from .vwap_sources import (  # noqa: I001
+    rolling_vwap_window as rolling_window,
     P6_VWAP_GLOBEX,
     P7_VWAP_CASH,
     P8_VWAP_PRIOR_RTH,
@@ -159,7 +160,10 @@ def build_level_set(
 
     if rolling_profile is not None:
         levels += _profile_levels(rolling_profile, P1_ROLLING, atr)
-        latest = rolling_profile.anchor_time
+        # The real latest contributing bar, not the anchor. Recording the anchor
+        # made this assertion unfalsifiable for the one source that reaches
+        # furthest back, which is precisely the source worth checking.
+        note(rolling_window(bars, anchor))
 
     for source in (P2_SINGLE_HOUR, P3_GLOBEX_DEVELOPING, P4_CASH_DEVELOPING,
                    P5_PRIOR_RTH):

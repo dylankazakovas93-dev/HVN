@@ -26,6 +26,11 @@ from decimal import Decimal
 # Predeclared tolerances, in ATR. Never searched.
 TOLERANCES_ATR = (Decimal("0.25"), Decimal("1.00"), Decimal("2.00"))
 
+# A barrier wider than this is not a level. Tied to the 0.5 ATR tap band rather
+# than fitted: a band six times the tap width cannot be interacted with in any
+# way a chart reader would recognise as touching a level.
+MAX_CLUSTER_WIDTH_ATR = Decimal("3.00")
+
 ABOVE = "ABOVE"
 BELOW = "BELOW"
 
@@ -39,6 +44,10 @@ class Level:
     low: Decimal
     high: Decimal
     detail: str = ""
+
+    @property
+    def midpoint(self) -> Decimal:
+        return (self.low + self.high) / 2
 
     def widened(self, tolerance: Decimal) -> tuple[Decimal, Decimal]:
         return self.low - tolerance, self.high + tolerance
@@ -63,46 +72,66 @@ class Cluster:
         return self.low <= price < self.high
 
 
+def within(a: Level, b: Level, tolerance: Decimal) -> bool:
+    """Do two levels agree, allowing a gap of at most `tolerance`?
+
+    Tolerance is the gap between the intervals, not a margin added to each. If
+    both were widened, a tolerance of 1 ATR would in fact merge levels 2 ATR
+    apart, and the reported axis would mean twice what it says.
+    """
+    return a.low - tolerance < b.high and b.low - tolerance < a.high
+
+
 def cluster_levels(
-    levels: list[Level] | tuple[Level, ...], *, tolerance: Decimal
+    levels: list[Level] | tuple[Level, ...],
+    *,
+    tolerance: Decimal,
+    max_width: Decimal | None = None,
 ) -> list[Cluster]:
-    """Group overlapping levels into clusters, sorted by price.
+    """Group levels that all agree with each other, sorted by price.
 
-    Sweep in price order and extend the open cluster while the next widened
-    level still overlaps it. Chaining is accepted: A may reach C through B even
-    when A and C do not touch. That merges slightly more aggressively than a
-    strict pairwise rule, which understates confluence degree rather than
-    inflating it, and understating is the safe direction for a test whose whole
-    claim is that degree matters.
+    **Complete linkage.** A level joins a group only when its tolerance-widened
+    interval overlaps that of *every* member already in it, not merely the
+    nearest one. Chaining is impossible by construction.
 
-    The reported interval is the *unwidened* union of its members, so tolerance
-    decides what groups together without silently inflating every barrier's
-    width.
+    An earlier version used single linkage — A joins B, B joins C, so A and C
+    end up together though they are nowhere near each other. With nine sources
+    emitting hundreds of levels, widening each by a whole ATR made everything
+    touch: barriers 130 ATR wide, and worse, a width that rose monotonically
+    with degree. That is the one confound this study cannot tolerate, because
+    degree is the axis under test. Single linkage is not an option here.
+
+    `max_width` drops clusters wider than the given price span. A region wider
+    than a few ATR is not a level a chart reader would draw, and it cannot be
+    tapped meaningfully by a 0.5 ATR band.
     """
     if not levels:
         return []
     ordered = sorted(levels, key=lambda level: (level.low, level.high, level.source))
-    clusters: list[list[Level]] = []
+    groups: list[list[Level]] = []
     current: list[Level] = [ordered[0]]
-    reach = ordered[0].widened(tolerance)[1]
     for level in ordered[1:]:
-        low, high = level.widened(tolerance)
-        if low <= reach:
+        # Complete linkage: it must agree with every member already in the
+        # group, not merely with the one nearest it. That single condition is
+        # what makes chaining impossible.
+        if all(within(level, member, tolerance) for member in current):
             current.append(level)
-            reach = max(reach, high)
         else:
-            clusters.append(current)
+            groups.append(current)
             current = [level]
-            reach = high
-    clusters.append(current)
+    groups.append(current)
 
     out = []
-    for members in clusters:
+    for members in groups:
+        low = min(m.low for m in members)
+        high = max(m.high for m in members)
+        if max_width is not None and high - low > max_width:
+            continue
         sources = tuple(sorted({m.source for m in members}))
         out.append(
             Cluster(
-                low=min(m.low for m in members),
-                high=max(m.high for m in members),
+                low=low,
+                high=high,
                 degree=len(sources),
                 sources=sources,
                 kinds=tuple(sorted({m.kind for m in members})),

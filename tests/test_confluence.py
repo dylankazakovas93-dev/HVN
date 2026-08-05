@@ -57,9 +57,10 @@ def test_a_source_emitting_many_levels_cannot_manufacture_degree():
 
 
 def test_a_tighter_tolerance_separates_what_a_looser_one_merges():
+    # The gap between them is 2.75, so only a tolerance above that merges them.
     levels = [level("P1", "100", "100.25"), level("P5", "103", "103.25")]
     tight = cluster_levels(levels, tolerance=Decimal("0.25"))
-    loose = cluster_levels(levels, tolerance=Decimal("2"))
+    loose = cluster_levels(levels, tolerance=Decimal("3"))
     assert len(tight) == 2 and max(c.degree for c in tight) == 1
     assert len(loose) == 1 and loose[0].degree == 2
 
@@ -73,14 +74,14 @@ def test_degree_never_falls_as_tolerance_rises():
     ]
     best = [
         max(c.degree for c in cluster_levels(levels, tolerance=Decimal(t)))
-        for t in ("0.25", "1", "2")
+        for t in ("0.25", "1", "4")
     ]
     assert best == sorted(best), "a wider tolerance cannot reduce agreement"
 
 
 def test_the_reported_interval_is_not_inflated_by_the_tolerance():
     levels = [level("P1", "100", "100.25"), level("P3", "100.5", "100.75")]
-    cluster = cluster_levels(levels, tolerance=Decimal("2"))[0]
+    cluster = cluster_levels(levels, tolerance=Decimal("1"))[0]
     # Members span 100.00 to 100.75; the tolerance groups them but must not
     # widen the barrier itself.
     assert cluster.low == Decimal("100") and cluster.high == Decimal("100.75")
@@ -152,3 +153,60 @@ def test_a_level_set_built_up_to_the_anchor_passes():
 
 def test_a_level_set_with_no_bars_is_not_a_causality_failure():
     LevelSet(anchor_time=ANCHOR, levels=(), latest_bar_close=None).assert_causal()
+
+
+# ---------------------------------------------------------------------------
+# Chaining is the defect that invalidated the first scan
+
+
+def test_a_ladder_of_levels_does_not_chain_into_one_giant_cluster():
+    # Nine sources one ATR apart. Under single linkage each reaches its
+    # neighbour and all nine merge; under complete linkage they cannot.
+    levels = [
+        Level(f"P{i}", "NODE", Decimal(100 + i), Decimal(100 + i) + Decimal("0.25"))
+        for i in range(9)
+    ]
+    clusters = cluster_levels(levels, tolerance=Decimal("1"))
+    assert max(c.degree for c in clusters) < 9, "single linkage would merge all nine"
+    for cluster in clusters:
+        assert cluster.high - cluster.low <= Decimal("3")
+
+
+def test_two_far_apart_levels_never_join_through_a_middle_one():
+    levels = [
+        Level("P1", "NODE", Decimal("100"), Decimal("100.25")),
+        Level("P3", "NODE", Decimal("101"), Decimal("101.25")),
+        Level("P5", "NODE", Decimal("102"), Decimal("102.25")),
+    ]
+    clusters = cluster_levels(levels, tolerance=Decimal("0.9"))
+    for cluster in clusters:
+        sources = set(cluster.sources)
+        assert not {"P1", "P5"} <= sources, "the ends must not meet through P3"
+
+
+def test_a_cluster_wider_than_the_cap_is_dropped():
+    levels = [
+        Level("P1", "NODE", Decimal("100"), Decimal("110")),
+        Level("P3", "NODE", Decimal("100"), Decimal("110")),
+    ]
+    assert cluster_levels(levels, tolerance=Decimal("1")) != []
+    assert cluster_levels(levels, tolerance=Decimal("1"), max_width=Decimal("3")) == []
+
+
+def test_the_width_cap_does_not_drop_an_ordinary_barrier():
+    levels = [
+        Level("P1", "NODE", Decimal("100"), Decimal("100.75")),
+        Level("P3", "NODE", Decimal("100.25"), Decimal("101")),
+    ]
+    kept = cluster_levels(levels, tolerance=Decimal("0.5"), max_width=Decimal("3"))
+    assert len(kept) == 1 and kept[0].degree == 2
+
+
+def test_tolerance_is_the_gap_between_levels_not_a_margin_on_each():
+    # Exactly 1.00 apart, edge to edge.
+    levels = [
+        Level("P1", "NODE", Decimal("100"), Decimal("100.25")),
+        Level("P3", "NODE", Decimal("101.25"), Decimal("101.50")),
+    ]
+    assert max(c.degree for c in cluster_levels(levels, tolerance=Decimal("0.9"))) == 1
+    assert max(c.degree for c in cluster_levels(levels, tolerance=Decimal("1.1"))) == 2
