@@ -1,0 +1,11 @@
+{
+  "anchors": 7527,
+  "archive_sha256": "0336cfac5fe804a4c756ff9372a0bad314e526c389e5dd8da3774883a29b2f62",
+  "audit": "IngestionAudit(archive='nq2021.zip', member='glbx-mdp3-20210101-20221230.ohlcv-1m.csv.zst', requested_year=2021, parsed_years=(2021, 2022), rows_admitted=454877, rows_excluded_earlier_year=0, rows_excluded_later_year=1, rows_skipped_non_outright=52236, dataset_sha256='0336cfac5fe804a4c756ff9372a0bad314e526c389e5dd8da3774883a29b2f62')",
+  "bars": 454877,
+  "causality_assertions_passed": 7539,
+  "code_sha": "de1c1ee34c6e3e4493377a676fcb8970be096001",
+  "rows": 126539,
+  "tapped": 71358,
+  "year": 2021
+}

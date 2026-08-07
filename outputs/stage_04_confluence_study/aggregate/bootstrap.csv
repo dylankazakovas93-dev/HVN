@@ -1,0 +1,13 @@
+metric,atr_timeframe,tolerance_atr,sessions,low_degree,high_degree,span_observed,span_ci_low,span_ci_high,span_excludes_zero,permutation_p,verdict
+mean_excursion_atr,1,0.25,516,1,4,-0.2229,-0.5249,0.0529,False,0.05,SPAN_COVERS_ZERO
+rotated_20b_pct,1,0.25,516,1,4,-2.2465,-4.5923,-0.1111,True,0.0067,SPAN_EXCLUDES_ZERO
+mean_excursion_atr,1,1,516,1,4,-0.1135,-0.5351,0.2302,False,0.6533,SPAN_COVERS_ZERO
+rotated_20b_pct,1,1,516,1,4,-1.9289,-5.1944,1.0818,False,0.2667,SPAN_COVERS_ZERO
+mean_excursion_atr,1,2,516,1,4,-0.2502,-0.9687,0.3411,False,0.6233,SPAN_COVERS_ZERO
+rotated_20b_pct,1,2,516,1,4,-0.1724,-5.5781,5.9223,False,0.97,SPAN_COVERS_ZERO
+mean_excursion_atr,5,0.25,516,1,4,0.2855,0.1228,0.4322,True,0.0,SPAN_EXCLUDES_ZERO
+rotated_20b_pct,5,0.25,516,1,4,4.2889,2.5531,6.0104,True,0.0,SPAN_EXCLUDES_ZERO
+mean_excursion_atr,5,1,516,1,4,0.1592,-0.3941,0.6023,False,0.73,SPAN_COVERS_ZERO
+rotated_20b_pct,5,1,516,1,4,2.5408,-3.4414,8.2909,False,0.61,SPAN_COVERS_ZERO
+mean_excursion_atr,5,2,,,,,,,,,UNTESTABLE_TOO_FEW_DEGREES
+rotated_20b_pct,5,2,,,,,,,,,UNTESTABLE_TOO_FEW_DEGREES

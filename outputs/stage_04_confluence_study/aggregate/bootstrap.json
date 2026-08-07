@@ -1,0 +1,434 @@
+[
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "mean_excursion_atr",
+    "per_degree": {
+      "1": {
+        "ci_high": -0.946,
+        "ci_low": -1.541,
+        "excludes_zero": true,
+        "observed": -1.2531
+      },
+      "2": {
+        "ci_high": -0.7896,
+        "ci_low": -1.3713,
+        "excludes_zero": true,
+        "observed": -1.1029
+      },
+      "3": {
+        "ci_high": -1.1504,
+        "ci_low": -1.745,
+        "excludes_zero": true,
+        "observed": -1.4624
+      },
+      "4": {
+        "ci_high": -1.1846,
+        "ci_low": -1.7906,
+        "excludes_zero": true,
+        "observed": -1.476
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 0.0529,
+      "ci_low": -0.5249,
+      "excludes_zero": false,
+      "observed": -0.2229,
+      "permutation_p": 0.05
+    },
+    "tolerance_atr": "0.25",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -8.704,
+        "ci_low": -12.7566,
+        "excludes_zero": true,
+        "observed": -10.6115
+      },
+      "2": {
+        "ci_high": -9.289,
+        "ci_low": -13.8881,
+        "excludes_zero": true,
+        "observed": -11.6917
+      },
+      "3": {
+        "ci_high": -11.1628,
+        "ci_low": -15.7092,
+        "excludes_zero": true,
+        "observed": -13.4059
+      },
+      "4": {
+        "ci_high": -10.7996,
+        "ci_low": -15.2254,
+        "excludes_zero": true,
+        "observed": -12.858
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": -0.1111,
+      "ci_low": -4.5923,
+      "excludes_zero": true,
+      "observed": -2.2465,
+      "permutation_p": 0.0067
+    },
+    "tolerance_atr": "0.25",
+    "verdict": "SPAN_EXCLUDES_ZERO"
+  },
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "mean_excursion_atr",
+    "per_degree": {
+      "1": {
+        "ci_high": -2.8826,
+        "ci_low": -4.1518,
+        "excludes_zero": true,
+        "observed": -3.5224
+      },
+      "2": {
+        "ci_high": -2.4961,
+        "ci_low": -3.7982,
+        "excludes_zero": true,
+        "observed": -3.1783
+      },
+      "3": {
+        "ci_high": -2.8507,
+        "ci_low": -4.132,
+        "excludes_zero": true,
+        "observed": -3.5611
+      },
+      "4": {
+        "ci_high": -3.0087,
+        "ci_low": -4.2028,
+        "excludes_zero": true,
+        "observed": -3.6359
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 0.2302,
+      "ci_low": -0.5351,
+      "excludes_zero": false,
+      "observed": -0.1135,
+      "permutation_p": 0.6533
+    },
+    "tolerance_atr": "1",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -17.9968,
+        "ci_low": -26.4294,
+        "excludes_zero": true,
+        "observed": -22.4607
+      },
+      "2": {
+        "ci_high": -18.4606,
+        "ci_low": -27.0376,
+        "excludes_zero": true,
+        "observed": -22.7438
+      },
+      "3": {
+        "ci_high": -22.025,
+        "ci_low": -28.8386,
+        "excludes_zero": true,
+        "observed": -25.165
+      },
+      "4": {
+        "ci_high": -21.2174,
+        "ci_low": -27.8029,
+        "excludes_zero": true,
+        "observed": -24.3896
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 1.0818,
+      "ci_low": -5.1944,
+      "excludes_zero": false,
+      "observed": -1.9289,
+      "permutation_p": 0.2667
+    },
+    "tolerance_atr": "1",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "mean_excursion_atr",
+    "per_degree": {
+      "1": {
+        "ci_high": -3.9852,
+        "ci_low": -6.6396,
+        "excludes_zero": true,
+        "observed": -5.3377
+      },
+      "2": {
+        "ci_high": -3.3534,
+        "ci_low": -6.0231,
+        "excludes_zero": true,
+        "observed": -4.6993
+      },
+      "3": {
+        "ci_high": -3.7882,
+        "ci_low": -6.7146,
+        "excludes_zero": true,
+        "observed": -5.2622
+      },
+      "4": {
+        "ci_high": -4.3304,
+        "ci_low": -6.9115,
+        "excludes_zero": true,
+        "observed": -5.5879
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 0.3411,
+      "ci_low": -0.9687,
+      "excludes_zero": false,
+      "observed": -0.2502,
+      "permutation_p": 0.6233
+    },
+    "tolerance_atr": "2",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "1",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -24.3848,
+        "ci_low": -39.3369,
+        "excludes_zero": true,
+        "observed": -31.7454
+      },
+      "2": {
+        "ci_high": -26.5867,
+        "ci_low": -39.0859,
+        "excludes_zero": true,
+        "observed": -32.9639
+      },
+      "3": {
+        "ci_high": -24.5036,
+        "ci_low": -36.4822,
+        "excludes_zero": true,
+        "observed": -30.3173
+      },
+      "4": {
+        "ci_high": -26.2376,
+        "ci_low": -37.4474,
+        "excludes_zero": true,
+        "observed": -31.9178
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 5.9223,
+      "ci_low": -5.5781,
+      "excludes_zero": false,
+      "observed": -0.1724,
+      "permutation_p": 0.97
+    },
+    "tolerance_atr": "2",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "mean_excursion_atr",
+    "per_degree": {
+      "1": {
+        "ci_high": -1.2936,
+        "ci_low": -1.6839,
+        "excludes_zero": true,
+        "observed": -1.4881
+      },
+      "2": {
+        "ci_high": -0.8917,
+        "ci_low": -1.4004,
+        "excludes_zero": true,
+        "observed": -1.1635
+      },
+      "3": {
+        "ci_high": -0.9548,
+        "ci_low": -1.3911,
+        "excludes_zero": true,
+        "observed": -1.1651
+      },
+      "4": {
+        "ci_high": -0.9938,
+        "ci_low": -1.4262,
+        "excludes_zero": true,
+        "observed": -1.2026
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 0.4322,
+      "ci_low": 0.1228,
+      "excludes_zero": true,
+      "observed": 0.2855,
+      "permutation_p": 0.0
+    },
+    "tolerance_atr": "0.25",
+    "verdict": "SPAN_EXCLUDES_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -14.0897,
+        "ci_low": -19.3723,
+        "excludes_zero": true,
+        "observed": -16.6342
+      },
+      "2": {
+        "ci_high": -10.8694,
+        "ci_low": -16.7235,
+        "excludes_zero": true,
+        "observed": -13.865
+      },
+      "3": {
+        "ci_high": -10.8383,
+        "ci_low": -15.9756,
+        "excludes_zero": true,
+        "observed": -13.4475
+      },
+      "4": {
+        "ci_high": -9.7886,
+        "ci_low": -15.0724,
+        "excludes_zero": true,
+        "observed": -12.3453
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 6.0104,
+      "ci_low": 2.5531,
+      "excludes_zero": true,
+      "observed": 4.2889,
+      "permutation_p": 0.0
+    },
+    "tolerance_atr": "0.25",
+    "verdict": "SPAN_EXCLUDES_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "mean_excursion_atr",
+    "per_degree": {
+      "1": {
+        "ci_high": -2.1273,
+        "ci_low": -4.3462,
+        "excludes_zero": true,
+        "observed": -3.1825
+      },
+      "2": {
+        "ci_high": -1.8836,
+        "ci_low": -4.1645,
+        "excludes_zero": true,
+        "observed": -2.8779
+      },
+      "3": {
+        "ci_high": -1.8601,
+        "ci_low": -4.021,
+        "excludes_zero": true,
+        "observed": -2.8676
+      },
+      "4": {
+        "ci_high": -1.9495,
+        "ci_low": -4.1632,
+        "excludes_zero": true,
+        "observed": -3.0233
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 0.6023,
+      "ci_low": -0.3941,
+      "excludes_zero": false,
+      "observed": 0.1592,
+      "permutation_p": 0.73
+    },
+    "tolerance_atr": "1",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -22.8921,
+        "ci_low": -47.3243,
+        "excludes_zero": true,
+        "observed": -34.9025
+      },
+      "2": {
+        "ci_high": -23.019,
+        "ci_low": -44.7212,
+        "excludes_zero": true,
+        "observed": -34.1123
+      },
+      "3": {
+        "ci_high": -23.0441,
+        "ci_low": -42.458,
+        "excludes_zero": true,
+        "observed": -33.1043
+      },
+      "4": {
+        "ci_high": -22.3416,
+        "ci_low": -41.9805,
+        "excludes_zero": true,
+        "observed": -32.3617
+      }
+    },
+    "sessions": 516,
+    "span": {
+      "ci_high": 8.2909,
+      "ci_low": -3.4414,
+      "excludes_zero": false,
+      "observed": 2.5408,
+      "permutation_p": 0.61
+    },
+    "tolerance_atr": "1",
+    "verdict": "SPAN_COVERS_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "metric": "mean_excursion_atr",
+    "tolerance_atr": "2",
+    "verdict": "UNTESTABLE_TOO_FEW_DEGREES"
+  },
+  {
+    "atr_timeframe": "5",
+    "metric": "rotated_20b_pct",
+    "tolerance_atr": "2",
+    "verdict": "UNTESTABLE_TOO_FEW_DEGREES"
+  }
+]
