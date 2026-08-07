@@ -1,0 +1,13 @@
+{
+  "cells_supported": 80,
+  "cells_tested": 96,
+  "cells_with_3of4_year_agreement": 0,
+  "expected_agreeing_from_noise": 25.0,
+  "first_touch_events": 36564,
+  "monotonic_rising": 0,
+  "not_monotonic": 20,
+  "untestable": 4,
+  "years": [
+    2019
+  ]
+}
