@@ -88,7 +88,10 @@ def reanchor_times(bars: list[Bar] | tuple[Bar, ...], *, minutes: int = REANCHOR
     previous = None
     for bar in sorted(bars, key=lambda b: b.close_time):
         local = bar.close_time.astimezone(NY)
-        if local.minute % minutes:
+        # Minutes since local midnight, not the minute field. `minute % 240` is
+        # just `minute`, so any cadence above an hour silently degenerated to
+        # hourly. At the default of 60 this is identical to the old condition.
+        if (local.hour * 60 + local.minute) % minutes:
             continue
         if previous is not None and bar.close_time == previous:
             continue

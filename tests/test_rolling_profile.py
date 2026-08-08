@@ -260,3 +260,13 @@ def test_the_closest_approach_is_recorded_even_when_no_tap_qualifies():
     )
     assert not tap.valid
     assert tap.closest_distance_atr == Decimal("0.5")  # 104 is 1 point above 103
+
+
+def test_a_cadence_above_an_hour_is_not_silently_hourly():
+    start = datetime(2019, 3, 4, 0, 0, tzinfo=NY)
+    bars = [bar(start + timedelta(minutes=i), "100", "101") for i in range(1, 24 * 60)]
+    hourly = reanchor_times(bars, minutes=60)
+    four = reanchor_times(bars, minutes=240)
+    assert len(hourly) == 23
+    assert len(four) == 5, "240 minutes must mean every fourth hour, not every hour"
+    assert {t.astimezone(NY).hour % 4 for t in four} == {0}
