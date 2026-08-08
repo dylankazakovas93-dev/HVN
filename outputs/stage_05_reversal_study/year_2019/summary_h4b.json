@@ -1,0 +1,14 @@
+{
+  "anchor_limit": 700,
+  "anchor_offset": 950,
+  "anchors": 700,
+  "archive_sha256": "910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203",
+  "audit": "IngestionAudit(archive='nq2018.zip', member='glbx-mdp3-20180101-20191230.ohlcv-1m.csv.zst', requested_year=2019, parsed_years=(2018, 2019), rows_admitted=430528, rows_excluded_earlier_year=481125, rows_excluded_later_year=0, rows_skipped_non_outright=30906, dataset_sha256='910fcd9faf31ea1a9a485398e6771e9e44eb3314f0ebbff84ed40b6bf2545203')",
+  "causality_assertions_passed": 700,
+  "code_sha": "23dce31758ad8820502254bafb6c32d8bf7c57b1",
+  "evaluated_120m": 6263,
+  "reanchor_minutes": 240,
+  "rows": 8400,
+  "tapped": 6263,
+  "year": 2019
+}
