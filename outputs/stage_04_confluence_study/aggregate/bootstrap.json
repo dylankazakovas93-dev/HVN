@@ -6,40 +6,40 @@
     "metric": "mean_excursion_atr",
     "per_degree": {
       "1": {
-        "ci_high": -0.946,
-        "ci_low": -1.541,
+        "ci_high": -1.0964,
+        "ci_low": -1.5333,
         "excludes_zero": true,
-        "observed": -1.2531
+        "observed": -1.3157
       },
       "2": {
-        "ci_high": -0.7896,
-        "ci_low": -1.3713,
+        "ci_high": -0.9354,
+        "ci_low": -1.368,
         "excludes_zero": true,
-        "observed": -1.1029
+        "observed": -1.1525
       },
       "3": {
-        "ci_high": -1.1504,
-        "ci_low": -1.745,
+        "ci_high": -1.2668,
+        "ci_low": -1.6752,
         "excludes_zero": true,
-        "observed": -1.4624
+        "observed": -1.4702
       },
       "4": {
-        "ci_high": -1.1846,
-        "ci_low": -1.7906,
+        "ci_high": -1.3235,
+        "ci_low": -1.7263,
         "excludes_zero": true,
-        "observed": -1.476
+        "observed": -1.5262
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 0.0529,
-      "ci_low": -0.5249,
-      "excludes_zero": false,
-      "observed": -0.2229,
-      "permutation_p": 0.05
+      "ci_high": -0.0164,
+      "ci_low": -0.4033,
+      "excludes_zero": true,
+      "observed": -0.2105,
+      "permutation_p": 0.0052
     },
     "tolerance_atr": "0.25",
-    "verdict": "SPAN_COVERS_ZERO"
+    "verdict": "SPAN_EXCLUDES_ZERO"
   },
   {
     "atr_timeframe": "1",
@@ -48,37 +48,37 @@
     "metric": "rotated_20b_pct",
     "per_degree": {
       "1": {
-        "ci_high": -8.704,
-        "ci_low": -12.7566,
+        "ci_high": -8.081,
+        "ci_low": -11.0016,
         "excludes_zero": true,
-        "observed": -10.6115
+        "observed": -9.5516
       },
       "2": {
-        "ci_high": -9.289,
-        "ci_low": -13.8881,
+        "ci_high": -8.6789,
+        "ci_low": -11.8495,
         "excludes_zero": true,
-        "observed": -11.6917
+        "observed": -10.255
       },
       "3": {
-        "ci_high": -11.1628,
-        "ci_low": -15.7092,
+        "ci_high": -9.8058,
+        "ci_low": -12.9703,
         "excludes_zero": true,
-        "observed": -13.4059
+        "observed": -11.3805
       },
       "4": {
-        "ci_high": -10.7996,
-        "ci_low": -15.2254,
+        "ci_high": -10.4417,
+        "ci_low": -13.2978,
         "excludes_zero": true,
-        "observed": -12.858
+        "observed": -11.8745
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": -0.1111,
-      "ci_low": -4.5923,
+      "ci_high": -0.9075,
+      "ci_low": -3.7947,
       "excludes_zero": true,
-      "observed": -2.2465,
-      "permutation_p": 0.0067
+      "observed": -2.323,
+      "permutation_p": 0.0002
     },
     "tolerance_atr": "0.25",
     "verdict": "SPAN_EXCLUDES_ZERO"
@@ -90,37 +90,37 @@
     "metric": "mean_excursion_atr",
     "per_degree": {
       "1": {
-        "ci_high": -2.8826,
-        "ci_low": -4.1518,
+        "ci_high": -2.8179,
+        "ci_low": -3.877,
         "excludes_zero": true,
-        "observed": -3.5224
+        "observed": -3.3449
       },
       "2": {
-        "ci_high": -2.4961,
-        "ci_low": -3.7982,
+        "ci_high": -2.5409,
+        "ci_low": -3.5802,
         "excludes_zero": true,
-        "observed": -3.1783
+        "observed": -3.0592
       },
       "3": {
-        "ci_high": -2.8507,
-        "ci_low": -4.132,
+        "ci_high": -2.9154,
+        "ci_low": -3.9364,
         "excludes_zero": true,
-        "observed": -3.5611
+        "observed": -3.4147
       },
       "4": {
-        "ci_high": -3.0087,
-        "ci_low": -4.2028,
+        "ci_high": -3.0443,
+        "ci_low": -4.0048,
         "excludes_zero": true,
-        "observed": -3.6359
+        "observed": -3.5157
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 0.2302,
-      "ci_low": -0.5351,
+      "ci_high": 0.1099,
+      "ci_low": -0.4448,
       "excludes_zero": false,
-      "observed": -0.1135,
-      "permutation_p": 0.6533
+      "observed": -0.1708,
+      "permutation_p": 0.3462
     },
     "tolerance_atr": "1",
     "verdict": "SPAN_COVERS_ZERO"
@@ -132,40 +132,40 @@
     "metric": "rotated_20b_pct",
     "per_degree": {
       "1": {
-        "ci_high": -17.9968,
-        "ci_low": -26.4294,
+        "ci_high": -17.1718,
+        "ci_low": -23.7296,
         "excludes_zero": true,
-        "observed": -22.4607
+        "observed": -20.442
       },
       "2": {
-        "ci_high": -18.4606,
-        "ci_low": -27.0376,
+        "ci_high": -17.559,
+        "ci_low": -24.1587,
         "excludes_zero": true,
-        "observed": -22.7438
+        "observed": -20.8709
       },
       "3": {
-        "ci_high": -22.025,
-        "ci_low": -28.8386,
+        "ci_high": -19.4757,
+        "ci_low": -25.1871,
         "excludes_zero": true,
-        "observed": -25.165
+        "observed": -22.2859
       },
       "4": {
-        "ci_high": -21.2174,
-        "ci_low": -27.8029,
+        "ci_high": -20.0964,
+        "ci_low": -25.4133,
         "excludes_zero": true,
-        "observed": -24.3896
+        "observed": -22.7916
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 1.0818,
-      "ci_low": -5.1944,
-      "excludes_zero": false,
-      "observed": -1.9289,
-      "permutation_p": 0.2667
+      "ci_high": -0.0828,
+      "ci_low": -4.6013,
+      "excludes_zero": true,
+      "observed": -2.3497,
+      "permutation_p": 0.0539
     },
     "tolerance_atr": "1",
-    "verdict": "SPAN_COVERS_ZERO"
+    "verdict": "SPAN_EXCLUDES_ZERO"
   },
   {
     "atr_timeframe": "1",
@@ -174,40 +174,40 @@
     "metric": "mean_excursion_atr",
     "per_degree": {
       "1": {
-        "ci_high": -3.9852,
-        "ci_low": -6.6396,
+        "ci_high": -2.9906,
+        "ci_low": -5.4363,
         "excludes_zero": true,
-        "observed": -5.3377
+        "observed": -4.1986
       },
       "2": {
-        "ci_high": -3.3534,
-        "ci_low": -6.0231,
+        "ci_high": -3.2535,
+        "ci_low": -5.51,
         "excludes_zero": true,
-        "observed": -4.6993
+        "observed": -4.3436
       },
       "3": {
-        "ci_high": -3.7882,
-        "ci_low": -6.7146,
+        "ci_high": -3.2829,
+        "ci_low": -5.5845,
         "excludes_zero": true,
-        "observed": -5.2622
+        "observed": -4.4062
       },
       "4": {
-        "ci_high": -4.3304,
-        "ci_low": -6.9115,
+        "ci_high": -3.7549,
+        "ci_low": -5.9553,
         "excludes_zero": true,
-        "observed": -5.5879
+        "observed": -4.8234
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 0.3411,
-      "ci_low": -0.9687,
-      "excludes_zero": false,
-      "observed": -0.2502,
-      "permutation_p": 0.6233
+      "ci_high": -0.0805,
+      "ci_low": -1.1884,
+      "excludes_zero": true,
+      "observed": -0.6248,
+      "permutation_p": 0.1172
     },
     "tolerance_atr": "2",
-    "verdict": "SPAN_COVERS_ZERO"
+    "verdict": "SPAN_EXCLUDES_ZERO"
   },
   {
     "atr_timeframe": "1",
@@ -216,37 +216,37 @@
     "metric": "rotated_20b_pct",
     "per_degree": {
       "1": {
-        "ci_high": -24.3848,
-        "ci_low": -39.3369,
+        "ci_high": -22.9887,
+        "ci_low": -35.4927,
         "excludes_zero": true,
-        "observed": -31.7454
+        "observed": -29.1825
       },
       "2": {
-        "ci_high": -26.5867,
-        "ci_low": -39.0859,
+        "ci_high": -21.5069,
+        "ci_low": -32.4345,
         "excludes_zero": true,
-        "observed": -32.9639
+        "observed": -27.0038
       },
       "3": {
-        "ci_high": -24.5036,
-        "ci_low": -36.4822,
+        "ci_high": -23.2353,
+        "ci_low": -33.1518,
         "excludes_zero": true,
-        "observed": -30.3173
+        "observed": -28.2221
       },
       "4": {
-        "ci_high": -26.2376,
-        "ci_low": -37.4474,
+        "ci_high": -25.3924,
+        "ci_low": -34.2794,
         "excludes_zero": true,
-        "observed": -31.9178
+        "observed": -29.8411
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 5.9223,
-      "ci_low": -5.5781,
+      "ci_high": 3.5195,
+      "ci_low": -4.7709,
       "excludes_zero": false,
-      "observed": -0.1724,
-      "permutation_p": 0.97
+      "observed": -0.6586,
+      "permutation_p": 0.7698
     },
     "tolerance_atr": "2",
     "verdict": "SPAN_COVERS_ZERO"
@@ -258,36 +258,78 @@
     "metric": "mean_excursion_atr",
     "per_degree": {
       "1": {
-        "ci_high": -1.2936,
-        "ci_low": -1.6839,
+        "ci_high": -1.2888,
+        "ci_low": -1.6131,
         "excludes_zero": true,
-        "observed": -1.4881
+        "observed": -1.4521
       },
       "2": {
-        "ci_high": -0.8917,
-        "ci_low": -1.4004,
+        "ci_high": -0.9236,
+        "ci_low": -1.262,
         "excludes_zero": true,
-        "observed": -1.1635
+        "observed": -1.0926
       },
       "3": {
-        "ci_high": -0.9548,
-        "ci_low": -1.3911,
+        "ci_high": -1.0181,
+        "ci_low": -1.3444,
         "excludes_zero": true,
-        "observed": -1.1651
+        "observed": -1.1802
       },
       "4": {
-        "ci_high": -0.9938,
-        "ci_low": -1.4262,
+        "ci_high": -1.0872,
+        "ci_low": -1.3984,
         "excludes_zero": true,
-        "observed": -1.2026
+        "observed": -1.2405
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 0.4322,
-      "ci_low": 0.1228,
+      "ci_high": 0.3196,
+      "ci_low": 0.1061,
       "excludes_zero": true,
-      "observed": 0.2855,
+      "observed": 0.2116,
+      "permutation_p": 0.001
+    },
+    "tolerance_atr": "0.25",
+    "verdict": "SPAN_EXCLUDES_ZERO"
+  },
+  {
+    "atr_timeframe": "5",
+    "high_degree": 4,
+    "low_degree": 1,
+    "metric": "rotated_20b_pct",
+    "per_degree": {
+      "1": {
+        "ci_high": -15.8409,
+        "ci_low": -19.6643,
+        "excludes_zero": true,
+        "observed": -17.7595
+      },
+      "2": {
+        "ci_high": -11.6365,
+        "ci_low": -15.7255,
+        "excludes_zero": true,
+        "observed": -13.6928
+      },
+      "3": {
+        "ci_high": -12.3415,
+        "ci_low": -16.1336,
+        "excludes_zero": true,
+        "observed": -14.2365
+      },
+      "4": {
+        "ci_high": -11.1434,
+        "ci_low": -14.7453,
+        "excludes_zero": true,
+        "observed": -12.9461
+      }
+    },
+    "sessions": 1032,
+    "span": {
+      "ci_high": 5.9644,
+      "ci_low": 3.6742,
+      "excludes_zero": true,
+      "observed": 4.8133,
       "permutation_p": 0.0
     },
     "tolerance_atr": "0.25",
@@ -297,82 +339,40 @@
     "atr_timeframe": "5",
     "high_degree": 4,
     "low_degree": 1,
-    "metric": "rotated_20b_pct",
-    "per_degree": {
-      "1": {
-        "ci_high": -14.0897,
-        "ci_low": -19.3723,
-        "excludes_zero": true,
-        "observed": -16.6342
-      },
-      "2": {
-        "ci_high": -10.8694,
-        "ci_low": -16.7235,
-        "excludes_zero": true,
-        "observed": -13.865
-      },
-      "3": {
-        "ci_high": -10.8383,
-        "ci_low": -15.9756,
-        "excludes_zero": true,
-        "observed": -13.4475
-      },
-      "4": {
-        "ci_high": -9.7886,
-        "ci_low": -15.0724,
-        "excludes_zero": true,
-        "observed": -12.3453
-      }
-    },
-    "sessions": 516,
-    "span": {
-      "ci_high": 6.0104,
-      "ci_low": 2.5531,
-      "excludes_zero": true,
-      "observed": 4.2889,
-      "permutation_p": 0.0
-    },
-    "tolerance_atr": "0.25",
-    "verdict": "SPAN_EXCLUDES_ZERO"
-  },
-  {
-    "atr_timeframe": "5",
-    "high_degree": 4,
-    "low_degree": 1,
     "metric": "mean_excursion_atr",
     "per_degree": {
       "1": {
-        "ci_high": -2.1273,
-        "ci_low": -4.3462,
+        "ci_high": -2.0959,
+        "ci_low": -3.9957,
         "excludes_zero": true,
-        "observed": -3.1825
+        "observed": -3.0213
       },
       "2": {
-        "ci_high": -1.8836,
-        "ci_low": -4.1645,
+        "ci_high": -2.0854,
+        "ci_low": -3.9086,
         "excludes_zero": true,
-        "observed": -2.8779
+        "observed": -2.966
       },
       "3": {
-        "ci_high": -1.8601,
-        "ci_low": -4.021,
+        "ci_high": -2.0355,
+        "ci_low": -3.8142,
         "excludes_zero": true,
-        "observed": -2.8676
+        "observed": -2.8877
       },
       "4": {
-        "ci_high": -1.9495,
-        "ci_low": -4.1632,
+        "ci_high": -2.3813,
+        "ci_low": -4.1267,
         "excludes_zero": true,
-        "observed": -3.0233
+        "observed": -3.2157
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 0.6023,
-      "ci_low": -0.3941,
+      "ci_high": 0.247,
+      "ci_low": -0.6549,
       "excludes_zero": false,
-      "observed": 0.1592,
-      "permutation_p": 0.73
+      "observed": -0.1944,
+      "permutation_p": 0.5956
     },
     "tolerance_atr": "1",
     "verdict": "SPAN_COVERS_ZERO"
@@ -384,37 +384,37 @@
     "metric": "rotated_20b_pct",
     "per_degree": {
       "1": {
-        "ci_high": -22.8921,
-        "ci_low": -47.3243,
+        "ci_high": -24.3576,
+        "ci_low": -42.5151,
         "excludes_zero": true,
-        "observed": -34.9025
+        "observed": -33.3646
       },
       "2": {
-        "ci_high": -23.019,
-        "ci_low": -44.7212,
+        "ci_high": -29.0879,
+        "ci_low": -44.911,
         "excludes_zero": true,
-        "observed": -34.1123
+        "observed": -37.0999
       },
       "3": {
-        "ci_high": -23.0441,
-        "ci_low": -42.458,
+        "ci_high": -27.1029,
+        "ci_low": -42.6193,
         "excludes_zero": true,
-        "observed": -33.1043
+        "observed": -34.8267
       },
       "4": {
-        "ci_high": -22.3416,
-        "ci_low": -41.9805,
+        "ci_high": -27.5667,
+        "ci_low": -42.7174,
         "excludes_zero": true,
-        "observed": -32.3617
+        "observed": -35.1016
       }
     },
-    "sessions": 516,
+    "sessions": 1032,
     "span": {
-      "ci_high": 8.2909,
-      "ci_low": -3.4414,
+      "ci_high": 3.4084,
+      "ci_low": -7.3626,
       "excludes_zero": false,
-      "observed": 2.5408,
-      "permutation_p": 0.61
+      "observed": -1.7371,
+      "permutation_p": 0.6211
     },
     "tolerance_atr": "1",
     "verdict": "SPAN_COVERS_ZERO"
