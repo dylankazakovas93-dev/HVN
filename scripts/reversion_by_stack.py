@@ -82,11 +82,19 @@ def build(events) -> list[dict]:
                         continue
                     value = rate(rows)
                     difference = value - base
+                    # Count only years carrying data in BOTH arms. A year with
+                    # an empty cell did not disagree, and conflating the two
+                    # understates a real effect — the mistake that made a
+                    # two-year result read as "2 of 4".
                     agreeing = 0
+                    testable = 0
                     for year in YEARS:
                         a = rate([r for r in rows if r["year"] == year])
                         b = rate([r for r in reference if r["year"] == year])
-                        if a is not None and b is not None and (a - b) * difference > 0:
+                        if a is None or b is None:
+                            continue
+                        testable += 1
+                        if (a - b) * difference > 0:
                             agreeing += 1
                     out.append(
                         {
@@ -97,7 +105,8 @@ def build(events) -> list[dict]:
                             "events": len(rows),
                             "reversion_pct": value.quantize(Decimal("0.01")),
                             "vs_single_kind_pp": difference.quantize(Decimal("0.01")),
-                            "years_agreeing": f"{agreeing}/4",
+                            "years_agreeing": f"{agreeing}/{testable}",
+                            "years_testable": testable,
                         }
                     )
     return out
@@ -128,12 +137,20 @@ def main(argv=None) -> None:
         writer.writerows(rows)
 
     stacked = [r for r in rows if r["level_kinds"] != 1]
-    print(f"cells: {len(stacked)}")
-    print(
-        "cells with 3+ of 4 years agreeing: "
-        f"{sum(1 for r in stacked if r['years_agreeing'] in ('3/4', '4/4'))}"
-        f"  (expected from noise: {round(len(stacked) * 5 / 16, 1)})"
-    )
+    full = [r for r in stacked if r["years_testable"] >= 2]
+    unanimous = [
+        r for r in full
+        if r["years_agreeing"].split("/")[0] == str(r["years_testable"])
+    ]
+    print(f"cells: {len(stacked)}  testable in 2+ years: {len(full)}")
+    print(f"cells where every testable year agrees: {len(unanimous)}")
+    for row in sorted(full, key=lambda r: -float(r["vs_single_kind_pp"]))[:14]:
+        print(
+            f"  tf{row['atr_timeframe']} tol{row['tolerance_atr']} "
+            f"w{row['width_bin']} kinds={row['level_kinds']} n={row['events']} "
+            f"rev={row['reversion_pct']}% vs1={row['vs_single_kind_pp']}pp "
+            f"years={row['years_agreeing']}"
+        )
 
 
 if __name__ == "__main__":
