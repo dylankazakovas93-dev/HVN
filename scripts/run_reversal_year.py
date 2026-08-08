@@ -98,6 +98,11 @@ def parse_args(argv=None):
     parser.add_argument("--anchor-offset", type=int, default=0)
     parser.add_argument("--anchor-limit", type=int, default=0)
     parser.add_argument("--part", type=str, default="")
+    # Re-anchor cadence. Stage 3 and 4 rebuilt at every hourly close. A
+    # 20-session rolling profile barely moves in an hour, so a coarser cadence
+    # draws almost the same levels for a fraction of the work. Recorded on every
+    # row so the sampling is never ambiguous when stages are compared.
+    parser.add_argument("--reanchor-minutes", type=int, default=60)
     return parser.parse_args(argv)
 
 
@@ -179,7 +184,7 @@ def measure(forward, floats, cluster, *, atr, direction, base):
     return row
 
 
-def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
+def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0, reanchor=60):
     by_symbol: dict[str, list] = {}
     for bar in bars:
         by_symbol.setdefault(bar.symbol, []).append(bar)
@@ -198,7 +203,7 @@ def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
             for minutes in (1, 5)
         }
         times = [b.close_time for b in series]
-        for anchor in reanchor_times(series):
+        for anchor in reanchor_times(series, minutes=reanchor):
             if max_anchors and anchors_used >= max_anchors:
                 break
             if limit and anchors_used >= limit:
@@ -255,6 +260,7 @@ def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
                                     "anchor_time": anchor.isoformat(),
                                     "anchor_time_dt": anchor,
                                     "session": session_date(anchor),
+                                    "reanchor_minutes": reanchor,
                                     "atr_timeframe": minutes,
                                     "atr": atr,
                                     "tolerance_atr": tolerance,
@@ -292,6 +298,7 @@ def main(argv=None) -> None:
     rows, anchors, checks = build(
         bars, year=args.year, code_sha=code_sha, max_anchors=args.max_anchors,
         offset=args.anchor_offset, limit=args.anchor_limit,
+        reanchor=args.reanchor_minutes,
     )
     suffix = f"_{args.part}" if args.part else ""
     fields: list[str] = []
@@ -313,6 +320,7 @@ def main(argv=None) -> None:
         "code_sha": code_sha,
         "audit": audit if isinstance(audit, dict) else str(audit),
     }
+    summary["reanchor_minutes"] = args.reanchor_minutes
     summary["anchor_offset"] = args.anchor_offset
     summary["anchor_limit"] = args.anchor_limit
     (output / f"summary{suffix}.json").write_text(
