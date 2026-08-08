@@ -42,7 +42,6 @@ from pathlib import Path
 from hvn.atr import wilder_atr
 from hvn.confluence import (
     ABOVE,
-    BELOW,
     MAX_CLUSTER_WIDTH_ATR,
     TOLERANCES_ATR,
     cluster_levels,
@@ -102,7 +101,7 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def measure(forward, cluster, *, atr, direction, base):
+def measure(forward, floats, cluster, *, atr, direction, base):
     """Tap the cluster, then favourable and adverse excursion at each horizon."""
     low, high = cluster.low, cluster.high
     node = Node(
@@ -130,37 +129,52 @@ def measure(forward, cluster, *, atr, direction, base):
     if not tap.valid or tap.first_index is None:
         return row
 
-    after = forward[tap.first_index + TAP_MIN_BARS :]
     midpoint = (low + high) / 2
     # Favourable is the way price came from; adverse is onward through.
-    sign = Decimal(-1) if direction == ABOVE else Decimal(1)
     row["tap_index"] = tap.first_index
 
+    # One pass over the longest horizon, snapshotting at each shorter one.
+    # Three separate max() sweeps in Decimal made a year of anchors take hours.
+    # Floats inside the loop. The window is identical across the twelve
+    # configurations measured at this anchor, so it is converted once by the
+    # caller and reused; Decimal division here dominated the whole run and buys
+    # no precision that an ATR-normalised excursion can use.
+    longest = max(HORIZONS_MINUTES)
+    start = tap.first_index + TAP_MIN_BARS
+    window = floats[start : start + longest]
+    mid = float(midpoint)
+    scale = float(atr)
+    up = direction == ABOVE
+    favourable = adverse = None
+    snapshots: dict[int, tuple] = {}
+    for index, (bar_low, bar_high, bar_close) in enumerate(window, start=1):
+        if up:
+            fav = (mid - bar_low) / scale
+            adv = (bar_high - mid) / scale
+        else:
+            fav = (bar_high - mid) / scale
+            adv = (mid - bar_low) / scale
+        if favourable is None or fav > favourable:
+            favourable = fav
+        if adverse is None or adv > adverse:
+            adverse = adv
+        if index in HORIZONS_MINUTES:
+            snapshots[index] = (favourable, adverse, bar_close)
+
     for horizon in HORIZONS_MINUTES:
-        window = after[:horizon]
-        if len(window) < horizon:
+        if horizon not in snapshots:
             row[f"evaluated_{horizon}m"] = False
             continue
-        row[f"evaluated_{horizon}m"] = True
-        favourable = max(
-            (sign * (bar.low if sign < 0 else bar.high) - sign * midpoint) / atr
-            for bar in window
-        )
-        adverse = max(
-            (sign * midpoint - sign * (bar.high if sign < 0 else bar.low)) / atr
-            for bar in window
-        )
-        close = window[-1].close
-        if (direction == ABOVE and close < low) or (direction == BELOW and close > high):
+        fav, adv, close = snapshots[horizon]
+        if (up and close < float(low)) or (not up and close > float(high)):
             state = REVERSED
-        elif (direction == ABOVE and close >= high) or (
-            direction == BELOW and close <= low
-        ):
+        elif (up and close >= float(high)) or (not up and close <= float(low)):
             state = BROKE_THROUGH
         else:
             state = INSIDE
-        row[f"favourable_{horizon}m"] = favourable
-        row[f"adverse_{horizon}m"] = adverse
+        row[f"evaluated_{horizon}m"] = True
+        row[f"favourable_{horizon}m"] = fav
+        row[f"adverse_{horizon}m"] = adv
         row[f"state_{horizon}m"] = state
     return row
 
@@ -213,6 +227,7 @@ def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
             if len(forward) < LIVE_BARS:
                 continue
             price = series[start - 1].close
+            floats = [(float(b.low), float(b.high), float(b.close)) for b in forward]
             anchors_used += 1
 
             for minutes in (1, 5):
@@ -233,7 +248,7 @@ def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
                             continue
                         rows.append(
                             measure(
-                                forward, cluster, atr=atr, direction=direction,
+                                forward, floats, cluster, atr=atr, direction=direction,
                                 base={
                                     "year": year,
                                     "contract": symbol,
