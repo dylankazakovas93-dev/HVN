@@ -93,6 +93,12 @@ def parse_args(argv=None):
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--max-anchors", type=int, default=0)
+    # Chunking. The environment kills long-running jobs, so a year is run as a
+    # sequence of anchor slices that are merged afterwards. Slices are disjoint
+    # and deterministic, so the union is identical to an uninterrupted run.
+    parser.add_argument("--anchor-offset", type=int, default=0)
+    parser.add_argument("--anchor-limit", type=int, default=0)
+    parser.add_argument("--part", type=str, default="")
     return parser.parse_args(argv)
 
 
@@ -159,7 +165,7 @@ def measure(forward, cluster, *, atr, direction, base):
     return row
 
 
-def build(bars, *, year, code_sha, max_anchors=0):
+def build(bars, *, year, code_sha, max_anchors=0, offset=0, limit=0):
     by_symbol: dict[str, list] = {}
     for bar in bars:
         by_symbol.setdefault(bar.symbol, []).append(bar)
@@ -168,6 +174,7 @@ def build(bars, *, year, code_sha, max_anchors=0):
 
     rows: list[dict] = []
     anchors_used = 0
+    seen = 0
     checks = 0
     for symbol, series in sorted(by_symbol.items()):
         if len(series) < 500:
@@ -180,6 +187,11 @@ def build(bars, *, year, code_sha, max_anchors=0):
         for anchor in reanchor_times(series):
             if max_anchors and anchors_used >= max_anchors:
                 break
+            if limit and anchors_used >= limit:
+                break
+            seen += 1
+            if seen <= offset:
+                continue
             try:
                 atr_one = atrs[1].before(anchor).value
             except (ValueError, IndexError):
@@ -263,14 +275,18 @@ def main(argv=None) -> None:
     code_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
 
     rows, anchors, checks = build(
-        bars, year=args.year, code_sha=code_sha, max_anchors=args.max_anchors
+        bars, year=args.year, code_sha=code_sha, max_anchors=args.max_anchors,
+        offset=args.anchor_offset, limit=args.anchor_limit,
     )
+    suffix = f"_{args.part}" if args.part else ""
     fields: list[str] = []
     for row in rows:
         for key in row:
             if key not in fields:
                 fields.append(key)
-    write_deterministic_gzip_csv(output / "reversal_ledger.csv.gz", rows, fields)
+    write_deterministic_gzip_csv(
+        output / f"reversal_ledger{suffix}.csv.gz", rows, fields
+    )
     summary = {
         "year": args.year,
         "archive_sha256": dataset_hash,
@@ -282,7 +298,9 @@ def main(argv=None) -> None:
         "code_sha": code_sha,
         "audit": audit if isinstance(audit, dict) else str(audit),
     }
-    (output / "summary.json").write_text(
+    summary["anchor_offset"] = args.anchor_offset
+    summary["anchor_limit"] = args.anchor_limit
+    (output / f"summary{suffix}.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True, default=str) + "\n"
     )
     print(json.dumps({k: v for k, v in summary.items() if k != "audit"},
