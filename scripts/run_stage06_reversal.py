@@ -51,11 +51,12 @@ HISTOGRAMS = ROOT / "outputs" / "stage_06_histograms"
 VALIDATION = ROOT / "outputs" / "stage_06_contract_validation"
 FILE_ID = "1aop7eaNO56pM9kZKyxelMcD6Uf8fG-Yf"
 
-# 2010-2012 were dropped: the dataset carries only 332-473 traded seconds per
-# session there, against 40,000+ from 2019 on, which cannot support a 183-minute
-# forward window. 2013-2014 are marginal (16-18k) and also excluded. See
-# AMENDMENT_01 in the Stage 6 spec.
-IS_YEARS = (2019, 2021, 2023, 2025)
+# All in-sample years. Early years carry intermittent coverage rather than
+# uniform thinness: a 2010 session with data has ~1,200 one-minute bars, close
+# to 2019's ~1,360, while many other 2010 sessions are near-empty and produce
+# nothing at all. Sessions without enough forward bars exclude themselves, which
+# is the right granularity for the decision — a whole year is not.
+IS_YEARS = (2010, 2011, 2012, 2019, 2021, 2023, 2025)
 ROLLING_SESSIONS = 20
 NANOS_PER_MINUTE = 60_000_000_000
 PRICE_SCALE = 1_000_000_000
@@ -183,13 +184,13 @@ def measure(forward, cluster, *, atr, direction, base) -> dict:
         favourable = fav if favourable is None or fav > favourable else favourable
         adverse = adv if adverse is None or adv > adverse else adverse
         if index in HORIZONS_MINUTES:
-            snapshots[index] = (favourable, adverse, bar_close)
+            snapshots[index] = (favourable, adverse, bar_close, bar.close_time)
 
     for horizon in HORIZONS_MINUTES:
         if horizon not in snapshots:
             row[f"evaluated_{horizon}m"] = False
             continue
-        fav, adv, close = snapshots[horizon]
+        fav, adv, close, at = snapshots[horizon]
         if (up and close < float(low)) or (not up and close > float(high)):
             state = REVERSED
         elif (up and close >= float(high)) or (not up and close <= float(low)):
@@ -200,6 +201,13 @@ def measure(forward, cluster, *, atr, direction, base) -> dict:
         row[f"favourable_{horizon}m"] = fav
         row[f"adverse_{horizon}m"] = adv
         row[f"state_{horizon}m"] = state
+        # A horizon is counted in bars, and a bar exists only where trading did.
+        # In a sparsely covered session "120 bars" is closer to three hours of
+        # wall clock than two, so the realised span is recorded rather than
+        # assumed equal across years.
+        row[f"span_hours_{horizon}m"] = round(
+            (at - window[0].close_time).total_seconds() / 3600, 3
+        )
     return row
 
 

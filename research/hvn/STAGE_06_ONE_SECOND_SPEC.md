@@ -148,13 +148,16 @@ with no intervening changes. The sealed year is not opened.
 
 ---
 
-# Amendment 01 — early years are too sparse to use
+# Amendment 01 — coverage is intermittent, not thin, and horizons are in bars
 
-Recorded after measuring the dataset, before any Stage 6 outcome was seen.
+Recorded after measuring the dataset, before any Stage 6 outcome was seen. This
+amendment **reverses** an earlier draft of itself that excluded 2010-2014 at the
+year level; that exclusion was wrong and the reasoning behind it was weak.
 
-The partition above assumed 2010-2012 could top the development set up to ~40%.
-They cannot. Median traded seconds per session, measured across all 286 row
-groups:
+## What the data actually looks like
+
+Median traded seconds per session suggested the early years were uniformly too
+thin to use:
 
 | years | median 1s rows/session |
 |---|---|
@@ -162,26 +165,25 @@ groups:
 | 2013-2014 | 15,877 - 17,610 |
 | 2015-2026 | 20,294 - 52,755 |
 
-A session with a few hundred traded seconds cannot supply the 183 minutes of
-forward bars every outcome needs, so those sessions yield nothing at all. This
-is a property of the source, not of the front-month filter: the filter retains
-99% of rows in the affected row groups (6,175 of 6,178 in a 2010 sample).
+The median hid enormous variance. Early coverage is **intermittent**, not thin.
+A 2010 session that carries data has ~1,200 one-minute bars against 2019's
+~1,360; many other 2010 sessions are near-empty and yield nothing at all.
 
-## Revised partitions
+Excluding whole years was therefore the wrong instrument. A session lacking the
+183 forward bars an outcome needs already excludes itself, and that is the right
+granularity for the decision.
 
-| set | years | approx share |
-|-----|-------|--------------|
-| IS | 2019, 2021, 2023, 2025 | ~33% |
-| OOS | 2015, 2016, 2017, 2018, 2020, 2022, 2024 | ~58% |
-| SEALED | 2026 | ~8% |
+**All originally assigned partitions stand.** No year is dropped.
 
-2013 and 2014 are excluded as marginal.
+## The real distortion, and how it is handled
 
-The development set is now entirely burned years. That is acceptable here and
-arguably preferable: Stage 6 asks whether the Stage 5 result survives accurate
-volume, and the sharpest form of that question is the **same years with better
-data** — same events, same regimes, only the volume precision differs. Adding
-fresh years would confound "the data got finer" with "the market was different".
+Horizons are counted in **bars**, and a bar exists only where trading occurred.
+So the 120-bar horizon spans about 2.9 hours of wall clock in a sparsely covered
+2010 session against 2.0 hours in 2019 — a systematic stretch of roughly 45%
+between the earliest and latest years.
 
-The out-of-sample set is untouched and remains pristine. The frozen reversal
-test is unchanged.
+The frozen test is **not** changed to compensate. Instead every evaluated
+outcome now records `span_hours_{horizon}m`, the realised wall-clock span of its
+horizon, so the distortion is measurable in the output rather than invisible.
+Any result that depends on comparing early and late years must show that it
+survives conditioning on that span.
