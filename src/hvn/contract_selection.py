@@ -15,7 +15,7 @@ the caller is expected to stop rather than proceed.
     1. tenure       a selected id holds for roughly a quarter, not days
     2. calendar     switches land near quarterly expiry, third Friday of
                     March, June, September, December
-    3. sign         its prices are strictly positive, which excludes spreads
+    3. sign         its prices are strictly positive
     4. dominance    it carries a large share of the session's volume
     5. continuity   the price gap across a roll is small relative to ATR
 
@@ -31,6 +31,12 @@ from decimal import Decimal
 
 # Predeclared thresholds. Chosen from contract mechanics, not fitted.
 MIN_DOMINANCE = Decimal("0.60")      # share of session volume
+# A calendar spread quotes the *difference* between two outrights, so its price
+# is a couple of hundred points where an outright is tens of thousands. Observed
+# directly in June 2023: ids 3522 and 2130 closed at 14,922.75 and 15,106.75,
+# and id 1584 closed at 184.70 — exactly their difference. Spreads are therefore
+# not reliably negative, and a sign test alone does not exclude them.
+MIN_PRICE_SHARE_OF_MAX = Decimal("0.50")
 MIN_TENURE_DAYS = 45                 # a quarterly contract leads far longer
 MAX_EXPIRY_DISTANCE_DAYS = 20        # switch should sit near the quarterly roll
 MAX_ROLL_GAP_ATR = Decimal("5.0")    # a roll gap is a spread, not a dislocation
@@ -68,9 +74,9 @@ class SelectionReport:
 def choose_front_month(session_date: str, rows) -> SessionChoice | None:
     """Highest-volume instrument in the session.
 
-    `rows` is an iterable of (instrument_id, volume, close_price). Instruments
-    quoting negative prices are excluded outright: a negative price is
-    consistent with a calendar spread and never with the outright we want.
+    `rows` is an iterable of (instrument_id, volume, close_price). Spreads are
+    excluded by price magnitude rather than by sign: a calendar spread quotes the
+    difference between two outrights, which is positive far more often than not.
     """
     totals: dict[int, list] = {}
     for instrument_id, volume, close in rows:
@@ -80,13 +86,26 @@ def choose_front_month(session_date: str, rows) -> SessionChoice | None:
             entry[1] = Decimal(close)
     if not totals:
         return None
-    session_volume = sum(volume for volume, _ in totals.values())
-    positive = {
+    priced = {
         key: value for key, value in totals.items()
         if value[1] is not None and value[1] > 0
     }
+    if not priced:
+        return None
+    # Keep only instruments quoting at outright levels. A spread priced at a few
+    # hundred cannot be confused with a contract priced in the thousands, and
+    # this catches the positive-priced spreads that a sign test misses.
+    ceiling = max(value[1] for value in priced.values())
+    positive = {
+        key: value for key, value in priced.items()
+        if value[1] >= ceiling * MIN_PRICE_SHARE_OF_MAX
+    }
     if not positive:
         return None
+    # Dominance is measured against outright volume only. Spreads are not
+    # competing contracts, and on a roll day their volume spikes; counting them
+    # in the denominator would make a perfectly clean front month look thin.
+    session_volume = sum(volume for volume, _ in positive.values())
     # Ties break on the lower id so the selection is deterministic.
     best = min(positive.items(), key=lambda item: (-item[1][0], item[0]))
     return SessionChoice(

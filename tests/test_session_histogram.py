@@ -188,3 +188,20 @@ def test_a_small_roll_gap_passes_continuity():
     atr = {c.session_date: Decimal("10") for c in choices}
     report = validate_selection(choices, atr_by_session=atr)
     assert report.verified, report.failures
+
+
+def test_a_positively_priced_calendar_spread_is_still_excluded():
+    # Observed in the real data, June 2023: the spread quotes the difference
+    # between two outrights and is positive, so a sign test alone misses it.
+    choice = choose_front_month(
+        "2023-06-02",
+        [
+            (3522, 3_633_229, "14922.75"),
+            (2130, 1_276_726, "15106.75"),
+            (1584, 9_999_999, "184.70"),   # spread, out-volumes both
+        ],
+    )
+    assert choice.instrument_id == 3522, "the spread must never win on volume"
+    # Dominance is against outright volume, so the spread's size cannot dilute it.
+    assert choice.dominance > Decimal("0.70")
+    assert choice.session_volume == 3_633_229 + 1_276_726
