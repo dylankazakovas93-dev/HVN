@@ -22,6 +22,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+import pyarrow as pa
 import pyarrow.compute as pc
 
 from hvn.session_histogram import TICK_SIZE
@@ -30,6 +31,13 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATION = ROOT / "outputs" / "stage_06_contract_validation"
 DEFAULT_OUT = ROOT / "outputs" / "stage_06_histograms"
 NANOS_PER_DAY = 86_400_000_000_000
+# The exchange session rolls at 17:00 Chicago, so shifting local time forward by
+# seven hours puts a session boundary on midnight and the calendar date of the
+# shifted timestamp *is* the session date. Keying on UTC calendar day instead —
+# as the first build did — splits every overnight session across two buckets and
+# would feed a 20-session composite the wrong twenty windows.
+SESSION_ROLL_HOURS = 7
+EXCHANGE_TZ = "America/Chicago"
 PRICE_SCALE = 1_000_000_000
 EPOCH = date(1970, 1, 1)
 
@@ -58,10 +66,36 @@ def front_month_by_day() -> dict[int, int]:
     return chosen
 
 
+def front_month_by_session(chosen: dict[int, int]) -> dict[int, int]:
+    """Translate UTC-day choices onto session days.
+
+    A session spans two UTC dates, so its front month is the choice they agree
+    on. When they disagree the session straddles a roll, and it is **dropped**
+    rather than assigned a guess: those are precisely the sessions where two
+    contracts both trade heavily, so a wrong pick would contaminate a profile
+    with the other contract's price levels. Four sessions a year at most.
+    """
+    out: dict[int, int] = {}
+    for day, instrument in chosen.items():
+        previous = chosen.get(day - 1)
+        if previous is None or previous == instrument:
+            out[day] = instrument
+    return out
+
+
+def session_day(ts_event) -> pa.Array:
+    """Session-date day number for UTC nanosecond timestamps."""
+    utc = pc.cast(ts_event, pa.timestamp("ns", tz="UTC"))
+    local = pc.local_timestamp(pc.cast(utc, pa.timestamp("ns", tz=EXCHANGE_TZ)))
+    shifted = pc.add(
+        pc.cast(local, pa.int64()), SESSION_ROLL_HOURS * 3_600_000_000_000
+    )
+    return pc.divide(shifted, NANOS_PER_DAY)
+
+
 def histogram_rows(table, instrument_by_day: dict[int, int]) -> dict[int, dict]:
-    """Per-day tick histograms for the front month, computed inside Arrow."""
-    day = pc.divide(table.column("ts_event"), NANOS_PER_DAY)
-    table = table.append_column("day", day)
+    """Per-session tick histograms for the front month, computed inside Arrow."""
+    table = table.append_column("day", session_day(table.column("ts_event")))
 
     # Keep only the front-month rows. Building the mask in Arrow avoids a Python
     # pass over half a million rows per group.
@@ -132,7 +166,7 @@ def main(argv=None) -> None:
     from scan_contracts import open_parquet, resolved_url, FILE_ID
 
     args.out.mkdir(parents=True, exist_ok=True)
-    chosen = front_month_by_day()
+    chosen = front_month_by_session(front_month_by_day())
     is_days = {
         day for day in chosen
         if (EPOCH + timedelta(days=day)).year in IS_YEARS
@@ -159,7 +193,7 @@ def main(argv=None) -> None:
         table = parquet.read_row_group(
             index, columns=["ts_event", "instrument_id", "low", "high", "volume"]
         )
-        days = set(pc.divide(table.column("ts_event"), NANOS_PER_DAY).to_pylist())
+        days = set(session_day(table.column("ts_event")).to_pylist())
         if not (days & is_days):
             target.write_text("{}")
             continue
