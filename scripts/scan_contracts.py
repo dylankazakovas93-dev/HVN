@@ -45,10 +45,7 @@ def resolved_url(file_id: str) -> str:
 
 
 def open_parquet(url: str) -> pq.ParquetFile:
-    import sys
-
-    sys.path.insert(0, "/workspace/dylankazakovas93-dev/nq1sdata/src")
-    from nq_data.remote import HTTPRangeReader
+    from hvn.range_reader import HTTPRangeReader
 
     return pq.ParquetFile(HTTPRangeReader(url))
 
