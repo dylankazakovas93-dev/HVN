@@ -12,5 +12,8 @@ outputs/stage_02/detailed/forward_metrics_*.csv.gz
 
 # Processed market data derived from the paid 1s dataset. AGENTS.md restricts
 # git to code, documentation, manifests and synthetic tests.
+# The expanded histogram directory stays out of git; the compressed archive in
+# outputs/stage_06_cache/ is committed instead and rehydrates it. This
+# environment rolls the workspace back between turns, and an uncommitted cache
+# costs a seven-minute rebuild every time.
 outputs/stage_06_histograms/
-outputs/stage_06_contract_validation/sessions/

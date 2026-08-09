@@ -18,6 +18,7 @@ for.
 from __future__ import annotations
 
 import json
+import tarfile
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -35,10 +36,28 @@ def session_name(day_number: int) -> str:
 class HistogramStore:
     """All cached sessions, merged once and held by session date."""
 
-    def __init__(self, folder: Path):
+    ARCHIVE = Path("outputs/stage_06_cache/histograms.tar.gz")
+
+    def __init__(self, folder: Path, archive: Path | None = None):
         self.folder = Path(folder)
+        self._rehydrate(archive if archive is not None else self.ARCHIVE)
         self._sessions: dict[str, dict] = {}
         self._load()
+
+    def _rehydrate(self, archive: Path) -> None:
+        """Unpack the committed archive when the expanded cache is missing.
+
+        Building the cache costs several minutes of streaming; the archive costs
+        seconds. Restoring automatically means a lost workspace is a pause, not
+        a rebuild.
+        """
+        if self.folder.exists() and any(self.folder.glob("rg_*.json")):
+            return
+        if not archive.exists():
+            return
+        self.folder.parent.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(archive, "r:gz") as handle:
+            handle.extractall(self.folder.parent, filter="data")
 
     def _load(self) -> None:
         merged: dict[int, dict] = defaultdict(
