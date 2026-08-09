@@ -1,0 +1,9 @@
+{
+  "cells": 81,
+  "expected_agreeing_from_noise": 9.4,
+  "first_touch_events": 58877,
+  "sign_test_p": 0.0,
+  "stacked_cells_mostly_agreeing": 25,
+  "stacked_cells_positive": 30,
+  "stacked_cells_testable": 30
+}
