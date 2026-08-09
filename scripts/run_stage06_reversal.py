@@ -51,7 +51,11 @@ HISTOGRAMS = ROOT / "outputs" / "stage_06_histograms"
 VALIDATION = ROOT / "outputs" / "stage_06_contract_validation"
 FILE_ID = "1aop7eaNO56pM9kZKyxelMcD6Uf8fG-Yf"
 
-IS_YEARS = (2010, 2011, 2012, 2019, 2021, 2023, 2025)
+# 2010-2012 were dropped: the dataset carries only 332-473 traded seconds per
+# session there, against 40,000+ from 2019 on, which cannot support a 183-minute
+# forward window. 2013-2014 are marginal (16-18k) and also excluded. See
+# AMENDMENT_01 in the Stage 6 spec.
+IS_YEARS = (2019, 2021, 2023, 2025)
 ROLLING_SESSIONS = 20
 NANOS_PER_MINUTE = 60_000_000_000
 PRICE_SCALE = 1_000_000_000

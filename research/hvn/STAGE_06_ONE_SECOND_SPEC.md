@@ -144,3 +144,44 @@ informative and both will be reported.
 
 The IS run happens first. The OOS run happens **once**, against this document,
 with no intervening changes. The sealed year is not opened.
+
+
+---
+
+# Amendment 01 — early years are too sparse to use
+
+Recorded after measuring the dataset, before any Stage 6 outcome was seen.
+
+The partition above assumed 2010-2012 could top the development set up to ~40%.
+They cannot. Median traded seconds per session, measured across all 286 row
+groups:
+
+| years | median 1s rows/session |
+|---|---|
+| 2010-2012 | 332 - 473 |
+| 2013-2014 | 15,877 - 17,610 |
+| 2015-2026 | 20,294 - 52,755 |
+
+A session with a few hundred traded seconds cannot supply the 183 minutes of
+forward bars every outcome needs, so those sessions yield nothing at all. This
+is a property of the source, not of the front-month filter: the filter retains
+99% of rows in the affected row groups (6,175 of 6,178 in a 2010 sample).
+
+## Revised partitions
+
+| set | years | approx share |
+|-----|-------|--------------|
+| IS | 2019, 2021, 2023, 2025 | ~33% |
+| OOS | 2015, 2016, 2017, 2018, 2020, 2022, 2024 | ~58% |
+| SEALED | 2026 | ~8% |
+
+2013 and 2014 are excluded as marginal.
+
+The development set is now entirely burned years. That is acceptable here and
+arguably preferable: Stage 6 asks whether the Stage 5 result survives accurate
+volume, and the sharpest form of that question is the **same years with better
+data** — same events, same regimes, only the volume precision differs. Adding
+fresh years would confound "the data got finer" with "the market was different".
+
+The out-of-sample set is untouched and remains pristine. The frozen reversal
+test is unchanged.
