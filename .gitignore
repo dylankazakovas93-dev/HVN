@@ -9,3 +9,8 @@ __pycache__/
 # source archive; byte hashes for every ledger, including these, are recorded
 # in outputs/stage_02/LEDGER_HASHES.csv.
 outputs/stage_02/detailed/forward_metrics_*.csv.gz
+
+# Processed market data derived from the paid 1s dataset. AGENTS.md restricts
+# git to code, documentation, manifests and synthetic tests.
+outputs/stage_06_histograms/
+outputs/stage_06_contract_validation/sessions/
