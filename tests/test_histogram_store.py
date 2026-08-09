@@ -15,7 +15,9 @@ ANCHOR = datetime(2019, 3, 4, tzinfo=UTC)
 def write_cache(tmp_path, payloads):
     for index, payload in enumerate(payloads):
         (tmp_path / f"rg_{index:04d}.json").write_text(json.dumps(payload))
-    return HistogramStore(tmp_path)
+    # An explicit missing archive: these fixtures test the store, not the
+    # restore, and must not reach for the repository's real cache.
+    return HistogramStore(tmp_path, archive=tmp_path / "absent.tar.gz")
 
 
 def test_slices_of_the_same_session_are_merged(tmp_path):

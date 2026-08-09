@@ -45,19 +45,30 @@ class HistogramStore:
         self._load()
 
     def _rehydrate(self, archive: Path) -> None:
-        """Unpack the committed archive when the expanded cache is missing.
+        """Unpack the committed archive unless the cache is already complete.
 
-        Building the cache costs several minutes of streaming; the archive costs
-        seconds. Restoring automatically means a lost workspace is a pause, not
-        a rebuild.
+        Completeness is judged against the archive's own member count, not
+        against "some files exist". A workspace rollback can leave a handful of
+        slices behind, and a weaker guard silently loaded five of them and
+        reported a cache a thirtieth of its real size — a partial cache that
+        looks like a working one is worse than no cache at all.
         """
-        if self.folder.exists() and any(self.folder.glob("rg_*.json")):
-            return
         if not archive.exists():
             return
-        self.folder.parent.mkdir(parents=True, exist_ok=True)
         with tarfile.open(archive, "r:gz") as handle:
+            expected = sum(
+                1 for name in handle.getnames() if name.endswith(".json")
+            )
+            present = len(list(self.folder.glob("rg_*.json")))
+            if present >= expected:
+                return
+            self.folder.parent.mkdir(parents=True, exist_ok=True)
             handle.extractall(self.folder.parent, filter="data")
+        restored = len(list(self.folder.glob("rg_*.json")))
+        if restored < expected:
+            raise RuntimeError(
+                f"histogram cache incomplete after restore: {restored} of {expected}"
+            )
 
     def _load(self) -> None:
         merged: dict[int, dict] = defaultdict(
