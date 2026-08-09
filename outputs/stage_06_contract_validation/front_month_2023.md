@@ -51,3 +51,45 @@ This remains a labeled **inference**, not a symbology mapping. It is sufficient
 to proceed with IS work on 2023-adjacent data; the same check must pass across
 2010–2026 before the mapping is used for the full study, and a real definitions
 file would supersede it.
+
+---
+
+# Full-history validation (all 286 row groups)
+
+Scanned the complete file: 142,750,604 rows, 4,990 sessions,
+2010-07-07 through 2026-08-06.
+
+Every year passes all five checks. No year failed.
+
+| year | sessions | switches | median dominance | min tenure | verdict |
+|---|---|---|---|---|---|
+| 2010 | 152 | 2 | 0.999 | 91 | OK |
+| 2011 | 309 | 4 | 0.999 | 91 | OK |
+| 2012 | 311 | 4 | 1.000 | 91 | OK |
+| 2013 | 306 | 4 | 1.000 | 91 | OK |
+| 2014 | 302 | 4 | 0.999 | 89 | OK |
+| 2015 | 312 | 4 | 0.999 | 91 | OK |
+| 2016 | 310 | 4 | 0.999 | 91 | OK |
+| 2017 | 309 | 4 | 0.998 | 91 | OK |
+| 2018 | 312 | 4 | 0.998 | 91 | OK |
+| 2019 | 312 | 4 | 0.999 | 91 | OK |
+| 2020 | 312 | 4 | 0.999 | 90 | OK |
+| 2021 | 311 | 4 | 0.998 | 89 | OK |
+| 2022 | 310 | 4 | 0.999 | 91 | OK |
+| 2023 | 310 | 4 | 0.999 | 91 | OK |
+| 2024 | 313 | 4 | 0.998 | 91 | OK |
+| 2025 | 312 | 4 | 0.999 | 90 | OK |
+| 2026 | 187 | 2 | 0.998 | 89 | OK |
+
+Four switches per full year, tenure of 89–91 days, and dominance at or above
+0.998 in every year including the thinnest early ones. That is the quarterly
+H/M/U/Z cycle reproducing itself sixteen years running.
+
+The concern that early years might follow a different ID convention or be too
+thin to resolve is not borne out: 2010 and 2011 look like 2025.
+
+## Status
+
+The mapping remains a labeled **inference** rather than vendor symbology, and a
+real definitions file would supersede it. It is now validated across the full
+history and is sufficient to proceed with the study.

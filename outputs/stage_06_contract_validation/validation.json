@@ -1,0 +1,169 @@
+{
+  "overall": {
+    "failures": [],
+    "first_session": "2010-07-07",
+    "last_session": "2026-08-06",
+    "median_dominance": "0.9987619169652321655303704764",
+    "sessions": 4990,
+    "switches": 64,
+    "verified": true
+  },
+  "years": {
+    "2010": {
+      "failures": [],
+      "median_dominance": "0.9992703392922291134622400584",
+      "min_tenure_days": 91,
+      "sessions": 152,
+      "switches": 2,
+      "verified": true
+    },
+    "2011": {
+      "failures": [],
+      "median_dominance": "0.9994408466969754557282149488",
+      "min_tenure_days": 91,
+      "sessions": 309,
+      "switches": 4,
+      "verified": true
+    },
+    "2012": {
+      "failures": [],
+      "median_dominance": "0.9998675345162902439171247765",
+      "min_tenure_days": 91,
+      "sessions": 311,
+      "switches": 4,
+      "verified": true
+    },
+    "2013": {
+      "failures": [],
+      "median_dominance": "0.9998233882656727689065906627",
+      "min_tenure_days": 91,
+      "sessions": 306,
+      "switches": 4,
+      "verified": true
+    },
+    "2014": {
+      "failures": [],
+      "median_dominance": "0.9985408477978989562491324646",
+      "min_tenure_days": 89,
+      "sessions": 302,
+      "switches": 4,
+      "verified": true
+    },
+    "2015": {
+      "failures": [],
+      "median_dominance": "0.9994697773064687168610816543",
+      "min_tenure_days": 91,
+      "sessions": 312,
+      "switches": 4,
+      "verified": true
+    },
+    "2016": {
+      "failures": [],
+      "median_dominance": "0.9991154211578154178815974839",
+      "min_tenure_days": 91,
+      "sessions": 310,
+      "switches": 4,
+      "verified": true
+    },
+    "2017": {
+      "failures": [],
+      "median_dominance": "0.9978920468081112883781032753",
+      "min_tenure_days": 91,
+      "sessions": 309,
+      "switches": 4,
+      "verified": true
+    },
+    "2018": {
+      "failures": [],
+      "median_dominance": "0.9980103461997612415439713490",
+      "min_tenure_days": 91,
+      "sessions": 312,
+      "switches": 4,
+      "verified": true
+    },
+    "2019": {
+      "failures": [],
+      "median_dominance": "0.9988640897202890199033645108",
+      "min_tenure_days": 91,
+      "sessions": 312,
+      "switches": 4,
+      "verified": true
+    },
+    "2020": {
+      "failures": [],
+      "median_dominance": "0.9990272286726579860956171743",
+      "min_tenure_days": 90,
+      "sessions": 312,
+      "switches": 4,
+      "verified": true
+    },
+    "2021": {
+      "failures": [],
+      "median_dominance": "0.9984932718722354146296037622",
+      "min_tenure_days": 89,
+      "sessions": 311,
+      "switches": 4,
+      "verified": true
+    },
+    "2022": {
+      "failures": [],
+      "median_dominance": "0.9985938635573672070022434986",
+      "min_tenure_days": 91,
+      "sessions": 310,
+      "switches": 4,
+      "verified": true
+    },
+    "2023": {
+      "failures": [],
+      "median_dominance": "0.9986040018613308515588645882",
+      "min_tenure_days": 91,
+      "sessions": 310,
+      "switches": 4,
+      "verified": true
+    },
+    "2024": {
+      "failures": [],
+      "median_dominance": "0.9983484255172830045121088027",
+      "min_tenure_days": 91,
+      "sessions": 313,
+      "switches": 4,
+      "verified": true
+    },
+    "2025": {
+      "failures": [],
+      "median_dominance": "0.9985717244881595124819586251",
+      "min_tenure_days": 90,
+      "sessions": 312,
+      "switches": 4,
+      "verified": true
+    },
+    "2026": {
+      "failures": [],
+      "median_dominance": "0.9979141092212455607123866792",
+      "min_tenure_days": 89,
+      "sessions": 187,
+      "switches": 2,
+      "verified": true
+    }
+  },
+  "years_failed": [],
+  "years_verified": [
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ]
+}
