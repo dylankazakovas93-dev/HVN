@@ -242,3 +242,70 @@ def test_every_source_window_ends_strictly_before_the_anchor(tmp_path):
     limit = bucket_index(anchor)
     for source, buckets in windows.items():
         assert all(b < limit for b in buckets), source
+
+
+# --------------------------------------------------------------------------
+# Range reads
+
+
+class FlakyResponse:
+    def __init__(self, body: bytes, total: int):
+        self.content = body
+        self.headers = {"Content-Range": f"bytes 0-{len(body) - 1}/{total}"}
+
+    def raise_for_status(self):
+        return None
+
+
+class FlakySession:
+    """Fails `failures` times, then serves the bytes."""
+
+    calls = 0
+    failures = 0
+    total = 1000
+
+    def __init__(self):
+        pass
+
+    def get(self, url, headers=None, timeout=None):
+        type(self).calls += 1
+        if type(self).calls <= type(self).failures:
+            import requests
+
+            raise requests.exceptions.ConnectionError("reset by peer")
+        return FlakyResponse(b"x", type(self).total)
+
+    def close(self):
+        return None
+
+
+def test_range_read_retries_a_dropped_connection(monkeypatch):
+    """One reset connection must not end a scan that runs for hours."""
+    import requests
+
+    from hvn import range_reader
+
+    FlakySession.calls = 0
+    FlakySession.failures = 3
+    monkeypatch.setattr(requests, "Session", FlakySession)
+    monkeypatch.setattr(range_reader.time, "sleep", lambda _: None)
+
+    reader = range_reader.HTTPRangeReader("https://example.invalid/f.parquet")
+    assert reader.size == 1000
+    assert FlakySession.calls == 4
+
+
+def test_range_read_gives_up_after_the_retry_budget(monkeypatch):
+    """A host that is genuinely gone still stops the run."""
+    import requests
+
+    from hvn import range_reader
+
+    FlakySession.calls = 0
+    FlakySession.failures = 99
+    monkeypatch.setattr(requests, "Session", FlakySession)
+    monkeypatch.setattr(range_reader.time, "sleep", lambda _: None)
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        range_reader.HTTPRangeReader("https://example.invalid/f.parquet")
+    assert FlakySession.calls == range_reader.RETRIES

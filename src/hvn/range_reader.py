@@ -7,14 +7,30 @@ for forty lines.
 
 PyArrow seeks the Parquet footer, reads the metadata, then fetches only the row
 groups it needs, so a 1.9 GB object is usable without downloading it.
+
+**Reads retry.** A scan makes tens of thousands of range requests over many
+hours and the host drops one occasionally — a reset connection, a 500, a
+timeout. Without a retry that single drop propagates all the way out and kills a
+run that is otherwise healthy, which is how the first Stage 7 scan died after
+ten sessions. Retrying is safe: a ranged GET is idempotent, so either the same
+bytes come back or none do.
 """
 
 from __future__ import annotations
 
 import io
+import time
 from urllib.parse import urlparse
 
 import requests
+
+RETRIES = 6
+BACKOFF_SECONDS = 2
+RETRYABLE = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+)
 
 
 class HTTPRangeReader(io.RawIOBase):
@@ -24,13 +40,46 @@ class HTTPRangeReader(io.RawIOBase):
         self.url = url
         self.timeout = timeout
         self.session = requests.Session()
-        probe = self.session.get(url, headers={"Range": "bytes=0-0"}, timeout=timeout)
-        probe.raise_for_status()
+        probe = self._fetch(0, 0)
         content_range = probe.headers.get("Content-Range", "")
         if "/" not in content_range:
             raise ValueError("Remote server does not support byte-range reads")
         self.size = int(content_range.rsplit("/", 1)[1])
         self.position = 0
+
+    def _fetch(self, start: int, end: int):
+        """One ranged GET, retried with exponential backoff.
+
+        The last failure is re-raised rather than swallowed: a host that is
+        genuinely gone should still stop the run, just not one that hiccuped.
+        A 4xx other than 429 is not retried, because asking again will not fix
+        a bad URL or an expired token.
+        """
+        delay = BACKOFF_SECONDS
+        last: Exception | None = None
+        for attempt in range(RETRIES):
+            try:
+                response = self.session.get(
+                    self.url,
+                    headers={"Range": f"bytes={start}-{end}"},
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                return response
+            except (*RETRYABLE, requests.exceptions.HTTPError) as error:
+                status = getattr(getattr(error, "response", None), "status_code", None)
+                if status is not None and status != 429 and 400 <= status < 500:
+                    raise
+                last = error
+                if attempt == RETRIES - 1:
+                    break
+                # A dropped connection usually means the pooled socket is stale,
+                # so the session is rebuilt rather than reused.
+                self.session.close()
+                self.session = requests.Session()
+                time.sleep(delay)
+                delay *= 2
+        raise last
 
     def readable(self) -> bool:
         return True
@@ -65,13 +114,7 @@ class HTTPRangeReader(io.RawIOBase):
         )
         if end < self.position:
             return b""
-        response = self.session.get(
-            self.url,
-            headers={"Range": f"bytes={self.position}-{end}"},
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        payload = response.content
+        payload = self._fetch(self.position, end).content
         self.position += len(payload)
         return payload
 
