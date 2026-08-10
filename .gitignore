@@ -17,3 +17,9 @@ outputs/stage_02/detailed/forward_metrics_*.csv.gz
 # environment rolls the workspace back between turns, and an uncommitted cache
 # costs a seven-minute rebuild every time.
 outputs/stage_06_histograms/
+
+# Stage 7: same rule. The expanded half-hour bucket cache stays out of git; the
+# compressed archive in outputs/stage_07_cache/ is committed and rehydrates it.
+outputs/stage_07_buckets/
+outputs/stage_07_races/
+outputs/stage_07_calibration/

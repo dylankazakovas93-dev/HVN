@@ -239,12 +239,20 @@ def detect_nodes(
     *,
     min_width_ticks: int | None = None,
     max_width_ticks: int | None = None,
+    high_percentile: Decimal = HIGH_NODE_PERCENTILE,
+    high_min_activity: Decimal = HIGH_NODE_MIN_ACTIVITY,
+    low_percentile: Decimal = LOW_NODE_PERCENTILE,
+    low_max_activity: Decimal = LOW_NODE_MAX_ACTIVITY,
 ) -> list[Node]:
     """High and low nodes as contiguous runs in the top and bottom activity decile.
 
     High and low nodes are found by the same procedure with the comparison
     reversed, so neither class is favoured by the construction. Runs outside the
     width band are dropped rather than truncated.
+
+    The four gates default to the frozen Stage 2-6 decile constants, so every
+    earlier caller behaves exactly as before. Stage 7 passes its tier's gates
+    instead; a second copy of this procedure would drift away from this one.
     """
     if not activity.valid:
         return []
@@ -267,15 +275,15 @@ def detect_nodes(
         i
         for i in profile.indices
         if i in active
-        and percentile.get(i, Decimal(0)) >= HIGH_NODE_PERCENTILE
-        and smoothed.get(i, Decimal(0)) >= HIGH_NODE_MIN_ACTIVITY
+        and percentile.get(i, Decimal(0)) >= high_percentile
+        and smoothed.get(i, Decimal(0)) >= high_min_activity
     )
     low_ticks = sorted(
         i
         for i in profile.indices
         if i in active
-        and percentile.get(i, Decimal(100)) <= LOW_NODE_PERCENTILE
-        and 0 < smoothed.get(i, Decimal(0)) <= LOW_NODE_MAX_ACTIVITY
+        and percentile.get(i, Decimal(100)) <= low_percentile
+        and 0 < smoothed.get(i, Decimal(0)) <= low_max_activity
     )
 
     nodes: list[Node] = []
