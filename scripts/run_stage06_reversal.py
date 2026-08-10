@@ -26,7 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 from bisect import bisect_right
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -76,14 +76,22 @@ INSIDE = "INSIDE"
 
 
 def minute_bars(parquet, day_numbers, instrument_by_day) -> list[Bar]:
-    """One-minute bars for the named session days, front month only."""
+    """One-minute bars for the named session days, front month only.
+
+    Row groups are aggregated separately for memory, then **merged by minute**
+    before any Bar is built. A minute straddling a row-group boundary otherwise
+    emits twice — two partial bars sharing a timestamp, each holding only half
+    the minute's range and volume. The ATR guard caught that as a duplicate id;
+    silently keeping either half would have been worse.
+    """
     import pyarrow as pa
 
     from build_histograms import session_day
 
     low_ns = min(day_numbers) * 86_400_000_000_000 - 86_400_000_000_000
     high_ns = (max(day_numbers) + 1) * 86_400_000_000_000
-    out: list[Bar] = []
+    # minute -> [open, high, low, close, volume]
+    merged: dict[int, list] = {}
     for index in range(parquet.metadata.num_row_groups):
         stats = parquet.metadata.row_group(index).column(0).statistics
         if stats is not None and stats.has_min_max:
@@ -93,10 +101,10 @@ def minute_bars(parquet, day_numbers, instrument_by_day) -> list[Bar]:
             index,
             columns=["ts_event", "instrument_id", "open", "high", "low", "close", "volume"],
         )
-        days = session_day(table.column("ts_event"))
-        table = table.append_column("day", days)
-        keep = pc.is_in(table.column("day"), value_set=pa.array(sorted(day_numbers)))
-        table = table.filter(keep)
+        table = table.append_column("day", session_day(table.column("ts_event")))
+        table = table.filter(
+            pc.is_in(table.column("day"), value_set=pa.array(sorted(day_numbers)))
+        )
         if table.num_rows == 0:
             continue
         wanted = pa.array(
@@ -122,22 +130,33 @@ def minute_bars(parquet, day_numbers, instrument_by_day) -> list[Bar]:
             grouped.column("volume_sum").to_pylist(),
             strict=True,
         ):
-            close_time = datetime.fromtimestamp(
-                (ts + NANOS_PER_MINUTE) / 1e9, tz=__import__("datetime").UTC
+            existing = merged.get(ts)
+            if existing is None:
+                merged[ts] = [o, h, low_price, c, v or 0]
+            else:
+                # Row groups arrive in time order, so the later fragment holds
+                # the closing price and the earlier one the opening price.
+                existing[1] = max(existing[1], h)
+                existing[2] = min(existing[2], low_price)
+                existing[3] = c
+                existing[4] += v or 0
+
+    out: list[Bar] = []
+    for ts in sorted(merged):
+        o, h, low_price, c, v = merged[ts]
+        close_time = datetime.fromtimestamp((ts + NANOS_PER_MINUTE) / 1e9, tz=UTC)
+        out.append(
+            Bar(
+                source_row_id=f"NQ|{ts}",
+                close_time=close_time,
+                open=Decimal(o) / PRICE_SCALE,
+                high=Decimal(h) / PRICE_SCALE,
+                low=Decimal(low_price) / PRICE_SCALE,
+                close=Decimal(c) / PRICE_SCALE,
+                volume=Decimal(v),
+                symbol="NQ",
             )
-            out.append(
-                Bar(
-                    source_row_id=f"NQ|{ts}",
-                    close_time=close_time,
-                    open=Decimal(o) / PRICE_SCALE,
-                    high=Decimal(h) / PRICE_SCALE,
-                    low=Decimal(low_price) / PRICE_SCALE,
-                    close=Decimal(c) / PRICE_SCALE,
-                    volume=Decimal(v or 0),
-                    symbol="NQ",
-                )
-            )
-    out.sort(key=lambda b: b.close_time)
+        )
     return out
 
 
