@@ -35,6 +35,7 @@ from pathlib import Path
 import numpy as np
 
 from aggregate_stage07 import load
+from answer_stage07 import short
 from hvn.race import BRACKET_GRID
 from hvn.tiers import TIERS
 
@@ -265,6 +266,43 @@ def main(argv=None) -> None:
               f"{best['mirror_first_pct']}%, edge {best['edge_pp']:+.2f}pp, "
               f"n={best['resolved']}, censored {best['censored_pct']}%")
     report["brackets"] = grid_out
+
+    print()
+    print("=" * 78)
+    print("4  the same question, per level combination")
+    print("=" * 78)
+    print(f"{'tier':>7} {'combination':<38} {'MFE':>6} {'MAE':>6} "
+          f"{'MFE-MAE':>8} {'95% interval':>20} {'n':>6}")
+    combos = defaultdict(list)
+    for event in events:
+        combos[(event["tier"], tuple(sorted(set(event["kinds"].split("|")))))].append(event)
+    per_combo = {}
+    for (tier_name, kinds), rows in sorted(
+        combos.items(), key=lambda kv: -len(kv[1])
+    ):
+        if len(rows) < MIN_EVENTS:
+            continue
+        favourable = quartiles([e["mfe_atr"] for e in rows if "mfe_atr" in e])
+        adverse = quartiles([e["mae_atr"] for e in rows if "mae_atr" in e])
+        sums, counts = session_means(
+            rows, lambda e: e["mfe_atr"] - e["mae_atr"] if "mfe_atr" in e else None
+        )
+        result = bootstrap_mean(sums, counts, args.resamples, args.seed)
+        if favourable is None or adverse is None or result is None:
+            continue
+        label = " + ".join(short(k) for k in kinds)
+        per_combo[f"{tier_name}|{label}"] = {
+            "mfe_median": favourable["median"],
+            "mae_median": adverse["median"],
+            "asymmetry": result,
+            "n": len(rows),
+        }
+        flag = "   <-" if result["excludes_zero"] else ""
+        interval = f"[{result['ci_low']:+.3f}, {result['ci_high']:+.3f}]"
+        print(f"{tier_name:>7} {label[:38]:<38} {favourable['median']:>6.2f} "
+              f"{adverse['median']:>6.2f} {result['observed']:>+8.3f} "
+              f"{interval:>20} {len(rows):>6}{flag}")
+    report["per_combination"] = per_combo
 
     output = args.dir / "aggregate"
     output.mkdir(parents=True, exist_ok=True)

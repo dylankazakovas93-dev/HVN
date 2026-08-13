@@ -73,17 +73,25 @@ TAP_MIN_BARS = 3
 # near side and the whole grid becomes unreadable. The measurement window
 # should not be the thing deciding the answer.
 #
-# Two full sessions. A 5 ATR move at 5-minute ATR almost always resolves inside
-# that, so censoring becomes a genuine "price never went there" rather than
-# "the clock ran out". Events are no longer dropped for having a short window
-# either — the window that was actually available is recorded, so a truncated
-# event is visible instead of silently excluded.
-FORWARD_BARS = 2880
+# One full session. At 1-minute ATR the unit is roughly 8-9 points on NQ, so
+# 5 ATR is about 43 points and resolves well inside a session; the two-session
+# window that 5-minute ATR needed would only be buying censoring that is
+# already near zero, at twice the scan time.
+#
+# Events are not dropped for having a short window. The window that was
+# actually available is recorded, so a truncated event stays visible instead of
+# being silently excluded, which would select against the end of every year.
+FORWARD_BARS = 1440
 LIVE_BARS = TAP_SEARCH_BARS + TAP_MIN_BARS
-# Forward bars come from the next two calendar days as well, which is why the
-# scan loads four days per session rather than two.
-FORWARD_DAYS = 2
-ATR_MINUTES = 5
+# Forward bars run into the next calendar day, so the scan loads three days per
+# session rather than two.
+FORWARD_DAYS = 1
+# 1-minute Wilder ATR. This was 5-minute, which made 5 ATR about 97 points on
+# NQ -- a move price often does not make in either direction inside a session,
+# so the widest races were asking a question the data could rarely answer. At
+# 1 minute the same 1/3/5 grid spans roughly 9 to 43 points, which is the scale
+# a level is actually interacted with on.
+ATR_MINUTES = 1
 ATR_PERIOD = 14
 
 
