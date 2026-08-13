@@ -46,7 +46,7 @@ from hvn.confluence import (
 from hvn.profile_sources import resample
 from hvn.race import DISTANCES_ATR, all_races, excursion_and_brackets
 from hvn.range_reader import HTTPRangeReader
-from hvn.rolling_profile import Node, find_tap, reanchor_times
+from hvn.rolling_profile import Node, find_tap, reanchor_times, session_date
 from hvn.stage02_pipeline import AtrSelector
 from hvn.stage7_levels import build_level_set
 from hvn.tiers import TIERS, tier
@@ -65,10 +65,24 @@ TOLERANCE_ATR = Decimal("1.00")
 TAP_SEARCH_BARS = 60
 TAP_BAND_ATR = Decimal("0.5")
 TAP_MIN_BARS = 3
-# Long enough that a 5 ATR race is usually decided rather than censored, and
-# short enough that "after the tap" still means something.
-FORWARD_BARS = 240
-LIVE_BARS = TAP_SEARCH_BARS + TAP_MIN_BARS + FORWARD_BARS
+# How long a barrier is watched after the tap.
+#
+# This was 240 bars, four hours, and it was the wrong call. At 5 ATR it left
+# 44% of events censored, and censoring is not neutral: a wide stop is rarely
+# reached inside a short window, so every target/stop cell drifts toward the
+# near side and the whole grid becomes unreadable. The measurement window
+# should not be the thing deciding the answer.
+#
+# Two full sessions. A 5 ATR move at 5-minute ATR almost always resolves inside
+# that, so censoring becomes a genuine "price never went there" rather than
+# "the clock ran out". Events are no longer dropped for having a short window
+# either — the window that was actually available is recorded, so a truncated
+# event is visible instead of silently excluded.
+FORWARD_BARS = 2880
+LIVE_BARS = TAP_SEARCH_BARS + TAP_MIN_BARS
+# Forward bars come from the next two calendar days as well, which is why the
+# scan loads four days per session rather than two.
+FORWARD_DAYS = 2
 ATR_MINUTES = 5
 ATR_PERIOD = 14
 
@@ -110,6 +124,9 @@ def measure(forward, cluster, *, atr, direction, base) -> dict:
     reference = forward[start - 1].close
     window = forward[start : start + FORWARD_BARS]
     row["forward_bars"] = len(window)
+    # A short window is a real state near the end of a partition, not an error.
+    # Recorded so a censored outcome can be told apart from a truncated one.
+    row["window_truncated"] = len(window) < FORWARD_BARS
     row["reference_price"] = str(reference)
     row["reference_offset_atr"] = str((reference - (low + high) / 2) / atr)
     results = all_races(
@@ -144,9 +161,14 @@ def run_session(
         return None
 
     day = (date.fromisoformat(session) - EPOCH).days
-    bars = minute_bars(parquet, {day - 1, day}, instrument_by_day)
+    days = {day - 1, day} | {day + offset for offset in range(1, FORWARD_DAYS + 1)}
+    bars = minute_bars(parquet, days, instrument_by_day)
     if len(bars) < 400:
         return []
+    # Wilder ATR is recursive from the past, and `AtrSelector.before` takes the
+    # last value at or before the anchor, so including the forward days in the
+    # series cannot affect any value read at an anchor. Anchors themselves are a
+    # different matter and are restricted below.
     # ATR is 5-minute Wilder. Resampling buckets on bar start, never close: a
     # bar closing at 10:05 belongs to the 10:00-10:05 bucket, and bucketing it
     # on its close put it in the next one for every earlier generation.
@@ -157,7 +179,11 @@ def run_session(
     times = [b.close_time for b in bars]
 
     rows: list[dict] = []
-    for anchor in reanchor_times(bars, minutes=60):
+    # Anchors come from this session only. The forward days are in `bars` to
+    # give the outcome window somewhere to run, not to be scanned themselves —
+    # they are scanned when their own session comes up.
+    own_session = [b for b in bars if session_date(b.close_time) == session]
+    for anchor in reanchor_times(own_session, minutes=60):
         try:
             atr = atrs.before(anchor).value
         except (ValueError, IndexError):
@@ -165,7 +191,10 @@ def run_session(
         if atr <= 0:
             continue
         index = bisect_right(times, anchor)
-        forward = bars[index : index + LIVE_BARS]
+        forward = bars[index : index + LIVE_BARS + FORWARD_BARS]
+        # Only the tap search has to fit. An event with a short outcome window
+        # is recorded with the window it had rather than dropped, because
+        # dropping them would quietly select against the end of every partition.
         if len(forward) < LIVE_BARS:
             continue
         price = bars[index - 1].close
