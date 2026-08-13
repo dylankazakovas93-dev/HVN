@@ -1,14 +1,21 @@
 # Agent Instructions
 
-This repository is in Stage 2: the preregistered NQ HVN acceptance and
-rotation study on development years only. Stage 1B is frozen and passed.
+This repository is in Stage 7: tiered levels built from one-second data,
+measured as a race to a fixed distance. Stages 1B through 6 are frozen.
+
+**Superseded by owner instruction.** The prohibition below on forward returns,
+MFE, MAE, stops and targets was written for Stage 2 and has been lifted by the
+repository owner. Excursion both ways and a target/stop bracket grid are
+recorded per event from Stage 7 onward, at their explicit request. The
+prohibition is kept in the history rather than deleted so the change of scope
+is visible, but it no longer binds.
 
 Hard prohibitions:
 
 - Do not access, parse, summarize, or calculate from 2020, 2022, or 2024
   market-data rows.
-- Do not compute forward returns, MFE, MAE, win rate, profit factor, Sharpe,
-  net profit, trades, stops, targets, or entries.
+- (LIFTED, see above) Do not compute forward returns, MFE, MAE, win rate,
+  profit factor, Sharpe, net profit, trades, stops, targets, or entries.
 - Do not optimize profile, node, event, control, metric, matching, gate,
   residence, or departure definitions using later behavior.
 - Do not call the proxies exact or true exchange volume-at-price profiles.

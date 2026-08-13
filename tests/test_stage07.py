@@ -309,3 +309,54 @@ def test_range_read_gives_up_after_the_retry_budget(monkeypatch):
     with pytest.raises(requests.exceptions.ConnectionError):
         range_reader.HTTPRangeReader("https://example.invalid/f.parquet")
     assert FlakySession.calls == range_reader.RETRIES
+
+
+# --------------------------------------------------------------------------
+# Excursion and the bracket grid
+
+
+def test_bracket_grid_records_the_bar_each_distance_is_first_reached():
+    from decimal import Decimal as D
+
+    from hvn.race import excursion_and_brackets
+
+    forward = [bar(99, 101), bar(97, 100), bar(94, 98)]
+    result = excursion_and_brackets(
+        forward, reference=D(100), direction=ABOVE, atr=D(2), grid=(D(1), D(3)),
+    )
+    # Favourable is down from 100: bar 1 reaches 97 (1.5 ATR), bar 2 reaches 94 (3 ATR).
+    assert result["favourable_bar"]["1"] == 1
+    assert result["favourable_bar"]["3"] == 2
+    assert result["mfe_atr"] == pytest.approx(3.0)
+    # Adverse never gets 1 ATR above 100 (high of 101 is 0.5 ATR).
+    assert result["adverse_bar"]["1"] is None
+    assert result["mae_atr"] == pytest.approx(0.5)
+
+
+def test_unreached_bracket_is_none_not_the_last_bar():
+    """Censored must stay distinguishable from resolved-at-the-deadline."""
+    from decimal import Decimal as D
+
+    from hvn.race import excursion_and_brackets
+
+    forward = [bar(99, 101) for _ in range(20)]
+    result = excursion_and_brackets(
+        forward, reference=D(100), direction=ABOVE, atr=D(2), grid=(D(5),),
+    )
+    assert result["favourable_bar"]["5"] is None
+    assert result["adverse_bar"]["5"] is None
+
+
+def test_asymmetric_pair_is_derivable_from_the_grid():
+    """A 3 ATR target against a 1 ATR stop, reconstructed without a re-scan."""
+    from decimal import Decimal as D
+
+    from hvn.race import excursion_and_brackets
+
+    forward = [bar(99, 101), bar(97, 100), bar(94, 98)]
+    grid = excursion_and_brackets(
+        forward, reference=D(100), direction=ABOVE, atr=D(2), grid=(D(1), D(3)),
+    )
+    target = grid["favourable_bar"]["3"]
+    stop = grid["adverse_bar"]["1"]
+    assert target is not None and stop is None  # target hit, stop never touched

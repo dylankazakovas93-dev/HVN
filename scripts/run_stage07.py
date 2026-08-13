@@ -44,7 +44,7 @@ from hvn.confluence import (
     nearest_barriers,
 )
 from hvn.profile_sources import resample
-from hvn.race import DISTANCES_ATR, all_races
+from hvn.race import DISTANCES_ATR, all_races, excursion_and_brackets
 from hvn.range_reader import HTTPRangeReader
 from hvn.rolling_profile import Node, find_tap, reanchor_times
 from hvn.stage02_pipeline import AtrSelector
@@ -119,6 +119,13 @@ def measure(forward, cluster, *, atr, direction, base) -> dict:
     for distance, result in results.items():
         row[f"race_{distance}"] = result.outcome
         row[f"race_{distance}_bars"] = result.bars
+    # Excursion both ways, plus the bar each grid distance is first reached.
+    # Recording the grid rather than one chosen pair means any asymmetric
+    # target/stop combination is derivable from the ledger afterwards without
+    # another overnight scan.
+    row |= excursion_and_brackets(
+        window, reference=reference, direction=direction, atr=atr
+    )
     return row
 
 

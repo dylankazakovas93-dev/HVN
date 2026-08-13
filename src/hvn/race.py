@@ -112,11 +112,63 @@ def all_races(forward, *, reference: Decimal, direction: str, atr: Decimal,
 
 __all__ = [
     "ADVERSE",
+    "BRACKET_GRID",
     "AMBIGUOUS",
     "CENSORED",
     "DISTANCES_ATR",
     "FAVOURABLE",
     "RaceResult",
     "all_races",
+    "excursion_and_brackets",
     "race",
 ]
+
+
+# The bracket grid, in ATR. Recording the bar at which each distance is first
+# reached in each direction makes every asymmetric target/stop pair derivable
+# offline: a 2 ATR target against a 1 ATR stop is `favourable_bar[2] <
+# adverse_bar[1]`. Without it, every new pair costs another overnight scan.
+BRACKET_GRID = tuple(Decimal(str(x / 2)) for x in range(1, 11))
+
+
+def excursion_and_brackets(forward, *, reference: Decimal, direction: str,
+                           atr: Decimal, grid=BRACKET_GRID):
+    """Furthest travel each way, and the bar each grid distance is first reached.
+
+    One pass over the window. `favourable` is back the way price came,
+    `adverse` is onward through the level, both measured from the touch price so
+    neither is a function of how wide the barrier is.
+
+    A distance never reached records None. That is a censored observation and
+    must stay distinguishable from "reached on the final bar", or every
+    unresolved event would silently count as resolved at the deadline.
+    """
+    sign = Decimal(-1) if direction == ABOVE else Decimal(1)
+    best_favourable = Decimal(0)
+    best_adverse = Decimal(0)
+    favourable_bar: dict[str, int | None] = {str(d): None for d in grid}
+    adverse_bar: dict[str, int | None] = {str(d): None for d in grid}
+
+    for index, bar in enumerate(forward):
+        if sign < 0:
+            favourable = (reference - bar.low) / atr
+            adverse = (bar.high - reference) / atr
+        else:
+            favourable = (bar.high - reference) / atr
+            adverse = (reference - bar.low) / atr
+        if favourable > best_favourable:
+            best_favourable = favourable
+        if adverse > best_adverse:
+            best_adverse = adverse
+        for distance in grid:
+            key = str(distance)
+            if favourable_bar[key] is None and favourable >= distance:
+                favourable_bar[key] = index
+            if adverse_bar[key] is None and adverse >= distance:
+                adverse_bar[key] = index
+    return {
+        "mfe_atr": float(best_favourable),
+        "mae_atr": float(best_adverse),
+        "favourable_bar": favourable_bar,
+        "adverse_bar": adverse_bar,
+    }
