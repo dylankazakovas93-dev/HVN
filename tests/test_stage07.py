@@ -360,3 +360,33 @@ def test_asymmetric_pair_is_derivable_from_the_grid():
     target = grid["favourable_bar"]["3"]
     stop = grid["adverse_bar"]["1"]
     assert target is not None and stop is None  # target hit, stop never touched
+
+
+def test_bracket_mirror_cancels_the_censoring_bias():
+    """Symmetric events must show no edge, however censored the cell is.
+
+    Raw expectancy does not have this property: dropping unresolved events
+    favours the near side, and on synthetic noise a 1 ATR target against a
+    4 ATR stop read +0.66 ATR at 93% target-first. The mirror removes it,
+    because the censoring is identical in both directions.
+    """
+    import sys
+    from pathlib import Path as _Path
+
+    sys.path.insert(0, str(_Path(__file__).resolve().parents[1] / "scripts"))
+    from excursion_stage07 import bracket_cell
+
+    # Perfectly symmetric: every event is present alongside its swapped twin,
+    # so the mirrored population is identical to the real one by construction.
+    # Both grid keys must exist on both sides, because the mirror reads the
+    # target off the adverse dict and the stop off the favourable one.
+    events = []
+    for index in range(400):
+        favourable = {"1.0": index % 7, "4.0": None if index % 3 else index % 11}
+        adverse = {"1.0": index % 5, "4.0": None if index % 4 else index % 9}
+        events.append({"favourable_bar": favourable, "adverse_bar": adverse})
+        events.append({"favourable_bar": adverse, "adverse_bar": favourable})
+    cell = bracket_cell(events, "1.0", "4.0")
+    assert cell is not None
+    assert cell["edge_pp"] == pytest.approx(0.0, abs=1e-9)
+    assert cell["expectancy_edge_atr"] == pytest.approx(0.0, abs=1e-9)
