@@ -40,6 +40,7 @@ from hvn.bucket_histogram import BucketStore
 from hvn.confluence import (
     ABOVE,
     MAX_CLUSTER_WIDTH_ATR,
+    Cluster,
     cluster_levels,
     nearest_barriers,
 )
@@ -49,7 +50,7 @@ from hvn.range_reader import HTTPRangeReader
 from hvn.rolling_profile import Node, find_tap, reanchor_times, session_date
 from hvn.stage02_pipeline import AtrSelector
 from hvn.stage7_levels import build_level_set
-from hvn.tiers import TIERS, tier
+from hvn.tiers import LOOSE, TIERS, tier
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "outputs" / "stage_07_races"
@@ -93,6 +94,20 @@ FORWARD_DAYS = 1
 # a level is actually interacted with on.
 ATR_MINUTES = 1
 ATR_PERIOD = 14
+
+# Control arm. A barrier is a level *and* a place price stalled, and the tap
+# rule selects on the stall: three consecutive bars sitting inside a narrow
+# band. Stalling is mildly mean-reverting on its own, so a small tilt toward
+# reversal can appear at a level that carries no information at all. The
+# control is the same band, the same width, the same distance from price, the
+# same tap rule -- placed where no level is. Whatever it shows is what the
+# procedure produces without a level, and only the difference belongs to levels.
+CONTROL_CLEARANCE_ATR = Decimal("1.0")
+# Offsets tried in order, in ATR, until one clears every level. Small first, so
+# the control stays as close to the real barrier's distance as it can.
+CONTROL_OFFSETS_ATR = tuple(
+    Decimal(str(x / 2)) for x in (3, -3, 4, -4, 5, -5, 6, -6, 8, -8, 10, -10)
+)
 
 
 def measure(forward, cluster, *, atr, direction, base) -> dict:
@@ -154,8 +169,40 @@ def measure(forward, cluster, *, atr, direction, base) -> dict:
     return row
 
 
+def control_cluster(cluster, price, direction, atr, levels):
+    """The same band, shifted to a price where no level lives.
+
+    Width, distance-side and tap treatment are preserved; only the location
+    changes. The shift is rejected unless the band clears every level in the
+    LOOSE set -- the widest one -- by `CONTROL_CLEARANCE_ATR`, so a control is
+    never accidentally sitting on a level that a stricter tier ignored.
+    """
+    width = cluster.high - cluster.low
+    clearance = CONTROL_CLEARANCE_ATR * atr
+    for offset in CONTROL_OFFSETS_ATR:
+        low = cluster.low + offset * atr
+        high = low + width
+        # A barrier above price must stay above it, and below must stay below,
+        # or the direction label would stop meaning what it says.
+        if direction == ABOVE and low <= price:
+            continue
+        if direction != ABOVE and high > price:
+            continue
+        if any(
+            low - clearance < level.high and level.low - clearance < high
+            for level in levels
+        ):
+            continue
+        return Cluster(
+            low=low, high=high, degree=0,
+            sources=("CONTROL",), kinds=("CONTROL",), members=(),
+        )
+    return None
+
+
 def run_session(
-    session: str, store: BucketStore, parquet, instrument_by_day
+    session: str, store: BucketStore, parquet, instrument_by_day,
+    *, control: bool = False,
 ) -> list[dict] | None:
     """Every anchor in one session, at every tier, against causal levels."""
     from run_stage06_reversal import minute_bars
@@ -207,6 +254,13 @@ def run_session(
             continue
         price = bars[index - 1].close
 
+        # The LOOSE set is the superset of every tier's levels, so it is what a
+        # control band has to clear.
+        loose_levels = (
+            build_level_set(store, session, anchor, atr=atr, spec=tier(LOOSE)).levels
+            if control
+            else ()
+        )
         for name in TIERS:
             spec = tier(name)
             level_set = build_level_set(store, session, anchor, atr=atr, spec=spec)
@@ -223,6 +277,12 @@ def run_session(
             for direction, cluster in nearest_barriers(clusters, price).items():
                 if cluster is None:
                     continue
+                if control:
+                    cluster = control_cluster(
+                        cluster, price, direction, atr, loose_levels
+                    )
+                    if cluster is None:
+                        continue
                 rows.append(
                     measure(
                         forward, cluster, atr=atr, direction=direction,
@@ -232,6 +292,7 @@ def run_session(
                             "anchor_time": anchor.isoformat(),
                             "anchor_time_dt": anchor,
                             "tier": name,
+                            "arm": "CONTROL" if control else "TREATED",
                             "levels_available": len(level_set.levels),
                             "atr": str(atr),
                             "tolerance_atr": str(TOLERANCE_ATR),
@@ -261,8 +322,14 @@ def main(argv=None) -> None:
     parser.add_argument("--limit", type=int, default=0, help="sessions this run")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--buckets", type=Path, default=BUCKETS)
+    parser.add_argument(
+        "--control", action="store_true",
+        help="place each barrier where no level is, keeping width and side",
+    )
     args = parser.parse_args(argv)
 
+    if args.control and args.out == DEFAULT_OUT:
+        args.out = ROOT / "outputs" / "stage_07_control"
     args.out.mkdir(parents=True, exist_ok=True)
     store = BucketStore(args.buckets)
     parquet, instrument_by_day = open_source()
@@ -279,7 +346,9 @@ def main(argv=None) -> None:
 
     done = 0
     for session in todo:
-        rows = run_session(session, store, parquet, instrument_by_day)
+        rows = run_session(
+            session, store, parquet, instrument_by_day, control=args.control
+        )
         if rows is None:
             print(f"{session}: skipped, needs {ROLLING_SESSIONS} sessions of history",
                   flush=True)
